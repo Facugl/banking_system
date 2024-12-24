@@ -6,4 +6,8 @@ public class AccountNotFoundException extends RuntimeException {
         super("Account with ID '" + accountId + "' was not found.");
     }
 
+    public AccountNotFoundException(String accountNumber) {
+        super("Account with account number '" + accountNumber + "' was not found.");
+    }
+
 }

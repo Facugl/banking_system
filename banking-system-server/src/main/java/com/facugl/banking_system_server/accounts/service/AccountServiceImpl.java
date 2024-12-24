@@ -115,6 +115,26 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    @Transactional
+    public void transfer(String accountFromNumber, String accountToNumber, BigDecimal amount) {
+        Account accountFrom = accountRepository.findByAccountNumber(accountFromNumber)
+                .orElseThrow(() -> new AccountNotFoundException(accountFromNumber));
+
+        Account accountTo = accountRepository.findByAccountNumber(accountToNumber)
+                .orElseThrow(() -> new AccountNotFoundException(accountToNumber));
+
+        if (accountFrom.getBalance().compareTo(amount) < 0) {
+            throw new InsufficientBalanceException(accountFrom.getAccountNumber(), accountFrom.getBalance(), amount);
+        }
+
+        accountFrom.setBalance(accountFrom.getBalance().subtract(amount));
+        accountTo.setBalance(accountTo.getBalance().add(amount));
+
+        accountRepository.save(accountFrom);
+        accountRepository.save(accountTo);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public BigDecimal getAccountBalance(Long accountId) {
         Account account = accountRepository.findById(accountId)

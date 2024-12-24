@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.facugl.banking_system_server.accounts.dto.request.AccountCreateRequest;
 import com.facugl.banking_system_server.accounts.dto.request.AccountUpdateRequest;
 import com.facugl.banking_system_server.accounts.dto.request.AmountRequest;
+import com.facugl.banking_system_server.accounts.dto.request.TransferRequest;
 import com.facugl.banking_system_server.accounts.dto.response.AccountResponse;
 import com.facugl.banking_system_server.accounts.service.AccountServiceImpl;
 
@@ -87,6 +88,16 @@ public class AccountController {
         BigDecimal newBalance = accountService.withdraw(accountId, amount.getAmount());
 
         return ResponseEntity.status(HttpStatus.OK).body(newBalance);
+    }
+
+    @PostMapping("/transfer")
+    public ResponseEntity<Void> transfer(@Valid @RequestBody TransferRequest transfer) {
+        accountService.transfer(
+                transfer.getSourceAccountNumber(),
+                transfer.getTargetAccountNumber(),
+                transfer.getAmount());
+
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/{account-id}/balance")

@@ -23,6 +23,8 @@ public interface AccountService {
 
     BigDecimal withdraw(Long accountId, BigDecimal amount);
 
+    void transfer(String accountFromNumber, String accountToNumber, BigDecimal amount);
+
     BigDecimal getAccountBalance(Long accountId);
 
 }
