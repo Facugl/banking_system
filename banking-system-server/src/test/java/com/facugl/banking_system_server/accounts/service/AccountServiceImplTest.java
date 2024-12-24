@@ -376,6 +376,106 @@ public class AccountServiceImplTest {
 	}
 
 	@Test
+	void transfer_shouldTransferAmount_whenAccountsExistAndBalanceIsSufficient() {
+		String accountFromNumber = "1234567890";
+		String accountToNumber = "0987654321";
+		BigDecimal amount = BigDecimal.valueOf(500);
+
+		Account accountFrom = Account.builder()
+				.id(1L)
+				.accountNumber(accountFromNumber)
+				.balance(BigDecimal.valueOf(1000))
+				.build();
+
+		Account accountTo = Account.builder()
+				.id(2L)
+				.accountNumber(accountToNumber)
+				.balance(BigDecimal.valueOf(500))
+				.build();
+
+		when(accountRepository.findByAccountNumber(accountFromNumber)).thenReturn(Optional.of(accountFrom));
+		when(accountRepository.findByAccountNumber(accountToNumber)).thenReturn(Optional.of(accountTo));
+
+		accountService.transfer(accountFromNumber, accountToNumber, amount);
+
+		assertEquals(BigDecimal.valueOf(500), accountFrom.getBalance());
+		assertEquals(BigDecimal.valueOf(1000), accountTo.getBalance());
+
+		verify(accountRepository).save(accountFrom);
+		verify(accountRepository).save(accountTo);
+	}
+
+	@Test
+	void transfer_shouldThrowException_whenAccountFromDoesNotExist() {
+		String accountFromNumber = "1234567890";
+		String accountToNumber = "0987654321";
+		BigDecimal amount = BigDecimal.valueOf(500);
+
+		when(accountRepository.findByAccountNumber(accountFromNumber)).thenReturn(Optional.empty());
+
+		AccountNotFoundException exception = assertThrows(AccountNotFoundException.class,
+				() -> accountService.transfer(accountFromNumber, accountToNumber, amount));
+
+		assertEquals("Account with account number '" + accountFromNumber + "' was not found.", exception.getMessage());
+
+		verify(accountRepository, never()).save(any());
+	}
+
+	@Test
+	void transfer_shouldThrowException_whenAccountToDoesNotExist() {
+		String accountFromNumber = "1234567890";
+		String accountToNumber = "0987654321";
+		BigDecimal amount = BigDecimal.valueOf(500);
+
+		Account accountFrom = Account.builder()
+				.id(1L)
+				.accountNumber(accountFromNumber)
+				.balance(BigDecimal.valueOf(1000))
+				.build();
+
+		when(accountRepository.findByAccountNumber(accountFromNumber)).thenReturn(Optional.of(accountFrom));
+		when(accountRepository.findByAccountNumber(accountToNumber)).thenReturn(Optional.empty());
+
+		AccountNotFoundException exception = assertThrows(AccountNotFoundException.class,
+				() -> accountService.transfer(accountFromNumber, accountToNumber, amount));
+
+		assertEquals("Account with account number '" + accountToNumber + "' was not found.", exception.getMessage());
+
+		verify(accountRepository, never()).save(any());
+	}
+
+	@Test
+	void transfer_shouldThrowException_whenInsufficientBalance() {
+		String accountFromNumber = "1234567890";
+		String accountToNumber = "0987654321";
+		BigDecimal amount = BigDecimal.valueOf(1500);
+
+		Account accountFrom = Account.builder()
+				.id(1L)
+				.accountNumber(accountFromNumber)
+				.balance(BigDecimal.valueOf(1000))
+				.build();
+
+		Account accountTo = Account.builder()
+				.id(2L)
+				.accountNumber(accountToNumber)
+				.balance(BigDecimal.valueOf(500))
+				.build();
+
+		when(accountRepository.findByAccountNumber(accountFromNumber)).thenReturn(Optional.of(accountFrom));
+		when(accountRepository.findByAccountNumber(accountToNumber)).thenReturn(Optional.of(accountTo));
+
+		InsufficientBalanceException exception = assertThrows(InsufficientBalanceException.class,
+				() -> accountService.transfer(accountFromNumber, accountToNumber, amount));
+
+		assertEquals("Insufficient balance in account " + accountFromNumber +
+				". Current balance: " + accountFrom.getBalance() + ", attempted withdrawal: " + amount,
+				exception.getMessage());
+
+		verify(accountRepository, never()).save(any());
+	}
+
+	@Test
 	void getAccountBalance_returnsBalance_whenAccountExists() {
 		Long accountId = 1L;
 		BigDecimal balance = BigDecimal.valueOf(1000);
