@@ -1,6 +1,7 @@
 package com.facugl.banking_system_server.accounts.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,6 +17,9 @@ import com.facugl.banking_system_server.accounts.exception.AccountAlreadyExistsE
 import com.facugl.banking_system_server.accounts.exception.AccountNotFoundException;
 import com.facugl.banking_system_server.accounts.exception.InsufficientBalanceException;
 import com.facugl.banking_system_server.accounts.repository.AccountRepository;
+import com.facugl.banking_system_server.transactions.entity.Transaction;
+import com.facugl.banking_system_server.transactions.entity.TransactionType;
+import com.facugl.banking_system_server.transactions.repository.TransactionRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
+    private final TransactionRepository transactionRepository;
     private final AccountMapper accountMapper;
 
     @Override
@@ -96,6 +101,17 @@ public class AccountServiceImpl implements AccountService {
 
         account.setBalance(account.getBalance().add(amount));
         accountRepository.save(account);
+
+        Transaction transaction = Transaction.builder()
+                .accountFrom(null)
+                .accountTo(account)
+                .amount(amount)
+                .transactionDate(LocalDateTime.now())
+                .type(TransactionType.DEPOSIT)
+                .build();
+
+        transactionRepository.save(transaction);
+
         return account.getBalance();
     }
 
@@ -111,6 +127,17 @@ public class AccountServiceImpl implements AccountService {
 
         account.setBalance(account.getBalance().subtract(amount));
         accountRepository.save(account);
+
+        Transaction transaction = Transaction.builder()
+                .accountFrom(account)
+                .accountTo(null)
+                .amount(amount)
+                .transactionDate(LocalDateTime.now())
+                .type(TransactionType.WITHDRAW)
+                .build();
+
+        transactionRepository.save(transaction);
+
         return account.getBalance();
     }
 
@@ -132,6 +159,16 @@ public class AccountServiceImpl implements AccountService {
 
         accountRepository.save(accountFrom);
         accountRepository.save(accountTo);
+
+        Transaction transaction = Transaction.builder()
+                .accountFrom(accountFrom)
+                .accountTo(accountTo)
+                .amount(amount)
+                .transactionDate(LocalDateTime.now())
+                .type(TransactionType.TRANSFER)
+                .build();
+
+        transactionRepository.save(transaction);
     }
 
     @Override
