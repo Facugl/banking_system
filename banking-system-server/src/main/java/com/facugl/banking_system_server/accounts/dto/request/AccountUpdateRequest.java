@@ -2,18 +2,19 @@ package com.facugl.banking_system_server.accounts.dto.request;
 
 import java.math.BigDecimal;
 
-import com.facugl.banking_system_server.accounts.entity.AccountType;
+import com.facugl.banking_system_server.accounts.persistence.entity.AccountStatus;
+import com.facugl.banking_system_server.accounts.persistence.entity.AccountType;
+import com.facugl.banking_system_server.common.validation.EnumValidator;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -21,13 +22,13 @@ import lombok.Setter;
 @Builder
 public class AccountUpdateRequest {
 
-    @Size(min = 10, max = 20, message = "The account number must be between 10 and 20 characters")
-    private String accountNumber;
+    @EnumValidator(enumClass = AccountType.class, message = "Invalid account type. Allowed values are: CHECKING, SAVINGS.")
+    private String type;
 
-    @Enumerated(EnumType.STRING)
-    private AccountType type;
-
-    @Min(value = 0, message = "The balance must be greater than or equal to 0")
+    @Min(value = 0, message = "The balance must be greater than or equal to 0.")
     private BigDecimal balance;
+
+    @EnumValidator(enumClass = AccountStatus.class, message = "Invalid status. Allowed values are: ACTIVE, INACTIVE, BLOCKED, CLOSED.")
+    private String status;
 
 }

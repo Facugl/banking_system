@@ -2,7 +2,8 @@ package com.facugl.banking_system_server.accounts.dto.response;
 
 import java.math.BigDecimal;
 
-import com.facugl.banking_system_server.accounts.entity.AccountType;
+import com.facugl.banking_system_server.accounts.persistence.entity.AccountStatus;
+import com.facugl.banking_system_server.accounts.persistence.entity.AccountType;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,5 +25,9 @@ public class AccountResponse {
     private AccountType type;
 
     private BigDecimal balance;
+
+    private AccountStatus status;
+
+    private String owner;
 
 }

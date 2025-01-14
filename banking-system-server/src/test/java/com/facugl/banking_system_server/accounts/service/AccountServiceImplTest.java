@@ -10,73 +10,118 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.access.AccessDeniedException;
 
 import com.facugl.banking_system_server.accounts.dto.AccountMapper;
 import com.facugl.banking_system_server.accounts.dto.request.AccountCreateRequest;
+import com.facugl.banking_system_server.accounts.dto.request.AccountOperationRequest;
 import com.facugl.banking_system_server.accounts.dto.request.AccountUpdateRequest;
+import com.facugl.banking_system_server.accounts.dto.request.TransferRequest;
 import com.facugl.banking_system_server.accounts.dto.response.AccountResponse;
-import com.facugl.banking_system_server.accounts.entity.Account;
-import com.facugl.banking_system_server.accounts.entity.AccountType;
-import com.facugl.banking_system_server.accounts.exception.AccountAlreadyExistsException;
 import com.facugl.banking_system_server.accounts.exception.AccountNotFoundException;
 import com.facugl.banking_system_server.accounts.exception.InsufficientBalanceException;
-import com.facugl.banking_system_server.accounts.repository.AccountRepository;
+import com.facugl.banking_system_server.accounts.persistence.entity.Account;
+import com.facugl.banking_system_server.accounts.persistence.entity.AccountStatus;
+import com.facugl.banking_system_server.accounts.persistence.entity.AccountType;
+import com.facugl.banking_system_server.accounts.persistence.repository.AccountRepository;
+import com.facugl.banking_system_server.auth.service.impl.AuthenticationServiceImpl;
+import com.facugl.banking_system_server.common.utils.IdentifierGenerator;
+import com.facugl.banking_system_server.roles.persistence.entity.Role;
+import com.facugl.banking_system_server.transactions.dto.response.TransactionResponse;
+import com.facugl.banking_system_server.transactions.persistence.entity.Transaction;
+import com.facugl.banking_system_server.transactions.persistence.entity.TransactionType;
+import com.facugl.banking_system_server.transactions.persistence.repository.TransactionRepository;
+import com.facugl.banking_system_server.transactions.service.TransactionServiceImpl;
+import com.facugl.banking_system_server.users.persistence.entity.User;
 
+@ExtendWith(MockitoExtension.class)
 public class AccountServiceImplTest {
+
+	private User user;
+	private Account account;
+	private static final String TEST_ACCOUNT_NUMBER = "76591142607308616612";
+	private static final String TEST_TRANSACTION_NUMBER = "9133817914";
+	private static final BigDecimal INITIAL_BALANCE = BigDecimal.valueOf(1000);
 
 	@Mock
 	private AccountRepository accountRepository;
 
 	@Mock
+	private TransactionRepository transactionRepository;
+
+	@Mock
+	private TransactionServiceImpl transactionService;
+
+	@Mock
+	private AuthenticationServiceImpl authenticationService;
+
+	@Mock
 	private AccountMapper accountMapper;
+
+	@Mock
+	private IdentifierGenerator identifierGenerator;
 
 	@InjectMocks
 	private AccountServiceImpl accountService;
 
 	@BeforeEach
 	void setUp() {
-		MockitoAnnotations.openMocks(this);
+		Role role = Role.builder()
+				.name("CUSTOMER")
+				.build();
+
+		user = User.builder()
+				.id(1L)
+				.username("testuser")
+				.name("Test User")
+				.role(role)
+				.build();
+
+		account = Account.builder()
+				.id(1L)
+				.accountNumber(TEST_ACCOUNT_NUMBER)
+				.type(AccountType.CHECKING.name())
+				.balance(INITIAL_BALANCE)
+				.status(AccountStatus.ACTIVE.name())
+				.owner(user)
+				.build();
 	}
 
 	@Test
-	void createAccount_shouldSaveAccount_whenAccountNumberIsNew() {
-		String accountNumber = "1234567890";
-
+	void createAccount_ShouldReturnAccountResponse() {
 		AccountCreateRequest request = AccountCreateRequest.builder()
-				.accountNumber(accountNumber)
-				.type(AccountType.CHECKING)
-				.balance(BigDecimal.valueOf(100.00))
-				.build();
-
-		Account account = Account.builder()
-				.accountNumber(accountNumber)
-				.type(AccountType.CHECKING)
-				.balance(BigDecimal.valueOf(100.00))
+				.type(AccountType.CHECKING.name())
+				.balance(INITIAL_BALANCE)
 				.build();
 
 		Account savedAccount = Account.builder()
 				.id(1L)
-				.accountNumber(accountNumber)
-				.type(AccountType.CHECKING)
-				.balance(BigDecimal.valueOf(100.00))
+				.accountNumber(TEST_ACCOUNT_NUMBER)
+				.type(AccountType.CHECKING.name())
+				.balance(INITIAL_BALANCE)
+				.status(AccountStatus.ACTIVE.name())
+				.owner(user)
 				.build();
 
 		AccountResponse expectedResponse = AccountResponse.builder()
 				.id(1L)
-				.accountNumber(accountNumber)
+				.accountNumber(TEST_ACCOUNT_NUMBER)
 				.type(AccountType.CHECKING)
-				.balance(BigDecimal.valueOf(100.00))
+				.balance(INITIAL_BALANCE)
+				.status(AccountStatus.ACTIVE)
+				.owner(user.getUsername())
 				.build();
 
-		when(accountRepository.existsByAccountNumber(accountNumber)).thenReturn(false);
 		when(accountMapper.toEntity(request)).thenReturn(account);
 		when(accountRepository.save(account)).thenReturn(savedAccount);
 		when(accountMapper.toResponse(savedAccount)).thenReturn(expectedResponse);
@@ -84,392 +129,389 @@ public class AccountServiceImplTest {
 		AccountResponse response = accountService.createAccount(request);
 
 		assertNotNull(response);
-		assertEquals("1234567890", response.getAccountNumber());
-		assertEquals(AccountType.CHECKING, response.getType());
-		assertEquals(BigDecimal.valueOf(100.00), response.getBalance());
+		assertEquals(TEST_ACCOUNT_NUMBER, response.getAccountNumber());
 
 		verify(accountRepository).save(account);
 	}
 
 	@Test
-	void createAccount_shouldThrowException_whenAccountNumberExists() {
-		String accountNumber = "1234567890";
+	void getAccountByAccountNumber_ShouldReturnAccountResponse() {
+		when(accountRepository.findByAccountNumber(TEST_ACCOUNT_NUMBER)).thenReturn(Optional.of(account));
+		when(authenticationService.findLoggedInUser()).thenReturn(user);
+		when(accountMapper.toResponse(account)).thenReturn(new AccountResponse());
 
-		AccountCreateRequest request = AccountCreateRequest.builder()
-				.accountNumber("1234567890")
-				.type(AccountType.CHECKING)
-				.balance(BigDecimal.valueOf(100.00))
-				.build();
-
-		when(accountRepository.existsByAccountNumber(accountNumber)).thenReturn(true);
-
-		assertThrows(AccountAlreadyExistsException.class, () -> accountService.createAccount(request));
-
-		verify(accountRepository, never()).save(any());
-	}
-
-	@Test
-	void getAccountById_shouldReturnResponse_whenAccountExists() {
-		Long accountId = 1L;
-
-		Account account = Account.builder()
-				.id(accountId)
-				.accountNumber("1234567890")
-				.type(AccountType.CHECKING)
-				.balance(BigDecimal.valueOf(100.00))
-				.build();
-
-		AccountResponse expectedResponse = AccountResponse.builder()
-				.id(1L)
-				.accountNumber("1234567890")
-				.type(AccountType.CHECKING)
-				.balance(BigDecimal.valueOf(100.00))
-				.build();
-
-		when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
-		when(accountMapper.toResponse(account)).thenReturn(expectedResponse);
-
-		AccountResponse response = accountService.getAccountById(accountId);
+		AccountResponse response = accountService.getAccountByAccountNumber(TEST_ACCOUNT_NUMBER);
 
 		assertNotNull(response);
-		assertEquals("1234567890", response.getAccountNumber());
-
-		verify(accountRepository).findById(accountId);
+		verify(accountRepository).findByAccountNumber(TEST_ACCOUNT_NUMBER);
 	}
 
 	@Test
-	void getAccountById_shouldThrowException_whenAccountDoesNotExist() {
-		Long nonExistentAccountId = 99L;
+	void getAccountByAccountNumber_ShouldThrowAccountNotFoundException() {
+		when(accountRepository.findByAccountNumber("invalid123")).thenReturn(Optional.empty());
 
-		when(accountRepository.findById(nonExistentAccountId)).thenReturn(Optional.empty());
+		assertThrows(AccountNotFoundException.class,
+				() -> accountService.getAccountByAccountNumber("invalid123"));
 
-		assertThrows(AccountNotFoundException.class, () -> accountService.getAccountById(nonExistentAccountId));
-
-		verify(accountRepository).findById(nonExistentAccountId);
+		verify(accountRepository).findByAccountNumber("invalid123");
 	}
 
 	@Test
-	void getAllAccounts_shouldReturnMappedResponses_whenAccountsExist() {
-		Account account = Account.builder()
+	void getAccountsForCurrentUser_ShouldReturnListOfAccounts() {
+		AccountResponse accountResponse = AccountResponse.builder()
 				.id(1L)
-				.accountNumber("1234567890")
-				.type(AccountType.CHECKING)
-				.balance(BigDecimal.valueOf(100.00))
+				.accountNumber(TEST_ACCOUNT_NUMBER)
+				.type(AccountType.SAVINGS)
+				.balance(BigDecimal.valueOf(2000))
 				.build();
 
-		AccountResponse expectedResponse = AccountResponse.builder()
-				.id(1L)
-				.accountNumber("1234567890")
-				.type(AccountType.CHECKING)
-				.balance(BigDecimal.valueOf(100.00))
+		when(authenticationService.findLoggedInUser()).thenReturn(user);
+		when(accountRepository.findByOwner(user)).thenReturn(List.of(account));
+		when(accountMapper.toResponse(account)).thenReturn(accountResponse);
+
+		List<AccountResponse> accounts = accountService.getAccountsForCurrentUser();
+
+		assertEquals(1, accounts.size());
+		assertEquals(TEST_ACCOUNT_NUMBER, accounts.get(0).getAccountNumber(), "Account number mismatch");
+		verify(accountRepository).findByOwner(user);
+	}
+
+	@Test
+	void getAccountsForCurrentUser_AdminUser_ShouldReturnAllAccounts() {
+		Role role = Role.builder()
+				.name("ADMINISTRATOR")
 				.build();
 
+		User adminUser = User.builder()
+				.id(2L)
+				.username("admin")
+				.role(role)
+				.build();
+
+		when(authenticationService.findLoggedInUser()).thenReturn(adminUser);
 		when(accountRepository.findAll()).thenReturn(List.of(account));
-		when(accountMapper.toResponse(account)).thenReturn(expectedResponse);
+		when(accountMapper.toResponse(account)).thenReturn(new AccountResponse());
 
-		List<AccountResponse> responses = accountService.getAllAccounts();
+		List<AccountResponse> accounts = accountService.getAccountsForCurrentUser();
 
-		assertNotNull(responses);
-		assertEquals(1, responses.size());
-		assertEquals("1234567890", responses.get(0).getAccountNumber());
-
+		assertEquals(1, accounts.size());
 		verify(accountRepository).findAll();
 	}
 
 	@Test
 	void updateAccount_shouldUpdateAccount_whenAccountExists() {
-		Long accountId = 1L;
-
 		AccountUpdateRequest request = AccountUpdateRequest.builder()
-				.accountNumber("1234567890")
-				.type(AccountType.SAVINGS)
+				.type(AccountType.SAVINGS.name())
 				.balance(BigDecimal.valueOf(2000))
-				.build();
-
-		Account existingAccount = Account.builder()
-				.id(accountId)
-				.accountNumber("0987654321")
-				.type(AccountType.CHECKING)
-				.balance(BigDecimal.valueOf(1000))
 				.build();
 
 		Account updatedAccount = Account.builder()
-				.id(accountId)
-				.accountNumber("1234567890")
+				.id(1L)
+				.accountNumber(TEST_ACCOUNT_NUMBER)
+				.type(AccountType.SAVINGS.name())
+				.balance(BigDecimal.valueOf(2000.00))
+				.build();
+
+		AccountResponse accountResponse = AccountResponse.builder()
+				.id(1L)
+				.accountNumber(TEST_ACCOUNT_NUMBER)
 				.type(AccountType.SAVINGS)
 				.balance(BigDecimal.valueOf(2000))
 				.build();
 
-		AccountResponse response = AccountResponse.builder()
-				.id(accountId)
-				.accountNumber("1234567890")
-				.type(AccountType.SAVINGS)
-				.balance(BigDecimal.valueOf(2000))
-				.build();
+		when(accountRepository.findByAccountNumber(TEST_ACCOUNT_NUMBER)).thenReturn(Optional.of(account));
+		when(accountRepository.save(account)).thenReturn(updatedAccount);
+		when(accountMapper.toResponse(updatedAccount)).thenReturn(accountResponse);
 
-		when(accountRepository.findById(accountId)).thenReturn(Optional.of(existingAccount));
-		when(accountRepository.save(existingAccount)).thenReturn(updatedAccount);
-		when(accountMapper.toResponse(updatedAccount)).thenReturn(response);
+		AccountResponse response = accountService.updateAccount(TEST_ACCOUNT_NUMBER, request);
 
-		AccountResponse result = accountService.updateAccount(accountId, request);
+		assertNotNull(response);
+		assertEquals(TEST_ACCOUNT_NUMBER, response.getAccountNumber());
+		assertEquals(BigDecimal.valueOf(2000), response.getBalance());
+		assertEquals(AccountType.SAVINGS, response.getType());
 
-		assertNotNull(result);
-		assertEquals("1234567890", result.getAccountNumber());
-		assertEquals(BigDecimal.valueOf(2000), result.getBalance());
-		assertEquals(AccountType.SAVINGS, result.getType());
-
-		verify(accountRepository).findById(accountId);
-		verify(accountRepository).save(existingAccount);
+		verify(accountRepository).findByAccountNumber(TEST_ACCOUNT_NUMBER);
+		verify(accountRepository).save(account);
 		verify(accountMapper).toResponse(updatedAccount);
-
 	}
 
 	@Test
 	void updateAccount_shouldThrowException_whenAccountDoesNotExist() {
-		Long accountId = 1L;
-
 		AccountUpdateRequest request = AccountUpdateRequest.builder()
-				.accountNumber("1234567890")
-				.type(AccountType.SAVINGS)
+				.type(AccountType.SAVINGS.name())
 				.balance(BigDecimal.valueOf(2000))
 				.build();
 
-		when(accountRepository.findById(accountId)).thenReturn(Optional.empty());
+		when(accountRepository.findByAccountNumber("invalid123")).thenReturn(Optional.empty());
 
 		AccountNotFoundException exception = assertThrows(
 				AccountNotFoundException.class,
-				() -> accountService.updateAccount(accountId, request));
+				() -> accountService.updateAccount("invalid123", request));
 
-		assertEquals("Account with ID '" + accountId + "' was not found.", exception.getMessage());
+		assertEquals("Account with account number 'invalid123' was not found.",
+				exception.getMessage());
 
-		verify(accountRepository).findById(accountId);
+		verify(accountRepository).findByAccountNumber("invalid123");
 		verifyNoMoreInteractions(accountRepository, accountMapper);
 	}
 
 	@Test
 	void deleteAccount_shouldDeleteAccount_whenAccountExists() {
-		Long accountId = 1L;
-		when(accountRepository.existsById(accountId)).thenReturn(true);
+		when(accountRepository.findByAccountNumber(TEST_ACCOUNT_NUMBER)).thenReturn(Optional.of(account));
 
-		accountService.deleteAccount(accountId);
+		accountService.deleteAccount(TEST_ACCOUNT_NUMBER);
 
-		verify(accountRepository).deleteById(accountId);
+		verify(accountRepository).delete(account);
 	}
 
 	@Test
 	void deleteAccount_throwsException_whenAccountDoesNotExist() {
-		Long nonExistentAccountId = 99L;
-		when(accountRepository.existsById(nonExistentAccountId)).thenReturn(false);
+		when(accountRepository.findByAccountNumber("invalid123")).thenReturn(Optional.empty());
 
-		assertThrows(
-				AccountNotFoundException.class,
-				() -> accountService.deleteAccount(nonExistentAccountId));
+		AccountNotFoundException exception = assertThrows(AccountNotFoundException.class,
+				() -> accountService.deleteAccount("invalid123"));
 
-		verify(accountRepository, never()).deleteById(nonExistentAccountId);
+		assertEquals("Account with account number 'invalid123' was not found.",
+				exception.getMessage());
 	}
 
 	@Test
 	void deposit_increasesBalance_whenAccountExists() {
-		Long accountId = 1L;
-		BigDecimal depositAmount = BigDecimal.valueOf(500);
-
-		Account account = Account.builder()
-				.id(accountId)
-				.accountNumber("1234567890")
-				.type(AccountType.CHECKING)
-				.balance(BigDecimal.valueOf(1000))
+		AccountOperationRequest request = AccountOperationRequest.builder()
+				.amount(BigDecimal.valueOf(2000))
+				.comment("Test deposit.")
 				.build();
 
-		when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
-		when(accountRepository.save(account)).thenReturn(account);
+		TransactionResponse transactionResponse = TransactionResponse.builder()
+				.transactionNumber(TEST_TRANSACTION_NUMBER)
+				.sourceAccount(null)
+				.targetAccount(TEST_ACCOUNT_NUMBER)
+				.amount(request.getAmount())
+				.transactionDate(LocalDateTime.now())
+				.type(TransactionType.DEPOSIT)
+				.comment(request.getComment())
+				.build();
 
-		BigDecimal newBalance = accountService.deposit(accountId, depositAmount);
+		when(accountRepository.findByAccountNumber(TEST_ACCOUNT_NUMBER)).thenReturn(Optional.of(account));
+		when(authenticationService.findLoggedInUser()).thenReturn(user);
+		when(identifierGenerator.generateUniqueIdentifier(any())).thenReturn(TEST_TRANSACTION_NUMBER);
+		when(transactionService.createTransaction(any(Transaction.class))).thenReturn(transactionResponse);
 
-		assertNotNull(newBalance);
-		assertEquals(BigDecimal.valueOf(1500), newBalance);
+		TransactionResponse response = accountService.deposit(TEST_ACCOUNT_NUMBER, request);
 
-		verify(accountRepository).findById(accountId);
-		verify(accountRepository).save(account);
+		assertNotNull(response);
+		assertEquals(BigDecimal.valueOf(3000), account.getBalance());
+		verify(transactionService).createTransaction(any(Transaction.class));
 	}
 
 	@Test
 	void deposit_throwsException_whenAccountNotFound() {
-		Long nonExistentAccountId = 99L;
-		BigDecimal depositAmount = BigDecimal.valueOf(500);
+		AccountOperationRequest request = AccountOperationRequest.builder()
+				.amount(BigDecimal.valueOf(1000))
+				.comment("Test deposit.")
+				.build();
 
-		when(accountRepository.findById(nonExistentAccountId)).thenReturn(Optional.empty());
+		when(accountRepository.findByAccountNumber("invalid123")).thenReturn(Optional.empty());
 
-		AccountNotFoundException exception = assertThrows(
-				AccountNotFoundException.class,
-				() -> accountService.deposit(nonExistentAccountId, depositAmount));
+		AccountNotFoundException exception = assertThrows(AccountNotFoundException.class,
+				() -> accountService.deposit("invalid123", request));
 
-		assertEquals("Account with ID '" + nonExistentAccountId + "' was not found.", exception.getMessage());
+		assertEquals("Account with account number 'invalid123' was not found.",
+				exception.getMessage());
 
-		verify(accountRepository).findById(nonExistentAccountId);
+		verify(accountRepository).findByAccountNumber("invalid123");
 		verifyNoMoreInteractions(accountRepository);
 	}
 
 	@Test
 	void withdraw_decreasesBalance_whenSufficientBalance() {
-		Long accountId = 1L;
-		BigDecimal withdrawAmount = BigDecimal.valueOf(500);
-
-		Account account = Account.builder()
-				.id(accountId)
-				.accountNumber("1234567890")
-				.type(AccountType.CHECKING)
-				.balance(BigDecimal.valueOf(1000))
+		AccountOperationRequest request = AccountOperationRequest.builder()
+				.amount(BigDecimal.valueOf(600))
+				.comment("Test withdrawal.")
 				.build();
 
-		when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
-		when(accountRepository.save(account)).thenReturn(account);
+		Account savedAccount = Account.builder()
+				.id(1L)
+				.accountNumber(TEST_ACCOUNT_NUMBER)
+				.type(AccountType.CHECKING.name())
+				.balance(BigDecimal.valueOf(400))
+				.build();
 
-		BigDecimal newBalance = accountService.withdraw(accountId, withdrawAmount);
+		TransactionResponse transactionResponse = TransactionResponse.builder()
+				.transactionNumber(TEST_TRANSACTION_NUMBER)
+				.sourceAccount(TEST_ACCOUNT_NUMBER)
+				.targetAccount(null)
+				.amount(request.getAmount())
+				.transactionDate(LocalDateTime.now())
+				.type(TransactionType.WITHDRAW)
+				.comment(request.getComment())
+				.build();
 
-		assertNotNull(newBalance);
-		assertEquals(BigDecimal.valueOf(500), newBalance);
+		when(accountRepository.findByAccountNumber(TEST_ACCOUNT_NUMBER)).thenReturn(Optional.of(account));
+		when(authenticationService.findLoggedInUser()).thenReturn(user);
+		when(accountRepository.save(account)).thenReturn(savedAccount);
+		when(identifierGenerator.generateUniqueIdentifier(any())).thenReturn(TEST_TRANSACTION_NUMBER);
+		when(transactionService.createTransaction(any(Transaction.class))).thenReturn(transactionResponse);
 
-		verify(accountRepository).findById(accountId);
+		TransactionResponse response = accountService.withdraw(TEST_ACCOUNT_NUMBER, request);
+
+		assertNotNull(response);
+		assertEquals(BigDecimal.valueOf(400), savedAccount.getBalance());
+
+		verify(accountRepository).findByAccountNumber(TEST_ACCOUNT_NUMBER);
 		verify(accountRepository).save(account);
 	}
 
 	@Test
 	void withdraw_throwsException_whenInsufficientBalance() {
-		Long accountId = 1L;
-		BigDecimal withdrawAmount = BigDecimal.valueOf(1500);
-
-		Account account = Account.builder()
-				.id(accountId)
-				.accountNumber("1234567890")
-				.type(AccountType.CHECKING)
-				.balance(BigDecimal.valueOf(1000))
+		AccountOperationRequest request = AccountOperationRequest.builder()
+				.amount(BigDecimal.valueOf(10000))
+				.comment("Test withdrawal.")
 				.build();
 
-		when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
+		when(accountRepository.findByAccountNumber(TEST_ACCOUNT_NUMBER)).thenReturn(Optional.of(account));
+		when(authenticationService.findLoggedInUser()).thenReturn(user);
 
 		InsufficientBalanceException exception = assertThrows(InsufficientBalanceException.class,
-				() -> accountService.withdraw(accountId, withdrawAmount));
+				() -> accountService.withdraw(TEST_ACCOUNT_NUMBER, request));
 
-		assertEquals("Insufficient balance in account " + account.getAccountNumber() +
-				". Current balance: " + account.getBalance() + ", attempted withdrawal: " + withdrawAmount,
+		assertEquals(
+				"Insufficient balance in account " + TEST_ACCOUNT_NUMBER +
+						". Current balance: " + account.getBalance() +
+						", attempted withdrawal: " + request.getAmount(),
 				exception.getMessage());
 
-		verify(accountRepository).findById(accountId);
+		verify(accountRepository).findByAccountNumber(TEST_ACCOUNT_NUMBER);
 		verifyNoMoreInteractions(accountRepository);
 	}
 
 	@Test
 	void withdraw_throwsException_whenAccountNotFound() {
-		Long accountId = 1L;
-		BigDecimal withdrawAmount = BigDecimal.valueOf(500);
+		AccountOperationRequest request = AccountOperationRequest.builder()
+				.amount(BigDecimal.valueOf(10000))
+				.comment("Test withdrawal.")
+				.build();
 
-		when(accountRepository.findById(accountId)).thenReturn(Optional.empty());
+		when(accountRepository.findByAccountNumber("invalid123")).thenReturn(Optional.empty());
 
-		AccountNotFoundException exception = assertThrows(
-				AccountNotFoundException.class,
-				() -> accountService.withdraw(accountId, withdrawAmount));
+		AccountNotFoundException exception = assertThrows(AccountNotFoundException.class,
+				() -> accountService.withdraw("invalid123", request));
 
-		assertEquals("Account with ID '" + accountId + "' was not found.", exception.getMessage());
+		assertEquals("Account with account number 'invalid123' was not found.",
+				exception.getMessage());
 
-		verify(accountRepository).findById(accountId);
+		verify(accountRepository).findByAccountNumber("invalid123");
 		verifyNoMoreInteractions(accountRepository);
 	}
 
 	@Test
 	void transfer_shouldTransferAmount_whenAccountsExistAndBalanceIsSufficient() {
-		String accountFromNumber = "1234567890";
-		String accountToNumber = "0987654321";
-		BigDecimal amount = BigDecimal.valueOf(500);
+		String targetAccountNumber = "2017374309977551073";
 
-		Account accountFrom = Account.builder()
-				.id(1L)
-				.accountNumber(accountFromNumber)
-				.balance(BigDecimal.valueOf(1000))
+		TransferRequest request = TransferRequest.builder()
+				.targetAccountNumber(targetAccountNumber)
+				.amount(BigDecimal.valueOf(100))
+				.comment("Test transfer.")
 				.build();
 
-		Account accountTo = Account.builder()
+		Account targetAccount = Account.builder()
 				.id(2L)
-				.accountNumber(accountToNumber)
-				.balance(BigDecimal.valueOf(500))
+				.accountNumber(targetAccountNumber)
+				.balance(BigDecimal.valueOf(3000))
 				.build();
 
-		when(accountRepository.findByAccountNumber(accountFromNumber)).thenReturn(Optional.of(accountFrom));
-		when(accountRepository.findByAccountNumber(accountToNumber)).thenReturn(Optional.of(accountTo));
+		TransactionResponse transactionResponse = TransactionResponse.builder()
+				.transactionNumber(TEST_TRANSACTION_NUMBER)
+				.sourceAccount(TEST_ACCOUNT_NUMBER)
+				.targetAccount(targetAccountNumber)
+				.amount(request.getAmount())
+				.transactionDate(LocalDateTime.now())
+				.type(TransactionType.TRANSFER)
+				.comment(request.getComment())
+				.build();
 
-		accountService.transfer(accountFromNumber, accountToNumber, amount);
+		when(accountRepository.findByAccountNumber(TEST_ACCOUNT_NUMBER)).thenReturn(Optional.of(account));
+		when(accountRepository.findByAccountNumber(targetAccountNumber)).thenReturn(Optional.of(targetAccount));
+		when(authenticationService.findLoggedInUser()).thenReturn(user);
+		when(identifierGenerator.generateUniqueIdentifier(any())).thenReturn(TEST_TRANSACTION_NUMBER);
+		when(transactionService.createTransaction(any(Transaction.class))).thenReturn(transactionResponse);
 
-		assertEquals(BigDecimal.valueOf(500), accountFrom.getBalance());
-		assertEquals(BigDecimal.valueOf(1000), accountTo.getBalance());
+		TransactionResponse response = accountService.transfer(TEST_ACCOUNT_NUMBER, request);
 
-		verify(accountRepository).save(accountFrom);
-		verify(accountRepository).save(accountTo);
+		assertNotNull(response);
+		assertEquals(BigDecimal.valueOf(900), account.getBalance());
+		assertEquals(BigDecimal.valueOf(3100), targetAccount.getBalance());
+		assertEquals(TEST_TRANSACTION_NUMBER, transactionResponse.getTransactionNumber());
+
+		verify(accountRepository).save(account);
+		verify(accountRepository).save(targetAccount);
 	}
 
 	@Test
-	void transfer_shouldThrowException_whenAccountFromDoesNotExist() {
-		String accountFromNumber = "1234567890";
-		String accountToNumber = "0987654321";
-		BigDecimal amount = BigDecimal.valueOf(500);
+	void transfer_shouldThrowException_whenSourceAccountDoesNotExist() {
+		when(accountRepository.findByAccountNumber("invalid123")).thenReturn(Optional.empty());
 
-		when(accountRepository.findByAccountNumber(accountFromNumber)).thenReturn(Optional.empty());
+		TransferRequest request = TransferRequest.builder()
+				.targetAccountNumber(TEST_ACCOUNT_NUMBER)
+				.amount(BigDecimal.valueOf(1000))
+				.comment("Test transfer.")
+				.build();
 
 		AccountNotFoundException exception = assertThrows(AccountNotFoundException.class,
-				() -> accountService.transfer(accountFromNumber, accountToNumber, amount));
+				() -> accountService.transfer("invalid123", request));
 
-		assertEquals("Account with account number '" + accountFromNumber + "' was not found.", exception.getMessage());
+		assertEquals("Account with account number 'invalid123' was not found.",
+				exception.getMessage());
 
 		verify(accountRepository, never()).save(any());
 	}
 
 	@Test
-	void transfer_shouldThrowException_whenAccountToDoesNotExist() {
-		String accountFromNumber = "1234567890";
-		String accountToNumber = "0987654321";
-		BigDecimal amount = BigDecimal.valueOf(500);
-
-		Account accountFrom = Account.builder()
-				.id(1L)
-				.accountNumber(accountFromNumber)
-				.balance(BigDecimal.valueOf(1000))
+	void transfer_shouldThrowException_whenTargetAccountDoesNotExist() {
+		TransferRequest request = TransferRequest.builder()
+				.targetAccountNumber("invalid123")
+				.amount(BigDecimal.valueOf(1000))
+				.comment("Test transfer.")
 				.build();
 
-		when(accountRepository.findByAccountNumber(accountFromNumber)).thenReturn(Optional.of(accountFrom));
-		when(accountRepository.findByAccountNumber(accountToNumber)).thenReturn(Optional.empty());
+		when(accountRepository.findByAccountNumber("invalid123")).thenReturn(Optional.empty());
 
 		AccountNotFoundException exception = assertThrows(AccountNotFoundException.class,
-				() -> accountService.transfer(accountFromNumber, accountToNumber, amount));
+				() -> accountService.transfer("invalid123", request));
 
-		assertEquals("Account with account number '" + accountToNumber + "' was not found.", exception.getMessage());
+		assertEquals("Account with account number 'invalid123' was not found.",
+				exception.getMessage());
 
 		verify(accountRepository, never()).save(any());
 	}
 
 	@Test
 	void transfer_shouldThrowException_whenInsufficientBalance() {
-		String accountFromNumber = "1234567890";
-		String accountToNumber = "0987654321";
-		BigDecimal amount = BigDecimal.valueOf(1500);
+		String targetAccountNumber = "2017374309977551073";
 
-		Account accountFrom = Account.builder()
-				.id(1L)
-				.accountNumber(accountFromNumber)
+		TransferRequest request = TransferRequest.builder()
+				.targetAccountNumber(targetAccountNumber)
+				.amount(BigDecimal.valueOf(2000))
+				.comment("Test transfer.")
+				.build();
+
+		Account targetAccount = Account.builder()
+				.id(2L)
+				.accountNumber(targetAccountNumber)
 				.balance(BigDecimal.valueOf(1000))
 				.build();
 
-		Account accountTo = Account.builder()
-				.id(2L)
-				.accountNumber(accountToNumber)
-				.balance(BigDecimal.valueOf(500))
-				.build();
-
-		when(accountRepository.findByAccountNumber(accountFromNumber)).thenReturn(Optional.of(accountFrom));
-		when(accountRepository.findByAccountNumber(accountToNumber)).thenReturn(Optional.of(accountTo));
+		when(accountRepository.findByAccountNumber(TEST_ACCOUNT_NUMBER)).thenReturn(Optional.of(account));
+		when(accountRepository.findByAccountNumber(targetAccountNumber)).thenReturn(Optional.of(targetAccount));
+		when(authenticationService.findLoggedInUser()).thenReturn(user);
 
 		InsufficientBalanceException exception = assertThrows(InsufficientBalanceException.class,
-				() -> accountService.transfer(accountFromNumber, accountToNumber, amount));
+				() -> accountService.transfer(TEST_ACCOUNT_NUMBER, request));
 
-		assertEquals("Insufficient balance in account " + accountFromNumber +
-				". Current balance: " + accountFrom.getBalance() + ", attempted withdrawal: " + amount,
+		assertEquals(
+				"Insufficient balance in account " + TEST_ACCOUNT_NUMBER +
+						". Current balance: " + account.getBalance() +
+						", attempted withdrawal: " + request.getAmount(),
 				exception.getMessage());
 
 		verify(accountRepository, never()).save(any());
@@ -477,40 +519,63 @@ public class AccountServiceImplTest {
 
 	@Test
 	void getAccountBalance_returnsBalance_whenAccountExists() {
-		Long accountId = 1L;
-		BigDecimal balance = BigDecimal.valueOf(1000);
+		when(accountRepository.findByAccountNumber(TEST_ACCOUNT_NUMBER)).thenReturn(Optional.of(account));
+		when(authenticationService.findLoggedInUser()).thenReturn(user);
 
-		Account account = Account.builder()
-				.id(accountId)
-				.accountNumber("1234567890")
-				.type(AccountType.CHECKING)
-				.balance(balance)
-				.build();
+		BigDecimal balance = accountService.getAccountBalance(TEST_ACCOUNT_NUMBER);
 
-		when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
-
-		BigDecimal returnedBalance = accountService.getAccountBalance(accountId);
-
-		assertNotNull(returnedBalance);
-		assertEquals(balance, returnedBalance);
-
-		verify(accountRepository).findById(accountId);
+		assertEquals(BigDecimal.valueOf(1000), balance);
 	}
 
 	@Test
 	void getAccountBalance_throwsException_whenAccountNotFound() {
-		Long accountId = 1L;
-
-		when(accountRepository.findById(accountId)).thenReturn(Optional.empty());
+		when(accountRepository.findByAccountNumber(TEST_ACCOUNT_NUMBER)).thenReturn(Optional.empty());
 
 		AccountNotFoundException exception = assertThrows(
 				AccountNotFoundException.class,
-				() -> accountService.getAccountBalance(accountId));
+				() -> accountService.getAccountBalance(TEST_ACCOUNT_NUMBER));
 
-		assertEquals("Account with ID '" + accountId + "' was not found.", exception.getMessage());
+		assertEquals("Account with account number '" + TEST_ACCOUNT_NUMBER + "' was not found.",
+				exception.getMessage());
 
-		verify(accountRepository).findById(accountId);
+		verify(accountRepository).findByAccountNumber(TEST_ACCOUNT_NUMBER);
 		verifyNoMoreInteractions(accountRepository);
+	}
+
+	@Test
+	void getAccountBalance_throwsException_whenUnauthorizedAccess() {
+		User anotherCustomer = User.builder()
+				.id(2L)
+				.username("anothercustomer")
+				.role(Role.builder().name("CUSTOMER").build())
+				.build();
+
+		when(accountRepository.findByAccountNumber(TEST_ACCOUNT_NUMBER)).thenReturn(Optional.of(account));
+		when(authenticationService.findLoggedInUser()).thenReturn(anotherCustomer);
+
+		AccessDeniedException exception = assertThrows(AccessDeniedException.class,
+				() -> accountService.getAccountBalance(TEST_ACCOUNT_NUMBER));
+
+		assertEquals("You do not have permission to perform this operation.", exception.getMessage());
+
+		verify(accountRepository).findByAccountNumber(TEST_ACCOUNT_NUMBER);
+		verifyNoMoreInteractions(accountRepository);
+	}
+
+	@Test
+	void getAccountBalance_returnsBalance_whenAdminUser() {
+		User adminUser = User.builder()
+				.id(3L)
+				.username("adminuser")
+				.role(Role.builder().name("ADMINISTRATOR").build())
+				.build();
+
+		when(accountRepository.findByAccountNumber(TEST_ACCOUNT_NUMBER)).thenReturn(Optional.of(account));
+		when(authenticationService.findLoggedInUser()).thenReturn(adminUser);
+
+		BigDecimal balance = accountService.getAccountBalance(TEST_ACCOUNT_NUMBER);
+
+		assertEquals(BigDecimal.valueOf(1000), balance);
 	}
 
 }

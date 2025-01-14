@@ -1,265 +1,350 @@
 package com.facugl.banking_system_server.accounts.controller;
 
+import static org.hamcrest.Matchers.comparesEqualTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.facugl.banking_system_server.accounts.dto.request.AccountCreateRequest;
+import com.facugl.banking_system_server.accounts.dto.request.AccountOperationRequest;
+import com.facugl.banking_system_server.accounts.dto.request.AccountStatusRequest;
 import com.facugl.banking_system_server.accounts.dto.request.AccountUpdateRequest;
-import com.facugl.banking_system_server.accounts.dto.request.AmountRequest;
+import com.facugl.banking_system_server.accounts.dto.request.TransferRequest;
 import com.facugl.banking_system_server.accounts.dto.response.AccountResponse;
-import com.facugl.banking_system_server.accounts.entity.AccountType;
+import com.facugl.banking_system_server.accounts.exception.AccountNotFoundException;
+import com.facugl.banking_system_server.accounts.persistence.entity.AccountStatus;
+import com.facugl.banking_system_server.accounts.persistence.entity.AccountType;
 import com.facugl.banking_system_server.accounts.service.AccountServiceImpl;
+import com.facugl.banking_system_server.common.handler.GlobalExceptionHandler;
+import com.facugl.banking_system_server.roles.persistence.entity.Role;
+import com.facugl.banking_system_server.transactions.dto.response.TransactionResponse;
+import com.facugl.banking_system_server.transactions.persistence.entity.TransactionType;
+import com.facugl.banking_system_server.users.persistence.entity.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@WebMvcTest(AccountController.class)
+@ExtendWith(MockitoExtension.class)
 public class AccountContollerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+	@Autowired
+	private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+	@Autowired
+	private ObjectMapper objectMapper;
 
-    @MockitoBean
-    private AccountServiceImpl accountService;
+	@Mock
+	private AccountServiceImpl accountService;
 
-    @Test
-    void createAccount_shouldReturnCreatedAccount() throws Exception {
-        AccountCreateRequest request = AccountCreateRequest.builder()
-                .accountNumber("1234567890")
-                .type(AccountType.SAVINGS)
-                .balance(BigDecimal.valueOf(1000))
-                .build();
+	@InjectMocks
+	private AccountController accountController;
 
-        AccountResponse savedAccount = AccountResponse.builder()
-                .id(1L)
-                .accountNumber("1234567890")
-                .type(AccountType.SAVINGS)
-                .balance(BigDecimal.valueOf(1000))
-                .build();
+	private User user;
+	private AccountResponse accountResponse;
+	private TransactionResponse transactionResponse;
 
-        when(accountService.createAccount(any(AccountCreateRequest.class))).thenReturn(savedAccount);
+	private static final String BASE_URL = "/accounts";
+	private static final String TEST_ACCOUNT_NUMBER = "76591142607308616612";
+	private static final String TEST_TRANSACTION_NUMBER = "9133817914";
+	private static final BigDecimal INITIAL_BALANCE = BigDecimal.valueOf(1000);
 
-        mockMvc.perform(post("/api/v1/accounts")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.accountNumber").value("1234567890"))
-                .andExpect(jsonPath("$.type").value("SAVINGS"))
-                .andExpect(jsonPath("$.balance").value(1000));
+	@BeforeEach
+	void setUp() {
+		objectMapper = new ObjectMapper();
 
-        verify(accountService, times(1)).createAccount(any(AccountCreateRequest.class));
-    }
+		mockMvc = MockMvcBuilders.standaloneSetup(accountController)
+				.setControllerAdvice(new GlobalExceptionHandler())
+				.build();
 
-    @Test
-    void createAccount_withInvalidRequest_shouldReturnBadRequest() throws Exception {
-        AccountCreateRequest request = AccountCreateRequest.builder()
-                .accountNumber("")
-                .type(null)
-                .balance(null)
-                .build();
+		Role role = Role.builder()
+				.name("CUSTOMER")
+				.build();
 
-        mockMvc.perform(post("/api/v1/accounts")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.frontendMessage").value("Some fields are invalid. Please correct them."))
-                .andExpect(jsonPath("$.backendMessage").exists());
-    }
+		user = User.builder()
+				.id(1L)
+				.username("sakura")
+				.name("Test User")
+				.role(role)
+				.build();
 
-    @Test
-    void getAccountById_shouldReturnAccount() throws Exception {
-        AccountResponse response = AccountResponse.builder()
-                .id(1L)
-                .accountNumber("1234567890")
-                .type(AccountType.SAVINGS)
-                .balance(BigDecimal.valueOf(1000))
-                .build();
+		accountResponse = AccountResponse.builder()
+				.id(1L)
+				.accountNumber(TEST_ACCOUNT_NUMBER)
+				.type(AccountType.CHECKING)
+				.balance(INITIAL_BALANCE)
+				.status(AccountStatus.ACTIVE)
+				.owner(user.getUsername())
+				.build();
+	}
 
-        when(accountService.getAccountById(1L)).thenReturn(response);
+	@DisplayName("Create account - Success")
+	@Test
+	void createAccount_shouldReturnCreatedAccount() throws Exception {
+		AccountCreateRequest request = AccountCreateRequest.builder()
+				.type(AccountType.CHECKING.name())
+				.balance(BigDecimal.valueOf(1000))
+				.build();
 
-        mockMvc.perform(get("/api/v1/accounts/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.accountNumber").value("1234567890"))
-                .andExpect(jsonPath("$.type").value("SAVINGS"))
-                .andExpect(jsonPath("$.balance").value(1000));
+		when(accountService.createAccount(any(AccountCreateRequest.class))).thenReturn(accountResponse);
 
-        verify(accountService, times(1)).getAccountById(1L);
-    }
+		mockMvc.perform(post(BASE_URL)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.id", is(1)))
+				.andExpect(jsonPath("$.accountNumber", is(TEST_ACCOUNT_NUMBER)));
+	}
 
-    @Test
-    void getAllAccounts_shouldReturnAccountList() throws Exception {
-        AccountResponse response1 = AccountResponse.builder()
-                .id(1L)
-                .accountNumber("1234567890")
-                .type(AccountType.SAVINGS)
-                .balance(BigDecimal.valueOf(1000))
-                .build();
+	@Test
+	void createAccount_withInvalidRequest_shouldReturnBadRequest() throws Exception {
+		AccountCreateRequest request = AccountCreateRequest.builder()
+				.type(null)
+				.balance(null)
+				.build();
 
-        AccountResponse response2 = AccountResponse.builder()
-                .id(2L)
-                .accountNumber("0987654321")
-                .type(AccountType.CHECKING)
-                .balance(BigDecimal.valueOf(500))
-                .build();
+		mockMvc.perform(post(BASE_URL)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+				.andExpect(status().isBadRequest());
+	}
 
-        List<AccountResponse> responses = Arrays.asList(response1, response2);
+	@Test
+	void getAccount_shouldReturnAccount() throws Exception {
+		when(accountService.getAccountByAccountNumber(TEST_ACCOUNT_NUMBER)).thenReturn(accountResponse);
 
-        when(accountService.getAllAccounts()).thenReturn(responses);
+		mockMvc.perform(get(BASE_URL + "/{account-number}", TEST_ACCOUNT_NUMBER))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.accountNumber", is(TEST_ACCOUNT_NUMBER)))
+				.andExpect(jsonPath("$.balance", comparesEqualTo(INITIAL_BALANCE.intValue())));
+	}
 
-        mockMvc.perform(get("/api/v1/accounts"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1L))
-                .andExpect(jsonPath("$[1].id").value(2L));
+	@Test
+	void getAllAccounts_shouldReturnAccountList() throws Exception {
+		when(accountService.getAccountsForCurrentUser()).thenReturn(List.of(accountResponse));
 
-        verify(accountService, times(1)).getAllAccounts();
-    }
+		mockMvc.perform(get(BASE_URL))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(1)));
+	}
 
-    @Test
-    void updateAccount_shouldReturnUpdatedAccount() throws Exception {
-        AccountUpdateRequest request = AccountUpdateRequest.builder()
-                .accountNumber("1234567890")
-                .type(AccountType.SAVINGS)
-                .balance(BigDecimal.valueOf(2000))
-                .build();
+	@DisplayName("Get all accounts - Empty List")
+	@Test
+	void getAllAccounts_ShouldReturnNoContentWhenEmpty() throws Exception {
+		when(accountService.getAccountsForCurrentUser()).thenReturn(Collections.emptyList());
 
-        AccountResponse response = AccountResponse.builder()
-                .id(1L)
-                .accountNumber("1234567890")
-                .type(AccountType.SAVINGS)
-                .balance(BigDecimal.valueOf(2000))
-                .build();
+		mockMvc.perform(get(BASE_URL))
+				.andExpect(status().isNoContent());
+	}
 
-        when(accountService.updateAccount(eq(1L), any(AccountUpdateRequest.class))).thenReturn(response);
+	@DisplayName("Update account - Success")
+	@Test
+	void updateAccount_shouldReturnUpdatedAccount() throws Exception {
+		AccountUpdateRequest request = AccountUpdateRequest.builder()
+				.type(AccountType.SAVINGS.name())
+				.balance(BigDecimal.valueOf(2000))
+				.build();
 
-        mockMvc.perform(put("/api/v1/accounts/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.accountNumber").value("1234567890"))
-                .andExpect(jsonPath("$.type").value("SAVINGS"))
-                .andExpect(jsonPath("$.balance").value(2000));
+		AccountResponse updatedAccount = AccountResponse.builder()
+				.id(1L)
+				.accountNumber(TEST_ACCOUNT_NUMBER)
+				.type(AccountType.SAVINGS)
+				.balance(BigDecimal.valueOf(2000))
+				.status(AccountStatus.ACTIVE)
+				.owner(user.getUsername())
+				.build();
 
-        verify(accountService, times(1)).updateAccount(eq(1L), any(AccountUpdateRequest.class));
-    }
+		when(accountService.updateAccount(TEST_ACCOUNT_NUMBER, request)).thenReturn(updatedAccount);
 
-    @Test
-    void updateAccount_withInvalidRequest_shouldReturnBadRequest() throws Exception {
-        AccountUpdateRequest request = AccountUpdateRequest.builder()
-                .accountNumber("123")
-                .balance(BigDecimal.valueOf(-1000))
-                .build();
+		mockMvc.perform(put(BASE_URL + "/{account-number}", TEST_ACCOUNT_NUMBER)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+				.andExpect(status().isOk());
+	}
 
-        mockMvc.perform(put("/api/v1/accounts/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.frontendMessage").value("Some fields are invalid. Please correct them."))
-                .andExpect(jsonPath("$.backendMessage").exists());
-    }
+	@Test
+	void updateAccount_withInvalidRequest_shouldReturnBadRequest() throws Exception {
+		AccountUpdateRequest request = AccountUpdateRequest.builder()
+				.balance(BigDecimal.valueOf(-1000))
+				.build();
 
-    @Test
-    void deleteAccount_shouldReturnNoContent() throws Exception {
-        doNothing().when(accountService).deleteAccount(1L);
+		mockMvc.perform(put(BASE_URL + "/{account-number}", TEST_ACCOUNT_NUMBER)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+				.andExpect(status().isBadRequest());
+	}
 
-        mockMvc.perform(delete("/api/v1/accounts/1"))
-                .andExpect(status().isNoContent());
+	@Test
+	void updateAccountStatus_ShouldReturnUpdatedAccountStatus() throws Exception {
+		AccountStatusRequest request = AccountStatusRequest.builder()
+				.status(AccountStatus.INACTIVE.name())
+				.build();
 
-        verify(accountService, times(1)).deleteAccount(1L);
-    }
+		AccountResponse updatedAccount = AccountResponse.builder()
+				.id(1L)
+				.accountNumber(TEST_ACCOUNT_NUMBER)
+				.type(AccountType.CHECKING)
+				.balance(INITIAL_BALANCE)
+				.status(AccountStatus.INACTIVE)
+				.owner(user.getUsername())
+				.build();
 
-    @Test
-    void deposit_shouldReturnNewBalance() throws Exception {
-        AmountRequest request = AmountRequest.builder()
-                .amount(BigDecimal.valueOf(500))
-                .build();
+		when(accountService.updateAccountStatus(TEST_ACCOUNT_NUMBER, request)).thenReturn(updatedAccount);
 
-        when(accountService.deposit(eq(1L), eq(request.getAmount()))).thenReturn(BigDecimal.valueOf(1500));
+		mockMvc.perform(patch(BASE_URL + "/{account-number}/change-status", TEST_ACCOUNT_NUMBER)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+				.andExpect(status().isOk());
+	}
 
-        mockMvc.perform(post("/api/v1/accounts/1/deposit")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("1500"));
+	@Test
+	void deleteAccount_shouldReturnNoContent() throws Exception {
+		doNothing().when(accountService).deleteAccount(TEST_ACCOUNT_NUMBER);
 
-        verify(accountService, times(1)).deposit(eq(1L), eq(request.getAmount()));
-    }
+		mockMvc.perform(delete(BASE_URL + "/{account-number}", TEST_ACCOUNT_NUMBER))
+				.andExpect(status().isNoContent());
 
-    @Test
-    void deposit_withInvalidRequest_shouldReturnBadRequest() throws Exception {
-        AmountRequest request = AmountRequest.builder().amount(null).build();
+		verify(accountService, times(1)).deleteAccount(TEST_ACCOUNT_NUMBER);
+	}
 
-        mockMvc.perform(post("/api/v1/accounts/1/deposit")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.frontendMessage").value("Some fields are invalid. Please correct them."))
-                .andExpect(jsonPath("$.backendMessage").exists());
-    }
+	@Test
+	void deleteNonExistentAccount_shouldReturnNotFound() throws Exception {
+		String invalidAccountNumber = "2390902392939090309";
 
-    @Test
-    void withdraw_shouldReturnNewBalance() throws Exception {
-        AmountRequest request = AmountRequest.builder()
-                .amount(BigDecimal.valueOf(200))
-                .build();
+		doThrow(new AccountNotFoundException(invalidAccountNumber))
+				.when(accountService).deleteAccount(invalidAccountNumber);
 
-        when(accountService.withdraw(eq(1L), eq(request.getAmount()))).thenReturn(BigDecimal.valueOf(800));
+		mockMvc.perform(delete(BASE_URL + "/{account-number}", invalidAccountNumber)
+				.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.frontendMessage").value("The requested account was not found."));
 
-        mockMvc.perform(post("/api/v1/accounts/1/withdraw")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("800"));
+		verify(accountService, times(1)).deleteAccount(invalidAccountNumber);
+	}
 
-        verify(accountService, times(1)).withdraw(eq(1L), eq(request.getAmount()));
-    }
+	@DisplayName("Deposit - Success")
+	@Test
+	void deposit_ShouldReturnTransactionResponse() throws Exception {
+		AccountOperationRequest request = AccountOperationRequest.builder()
+				.amount(BigDecimal.valueOf(1000))
+				.comment("Deposit test.")
+				.build();
 
-    @Test
-    void withdraw_withInvalidRequest_shouldReturnBadRequest() throws Exception {
-        AmountRequest request = AmountRequest.builder().amount(null).build();
+		transactionResponse = TransactionResponse.builder()
+				.transactionNumber(TEST_TRANSACTION_NUMBER)
+				.type(TransactionType.DEPOSIT)
+				.build();
 
-        mockMvc.perform(post("/api/v1/accounts/1/withdraw")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.frontendMessage").value("Some fields are invalid. Please correct them."))
-                .andExpect(jsonPath("$.backendMessage").exists());
-    }
+		when(accountService.deposit(TEST_ACCOUNT_NUMBER, request)).thenReturn(transactionResponse);
 
-    @Test
-    void getAccountBalance_shouldReturnBalance() throws Exception {
-        when(accountService.getAccountBalance(1L)).thenReturn(BigDecimal.valueOf(1000));
+		mockMvc.perform(post(BASE_URL + "/{account-number}/deposit", TEST_ACCOUNT_NUMBER)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+				.andExpect(status().isOk());
+	}
 
-        mockMvc.perform(get("/api/v1/accounts/1/balance"))
-                .andExpect(status().isOk())
-                .andExpect(content().string("1000"));
+	@Test
+	void deposit_withInvalidRequest_shouldReturnBadRequest() throws Exception {
+		AccountOperationRequest request = AccountOperationRequest.builder()
+				.amount(BigDecimal.valueOf(-500))
+				.comment("Invalid deposit test.")
+				.build();
 
-        verify(accountService, times(1)).getAccountBalance(1L);
-    }
+		mockMvc.perform(post(BASE_URL + "/{account-number}/deposit", TEST_ACCOUNT_NUMBER)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	void withdraw_ShouldReturnTransactionResponse() throws Exception {
+		AccountOperationRequest request = AccountOperationRequest.builder()
+				.amount(BigDecimal.valueOf(1000))
+				.comment("Withdrawal test.")
+				.build();
+
+		transactionResponse = TransactionResponse.builder()
+				.transactionNumber(TEST_TRANSACTION_NUMBER)
+				.type(TransactionType.WITHDRAW)
+				.build();
+
+		when(accountService.withdraw(TEST_ACCOUNT_NUMBER, request)).thenReturn(transactionResponse);
+
+		mockMvc.perform(post(BASE_URL + "/{account-number}/withdraw", TEST_ACCOUNT_NUMBER)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+				.andExpect(status().isOk());
+	}
+
+	@Test
+	void withdraw_withInvalidRequest_shouldReturnBadRequest() throws Exception {
+		AccountOperationRequest request = AccountOperationRequest.builder()
+				.amount(BigDecimal.valueOf(-5000))
+				.comment("Invalid withdrawal test.")
+				.build();
+
+		mockMvc.perform(post(BASE_URL + "/{account-number}/withdraw", TEST_ACCOUNT_NUMBER)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	void transfer_ShouldReturnTransactionResponse() throws Exception {
+		TransferRequest request = TransferRequest.builder()
+				.targetAccountNumber("2017374309977551073")
+				.amount(BigDecimal.valueOf(500))
+				.comment("Transfer test.")
+				.build();
+
+		transactionResponse = TransactionResponse.builder()
+				.transactionNumber(TEST_TRANSACTION_NUMBER)
+				.sourceAccount(TEST_ACCOUNT_NUMBER)
+				.targetAccount(request.getTargetAccountNumber())
+				.amount(request.getAmount())
+				.comment(request.getComment())
+				.type(TransactionType.TRANSFER)
+				.build();
+
+		when(accountService.transfer(TEST_ACCOUNT_NUMBER, request)).thenReturn(transactionResponse);
+
+		mockMvc.perform(post(BASE_URL + "/{source-account-number}/transfer", TEST_ACCOUNT_NUMBER)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+				.andExpect(status().isOk());
+	}
+
+	@Test
+	void getAccountBalance_shouldReturnBalance() throws Exception {
+		when(accountService.getAccountBalance(TEST_ACCOUNT_NUMBER)).thenReturn(INITIAL_BALANCE);
+
+		mockMvc.perform(get(BASE_URL + "/{account-number}/balance", TEST_ACCOUNT_NUMBER))
+				.andExpect(status().isOk());
+	}
 
 }

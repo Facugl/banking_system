@@ -1,3 +1,7 @@
+server:
+  servlet:
+    context-path: /api/v1
+
 spring:
   application:
     name: banking-system-server
@@ -6,16 +10,24 @@ spring:
     username: root
     password: password
     driver-class-name: com.mysql.cj.jdbc.Driver
-    hikari:
-      maximum-pool-size: 5
+  sql:
+    init:
+      mode: always
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
+    defer-datasource-initialization: true
     properties:
       hibernate:
         format_sql: true
   logging:
     level:
       org.hibernate.SQL: DEBUG
-      org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+      org.hibernate.jdbc.datasource.init.ScriptUtils: DBUG
+
+security:
+  default:
+    role: "CUSTOMER"
+  jwt:
+    expiration-in-minutes: 30
