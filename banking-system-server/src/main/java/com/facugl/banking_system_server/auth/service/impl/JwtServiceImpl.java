@@ -8,11 +8,13 @@ import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.facugl.banking_system_server.auth.service.JwtService;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class JwtServiceImpl implements JwtService {
@@ -49,6 +51,20 @@ public class JwtServiceImpl implements JwtService {
 
     private Claims extractAllClaims(String jwt) {
         return Jwts.parser().verifyWith(SECRET_KEY).build().parseSignedClaims(jwt).getPayload();
+    }
+
+    public String extractJwtFromRequest(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader("Authorization");
+
+        if (!StringUtils.hasText(authorizationHeader) || !authorizationHeader.startsWith("Bearer ")) {
+            return null;
+        }
+
+        return authorizationHeader.split(" ")[1];
+    }
+
+    public Date extractExpiration(String jwt) {
+        return extractAllClaims(jwt).getExpiration();
     }
 
 }

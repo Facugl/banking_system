@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.facugl.banking_system_server.auth.dto.request.AuthenticationRequest;
 import com.facugl.banking_system_server.auth.dto.response.AuthenticationResponse;
+import com.facugl.banking_system_server.auth.dto.response.LogoutResponse;
 import com.facugl.banking_system_server.auth.service.impl.AuthenticationServiceImpl;
 import com.facugl.banking_system_server.users.dto.response.LoggedInUserResponse;
 import com.facugl.banking_system_server.users.persistence.entity.User;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -34,7 +36,6 @@ public class AuthenticationController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    // método de utilería
     @GetMapping("/validate-token")
     public ResponseEntity<Boolean> validate(@RequestParam String jwt) {
         boolean isTokenValid = authenticationService.validateToken(jwt);
@@ -58,6 +59,15 @@ public class AuthenticationController {
                 .build();
 
         return ResponseEntity.status(HttpStatus.OK).body(loggedInUser);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<LogoutResponse> logout(HttpServletRequest request) {
+        authenticationService.logout(request);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new LogoutResponse("Logout successful."));
     }
 
 }

@@ -6,6 +6,8 @@ import com.facugl.banking_system_server.users.dto.request.CustomerRequest;
 import com.facugl.banking_system_server.users.dto.response.UserResponse;
 import com.facugl.banking_system_server.users.persistence.entity.User;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 public interface AuthenticationService {
 
     UserResponse registerCustomer(CustomerRequest request);
@@ -15,5 +17,7 @@ public interface AuthenticationService {
     boolean validateToken(String jwt);
 
     User findLoggedInUser();
+
+    void logout(HttpServletRequest request);
 
 }
