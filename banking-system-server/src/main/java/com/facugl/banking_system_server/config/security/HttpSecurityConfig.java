@@ -1,23 +1,24 @@
 package com.facugl.banking_system_server.config.security;
 
+import java.util.Arrays;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authorization.AuthorizationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.RegexRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.facugl.banking_system_server.config.security.filter.JwtAuthenticationFilter;
-import com.facugl.banking_system_server.users.util.RoleEnum;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,6 +36,7 @@ public class HttpSecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
+				.cors(Customizer.withDefaults())
 				.csrf(csrfConfig -> csrfConfig.disable())
 				.sessionManagement(management -> management
 						.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -50,41 +52,18 @@ public class HttpSecurityConfig {
 				.build();
 	}
 
-	private void buildRequestMatchers(
-			AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authReqConfig) {
-		authReqConfig.requestMatchers(HttpMethod.POST, "/accounts")
-				.hasAnyRole(RoleEnum.ADMINISTRATOR.name(), RoleEnum.EMPLOYEE.name(), RoleEnum.CUSTOMER.name());
-		// authReqConfig.requestMatchers(HttpMethod.GET, "/accounts/{account-number}")
-		authReqConfig.requestMatchers(RegexRequestMatcher.regexMatcher(HttpMethod.GET, "/accounts/^[0-9]{10,20}$"))
-				.hasAnyRole(RoleEnum.ADMINISTRATOR.name(), RoleEnum.EMPLOYEE.name(), RoleEnum.CUSTOMER.name());
-		authReqConfig.requestMatchers(HttpMethod.GET, "/accounts")
-				.hasAnyRole(RoleEnum.ADMINISTRATOR.name(), RoleEnum.EMPLOYEE.name(), RoleEnum.CUSTOMER.name());
-		authReqConfig.requestMatchers(HttpMethod.PUT, "/accounts/{account-number}")
-				.hasAnyRole(RoleEnum.ADMINISTRATOR.name(), RoleEnum.EMPLOYEE.name());
-		authReqConfig.requestMatchers(HttpMethod.PATCH, "/accounts/{account-number}/change-status")
-				.hasAnyRole(RoleEnum.CUSTOMER.name());
-		authReqConfig.requestMatchers(HttpMethod.DELETE, "/accounts/{account-number}")
-				.hasAnyRole(RoleEnum.ADMINISTRATOR.name());
-		authReqConfig.requestMatchers(HttpMethod.POST, "/accounts/{account-number}/deposit")
-				.hasAnyRole(RoleEnum.ADMINISTRATOR.name(), RoleEnum.EMPLOYEE.name(), RoleEnum.CUSTOMER.name());
-		authReqConfig.requestMatchers(HttpMethod.POST, "/accounts/{account-number}/withdraw")
-				.hasAnyRole(RoleEnum.ADMINISTRATOR.name(), RoleEnum.EMPLOYEE.name(), RoleEnum.CUSTOMER.name());
-		authReqConfig.requestMatchers(HttpMethod.POST, "/accounts/{source-account-number}/transfer")
-				.hasAnyRole(RoleEnum.ADMINISTRATOR.name(), RoleEnum.EMPLOYEE.name(), RoleEnum.CUSTOMER.name());
-		authReqConfig.requestMatchers(HttpMethod.GET, "/accounts/{account-number}/balance")
-				.hasAnyRole(RoleEnum.ADMINISTRATOR.name(), RoleEnum.EMPLOYEE.name(), RoleEnum.CUSTOMER.name());
+	@Bean
+	UrlBasedCorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration configuration = new CorsConfiguration();
+		configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+		configuration.setAllowedMethods(Arrays.asList("*"));
+		configuration.setAllowedHeaders(Arrays.asList("*"));
+		configuration.setAllowCredentials(true);
 
-		authReqConfig.requestMatchers(HttpMethod.GET, "/transactions")
-				.hasAnyRole(RoleEnum.ADMINISTRATOR.name(), RoleEnum.EMPLOYEE.name(), RoleEnum.CUSTOMER.name());
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", configuration);
 
-		authReqConfig.requestMatchers(HttpMethod.GET, "/auth/profile")
-				.hasAnyRole(RoleEnum.ADMINISTRATOR.name(), RoleEnum.EMPLOYEE.name(), RoleEnum.CUSTOMER.name());
-
-		authReqConfig.requestMatchers(HttpMethod.POST, "/users").permitAll();
-		authReqConfig.requestMatchers(HttpMethod.POST, "/auth/authenticate").permitAll();
-		authReqConfig.requestMatchers(HttpMethod.GET, "/auth/validate-token").permitAll();
-
-		authReqConfig.anyRequest().authenticated();
+		return source;
 	}
 
 }
