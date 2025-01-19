@@ -3,6 +3,10 @@ INSERT INTO modules (name, base_path) VALUES ('ACCOUNT', '/accounts');
 INSERT INTO modules (name, base_path) VALUES ('TRANSACTION', '/transactions');
 INSERT INTO modules (name, base_path) VALUES ('USER', '/users');
 INSERT INTO modules (name, base_path) VALUES ('AUTH', '/auth');
+INSERT INTO modules (name, base_path) VALUES ('MODULE', '/modules');
+INSERT INTO modules (name, base_path) VALUES ('OPERATION', '/operations');
+INSERT INTO modules (name, base_path) VALUES ('PERMISSION', '/permissions');
+INSERT INTO modules (name, base_path) VALUES ('ROLE', '/roles');
 
 -- CREACIÓN DE OPERACIONES
 INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES ('CREATE_ONE_ACCOUNT','', 'POST', false, 1);
@@ -27,6 +31,29 @@ INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES 
 INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES ('READ_MY_PROFILE','/profile','GET', false, 4);
 INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES ('LOGOUT','/logout','POST', true, 4);
 
+INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES ('CREATE_ONE_MODULE','', 'POST', false, 5);
+INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES ('READ_ONE_MODULE','/[0-9]*', 'GET', false, 5);
+INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES ('READ_ALL_MODULES','', 'GET', false, 5);
+INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES ('UPDATE_ONE_MODULE','/[0-9]*', 'PUT', false, 5);
+INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES ('DELETE_ONE_MODULE','/[0-9]*', 'DELETE', false, 5);
+
+INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES ('CREATE_ONE_OPERATION','', 'POST', false, 6);
+INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES ('READ_ONE_OPERATION','/[0-9]*', 'GET', false, 6);
+INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES ('READ_ALL_OPERATIONS','', 'GET', false, 6);
+INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES ('UPDATE_ONE_OPERATION','/[0-9]*', 'PUT', false, 6);
+INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES ('DELETE_ONE_OPERATION','/[0-9]*', 'DELETE', false, 6);
+
+INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES ('CREATE_ONE_PERMISSION','', 'POST', false, 7);
+INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES ('READ_ONE_PERMISSION','/[0-9]*', 'GET', false, 7);
+INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES ('READ_ALL_PERMISSIONS','', 'GET', false, 7);
+INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES ('DELETE_ONE_PERMISSION','/[0-9]*', 'DELETE', false, 7);
+
+INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES ('CREATE_ONE_ROLE','', 'POST', false, 8);
+INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES ('READ_ONE_ROLE','/[0-9]*', 'GET', false, 8);
+INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES ('READ_ALL_ROLES','', 'GET', false, 8);
+INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES ('UPDATE_ONE_ROLE','/[0-9]*', 'PUT', false, 8);
+INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES ('DELETE_ONE_ROLE','/[0-9]*', 'DELETE', false, 8);
+
 -- CREACIÓN DE ROLES
 INSERT INTO roles (name) VALUES ('ADMINISTRATOR');
 INSERT INTO roles (name) VALUES ('EMPLOYEE');
@@ -46,6 +73,28 @@ INSERT INTO permissions (roles_id, operations_id) VALUES (1, 10);
 INSERT INTO permissions (roles_id, operations_id) VALUES (1, 11);
 INSERT INTO permissions (roles_id, operations_id) VALUES (1, 12);
 INSERT INTO permissions (roles_id, operations_id) VALUES (1, 17);
+INSERT INTO permissions (roles_id, operations_id) VALUES (1, 19);
+INSERT INTO permissions (roles_id, operations_id) VALUES (1, 20);
+INSERT INTO permissions (roles_id, operations_id) VALUES (1, 21);
+INSERT INTO permissions (roles_id, operations_id) VALUES (1, 22);
+INSERT INTO permissions (roles_id, operations_id) VALUES (1, 23);
+
+INSERT INTO permissions (roles_id, operations_id) VALUES (1, 24);
+INSERT INTO permissions (roles_id, operations_id) VALUES (1, 25);
+INSERT INTO permissions (roles_id, operations_id) VALUES (1, 26);
+INSERT INTO permissions (roles_id, operations_id) VALUES (1, 27);
+INSERT INTO permissions (roles_id, operations_id) VALUES (1, 28);
+
+INSERT INTO permissions (roles_id, operations_id) VALUES (1, 29);
+INSERT INTO permissions (roles_id, operations_id) VALUES (1, 30);
+INSERT INTO permissions (roles_id, operations_id) VALUES (1, 31);
+INSERT INTO permissions (roles_id, operations_id) VALUES (1, 32);
+
+INSERT INTO permissions (roles_id, operations_id) VALUES (1, 33);
+INSERT INTO permissions (roles_id, operations_id) VALUES (1, 34);
+INSERT INTO permissions (roles_id, operations_id) VALUES (1, 35);
+INSERT INTO permissions (roles_id, operations_id) VALUES (1, 36);
+INSERT INTO permissions (roles_id, operations_id) VALUES (1, 37);
 
 INSERT INTO permissions (roles_id, operations_id) VALUES (2, 1);
 INSERT INTO permissions (roles_id, operations_id) VALUES (2, 2);

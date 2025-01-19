@@ -13,7 +13,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.facugl.banking_system_server.accounts.exception.AccountNotFoundException;
 import com.facugl.banking_system_server.accounts.exception.InsufficientBalanceException;
-import com.facugl.banking_system_server.roles.exceptions.RoleNotFoundException;
+import com.facugl.banking_system_server.admin.modules.exception.ModuleAlreadyExistsException;
+import com.facugl.banking_system_server.admin.modules.exception.ModuleNotFoundException;
+import com.facugl.banking_system_server.admin.permissions.exception.GrantedPermissionNotFoundException;
+import com.facugl.banking_system_server.admin.roles.exception.RoleAlreadyExistsException;
+import com.facugl.banking_system_server.admin.roles.exception.RoleNotFoundException;
 import com.facugl.banking_system_server.users.exception.UserNotFoundException;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -122,6 +126,70 @@ public class GlobalExceptionHandler {
 
 		return ResponseEntity
 				.status(HttpStatus.NOT_FOUND)
+				.body(errorResponse);
+	}
+
+	@ExceptionHandler(ModuleNotFoundException.class)
+	public ResponseEntity<ErrorResponse> handleModuleNotFound(ModuleNotFoundException ex,
+			HttpServletRequest request) {
+		ErrorResponse errorResponse = ErrorResponse.builder()
+				.frontendMessage("The requested module was not found.")
+				.backendMessage(ex.getMessage())
+				.status(HttpStatus.NOT_FOUND.value())
+				.path(request.getRequestURI())
+				.timestamp(now())
+				.build();
+
+		return ResponseEntity
+				.status(HttpStatus.NOT_FOUND)
+				.body(errorResponse);
+	}
+
+	@ExceptionHandler(GrantedPermissionNotFoundException.class)
+	public ResponseEntity<ErrorResponse> handleGrantedPermissionNotFound(GrantedPermissionNotFoundException ex,
+			HttpServletRequest request) {
+		ErrorResponse errorResponse = ErrorResponse.builder()
+				.frontendMessage("The requested permission was not found.")
+				.backendMessage(ex.getMessage())
+				.status(HttpStatus.NOT_FOUND.value())
+				.path(request.getRequestURI())
+				.timestamp(now())
+				.build();
+
+		return ResponseEntity
+				.status(HttpStatus.NOT_FOUND)
+				.body(errorResponse);
+	}
+
+	@ExceptionHandler(ModuleAlreadyExistsException.class)
+	public ResponseEntity<ErrorResponse> handleModuleAlreadyExists(ModuleAlreadyExistsException ex,
+			HttpServletRequest request) {
+		ErrorResponse errorResponse = ErrorResponse.builder()
+				.frontendMessage("The requested module was not found.")
+				.backendMessage(ex.getMessage())
+				.status(HttpStatus.CONFLICT.value())
+				.path(request.getRequestURI())
+				.timestamp(now())
+				.build();
+
+		return ResponseEntity
+				.status(HttpStatus.CONFLICT)
+				.body(errorResponse);
+	}
+
+	@ExceptionHandler(RoleAlreadyExistsException.class)
+	public ResponseEntity<ErrorResponse> handleRoleAlreadyExists(RoleAlreadyExistsException ex,
+			HttpServletRequest request) {
+		ErrorResponse errorResponse = ErrorResponse.builder()
+				.frontendMessage("The requested role was not found.")
+				.backendMessage(ex.getMessage())
+				.status(HttpStatus.CONFLICT.value())
+				.path(request.getRequestURI())
+				.timestamp(now())
+				.build();
+
+		return ResponseEntity
+				.status(HttpStatus.CONFLICT)
 				.body(errorResponse);
 	}
 

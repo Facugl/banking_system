@@ -15,8 +15,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.stereotype.Component;
 
-import com.facugl.banking_system_server.operations.persistence.entity.Operation;
-import com.facugl.banking_system_server.operations.persistence.repository.OperationRepository;
+import com.facugl.banking_system_server.admin.operations.persistence.entity.Operation;
+import com.facugl.banking_system_server.admin.operations.persistence.repository.OperationRepository;
 import com.facugl.banking_system_server.users.exception.UserNotFoundException;
 import com.facugl.banking_system_server.users.persistence.entity.User;
 import com.facugl.banking_system_server.users.service.UserService;

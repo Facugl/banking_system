@@ -43,8 +43,8 @@ import com.facugl.banking_system_server.accounts.exception.AccountNotFoundExcept
 import com.facugl.banking_system_server.accounts.persistence.entity.AccountStatus;
 import com.facugl.banking_system_server.accounts.persistence.entity.AccountType;
 import com.facugl.banking_system_server.accounts.service.AccountServiceImpl;
+import com.facugl.banking_system_server.admin.roles.persistence.entity.Role;
 import com.facugl.banking_system_server.common.handler.GlobalExceptionHandler;
-import com.facugl.banking_system_server.roles.persistence.entity.Role;
 import com.facugl.banking_system_server.transactions.dto.response.TransactionResponse;
 import com.facugl.banking_system_server.transactions.persistence.entity.TransactionType;
 import com.facugl.banking_system_server.users.persistence.entity.User;

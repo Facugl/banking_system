@@ -10,7 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.facugl.banking_system_server.accounts.persistence.entity.Account;
-import com.facugl.banking_system_server.roles.persistence.entity.Role;
+import com.facugl.banking_system_server.admin.roles.persistence.entity.Role;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -114,8 +114,6 @@ public class User implements UserDetails {
                 .map(each -> each.getOperation().getName())
                 .map(each -> new SimpleGrantedAuthority(each))
                 .collect(Collectors.toList());
-
-        authorities.add(new SimpleGrantedAuthority("ROLE_" + this.role.getName()));
 
         return authorities;
     }

@@ -40,14 +40,12 @@ public class Account {
     private String accountNumber;
 
     @Column(nullable = false)
-    // @Enumerated(EnumType.STRING)
     private String type;
 
     @Column(nullable = false)
     private BigDecimal balance;
 
     @Column(nullable = false)
-    // @Enumerated(EnumType.STRING)
     private String status;
 
     @ManyToOne

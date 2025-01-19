@@ -6,9 +6,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.facugl.banking_system_server.roles.exceptions.RoleNotFoundException;
-import com.facugl.banking_system_server.roles.persistence.entity.Role;
-import com.facugl.banking_system_server.roles.service.RoleService;
+import com.facugl.banking_system_server.admin.roles.exception.RoleNotFoundException;
+import com.facugl.banking_system_server.admin.roles.persistence.entity.Role;
+import com.facugl.banking_system_server.admin.roles.service.RoleServiceImpl;
 import com.facugl.banking_system_server.users.dto.request.CustomerRequest;
 import com.facugl.banking_system_server.users.exception.InvalidPasswordException;
 import com.facugl.banking_system_server.users.persistence.entity.User;
@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final RoleService roleService;
+    private final RoleServiceImpl roleService;
 
     @Override
     public User registerCustomer(CustomerRequest request) {
