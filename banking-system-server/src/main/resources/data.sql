@@ -7,6 +7,7 @@ INSERT INTO modules (name, base_path) VALUES ('MODULE', '/modules');
 INSERT INTO modules (name, base_path) VALUES ('OPERATION', '/operations');
 INSERT INTO modules (name, base_path) VALUES ('PERMISSION', '/permissions');
 INSERT INTO modules (name, base_path) VALUES ('ROLE', '/roles');
+INSERT INTO modules (name, base_path) VALUES ('STATISTICS', '/statistics');
 
 -- CREACIÓN DE OPERACIONES
 INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES ('CREATE_ONE_ACCOUNT','', 'POST', false, 1);
@@ -54,6 +55,8 @@ INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES 
 INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES ('UPDATE_ONE_ROLE','/[0-9]*', 'PUT', false, 8);
 INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES ('DELETE_ONE_ROLE','/[0-9]*', 'DELETE', false, 8);
 
+INSERT INTO operations (name, path, http_method, permit_all, modules_id) VALUES ('READ_STATISTICS', '', 'GET', false, 9);
+
 -- CREACIÓN DE ROLES
 INSERT INTO roles (name) VALUES ('ADMINISTRATOR');
 INSERT INTO roles (name) VALUES ('EMPLOYEE');
@@ -96,6 +99,8 @@ INSERT INTO permissions (roles_id, operations_id) VALUES (1, 35);
 INSERT INTO permissions (roles_id, operations_id) VALUES (1, 36);
 INSERT INTO permissions (roles_id, operations_id) VALUES (1, 37);
 
+INSERT INTO permissions (roles_id, operations_id) VALUES (1, 38);
+
 INSERT INTO permissions (roles_id, operations_id) VALUES (2, 1);
 INSERT INTO permissions (roles_id, operations_id) VALUES (2, 2);
 INSERT INTO permissions (roles_id, operations_id) VALUES (2, 3);
@@ -128,11 +133,19 @@ INSERT INTO users (username, name, password, roles_id) VALUES ('sakura', 'Sakura
 INSERT INTO users (username, name, password, roles_id) VALUES ('kakashi', 'Kakashi Hatake', '$2a$10$HVjEpElssWISJcEN/nW8YeTSdpcaw8jgnPjsKtO.R3hOPxCXlCXsK', 3);
 
 -- CREACIÓN DE CUENTAS
-INSERT INTO accounts (account_number, balance, type, status, users_id) VALUES ('394087875667608994', 5000.00, 'SAVINGS', 'ACTIVE', 3);
-INSERT INTO accounts (account_number, balance, type, status, users_id) VALUES ('114087875602508931', 5000.00, 'CHECKING', 'ACTIVE', 3);
-INSERT INTO accounts (account_number, balance, type, status, users_id) VALUES ('76591142607308616612', 10000.00, 'CHECKING', 'ACTIVE', 3);
-INSERT INTO accounts (account_number, balance, type, status, users_id) VALUES ('2017374309977551073', 10000.00, 'SAVINGS', 'ACTIVE', 4);
+INSERT INTO accounts (account_number, balance, type, status, users_id, created_at) VALUES ('394087875667608994', 5000.00, 'SAVINGS', 'ACTIVE', 3, '2024-01-15 10:30:45.369442');
+INSERT INTO accounts (account_number, balance, type, status, users_id, created_at) VALUES ('114087875602508931', 5000.00, 'CHECKING', 'ACTIVE', 3, '2024-02-10 14:15:30.369442');
+INSERT INTO accounts (account_number, balance, type, status, users_id, created_at) VALUES ('76591142607308616612', 10000.00, 'CHECKING', 'ACTIVE', 3, '2024-03-05 08:45:00.369442');
+INSERT INTO accounts (account_number, balance, type, status, users_id, created_at) VALUES ('564738291056473829', 8000.00, 'SAVINGS', 'ACTIVE', 3, '2024-02-01 14:30:00.369442');
+INSERT INTO accounts (account_number, balance, type, status, users_id, created_at) VALUES ('908070605040302010', 3000.00, 'CHECKING', 'ACTIVE', 3, '2024-02-15 09:45:00.369442');
+INSERT INTO accounts (account_number, balance, type, status, users_id, created_at) VALUES ('2017374309977551073', 10000.00, 'SAVINGS', 'ACTIVE', 4, '2024-04-20 19:25:10.369442');
+INSERT INTO accounts (account_number, balance, type, status, users_id, created_at) VALUES ('234567890123456789', 12000.00, 'SAVINGS', 'ACTIVE', 4, '2024-03-01 11:20:00.369442');
+INSERT INTO accounts (account_number, balance, type, status, users_id, created_at) VALUES ('987654123456789012', 15000.00, 'CHECKING', 'ACTIVE', 4, '2024-03-10 13:15:00.369442');
 
 -- CREACIÓN DE TRANSACCIONES
 INSERT INTO transactions (transaction_number, type, amount, source_account_id, target_account_id, transaction_date, comment) 
-VALUES ('9133817914', 'DEPOSIT', 5000.00, null, 1, '2025-01-06 19:10:08.369442', 'deposit :D');
+VALUES ('913381791423', 'DEPOSIT', 5000.00, null, 1, '2025-01-06 19:10:08.369442', 'Kakashi deposit');
+INSERT INTO transactions (transaction_number, type, amount, source_account_id, target_account_id, transaction_date, comment) 
+VALUES ('505050505023', 'DEPOSIT', 3000.00, null, 7, '2024-03-15 09:10:00.369442', 'Kakashi deposit');
+INSERT INTO transactions (transaction_number, type, amount, source_account_id, target_account_id, transaction_date, comment) 
+VALUES ('606060606043', 'WITHDRAW', 2500.00, 8, null, '2024-03-20 14:45:00.369442', 'Kakashi withdrawal');

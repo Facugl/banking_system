@@ -19,4 +19,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     @Query("SELECT t FROM Transaction t WHERE t.sourceAccount IN :accounts OR t.targetAccount IN :accounts")
     List<Transaction> findBySourceOrTargetAccounts(@Param("accounts") List<Account> accounts);
 
+    @Query("SELECT t.type, COUNT(t) FROM Transaction t GROUP BY t.type")
+    List<Object[]> countByType();
+
 }

@@ -56,6 +56,7 @@ public class AccountServiceImpl implements AccountService {
 		account.setAccountNumber(accountNumber);
 		account.setOwner(currentUser);
 		account.setStatus(AccountStatus.ACTIVE.name());
+		account.setCreatedAt(LocalDateTime.now());
 
 		Account savedAccount = accountRepository.save(account);
 

@@ -1,6 +1,7 @@
 package com.facugl.banking_system_server.accounts.dto.response;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import com.facugl.banking_system_server.accounts.persistence.entity.AccountStatus;
 import com.facugl.banking_system_server.accounts.persistence.entity.AccountType;
@@ -29,5 +30,7 @@ public class AccountResponse {
     private AccountStatus status;
 
     private String owner;
+
+    private LocalDateTime createdAt;
 
 }

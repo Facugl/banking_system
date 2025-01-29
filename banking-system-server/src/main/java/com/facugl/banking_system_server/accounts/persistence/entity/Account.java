@@ -1,11 +1,13 @@
 package com.facugl.banking_system_server.accounts.persistence.entity;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.facugl.banking_system_server.transactions.persistence.entity.Transaction;
 import com.facugl.banking_system_server.users.persistence.entity.User;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -55,5 +57,9 @@ public class Account {
     @Builder.Default
     @OneToMany(mappedBy = "sourceAccount", cascade = CascadeType.ALL)
     private List<Transaction> transactions = new ArrayList<>();
+
+    @JsonFormat(pattern = "yyyy/MM/dd HH:mm:ss")
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
 
 }
