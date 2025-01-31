@@ -20,6 +20,7 @@ import com.facugl.banking_system_server.accounts.exception.AccountNotFoundExcept
 import com.facugl.banking_system_server.accounts.exception.InsufficientBalanceException;
 import com.facugl.banking_system_server.accounts.persistence.entity.Account;
 import com.facugl.banking_system_server.accounts.persistence.entity.AccountStatus;
+import com.facugl.banking_system_server.accounts.persistence.entity.AccountType;
 import com.facugl.banking_system_server.accounts.persistence.repository.AccountRepository;
 import com.facugl.banking_system_server.auth.service.impl.AuthenticationServiceImpl;
 import com.facugl.banking_system_server.common.utils.IdentifierGenerator;
@@ -55,7 +56,7 @@ public class AccountServiceImpl implements AccountService {
 
 		account.setAccountNumber(accountNumber);
 		account.setOwner(currentUser);
-		account.setStatus(AccountStatus.ACTIVE.name());
+		account.setStatus(AccountStatus.ACTIVE);
 		account.setCreatedAt(LocalDateTime.now());
 
 		Account savedAccount = accountRepository.save(account);
@@ -105,11 +106,11 @@ public class AccountServiceImpl implements AccountService {
 		}
 
 		if (request.getType() != null) {
-			account.setType(request.getType());
+			account.setType(AccountType.valueOf(request.getType()));
 		}
 
 		if (request.getStatus() != null) {
-			account.setStatus(request.getStatus());
+			account.setStatus(AccountStatus.valueOf(request.getStatus()));
 		}
 
 		Account updatedAccount = accountRepository.save(account);
@@ -127,7 +128,7 @@ public class AccountServiceImpl implements AccountService {
 			throw new AccessDeniedException("You do not have permission to perform this operation.");
 		}
 
-		account.setStatus(request.getStatus());
+		account.setStatus(AccountStatus.valueOf(request.getStatus()));
 
 		Account updatedAccount = accountRepository.save(account);
 

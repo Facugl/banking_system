@@ -20,11 +20,11 @@ import lombok.Setter;
 @Builder
 public class AccountOperationRequest {
 
-    @NotNull(message = "Amount is mandatory.")
-    @DecimalMin(value = "0.01", message = "Amount must be greater than zero.")
+    @NotNull(message = "The amount is mandatory.")
+    @DecimalMin(value = "0.01", message = "The amount must be greater than zero.")
     private BigDecimal amount;
 
-    @Size(max = 255, message = "Comment must not exceed 255 characters.")
+    @Size(max = 255, message = "The comment must not exceed 255 characters.")
     private String comment;
 
 }

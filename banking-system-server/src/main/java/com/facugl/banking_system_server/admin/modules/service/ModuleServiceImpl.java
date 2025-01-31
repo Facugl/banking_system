@@ -32,6 +32,7 @@ public class ModuleServiceImpl implements ModuleService {
         }
 
         Module module = moduleMapper.toEntity(request);
+        module.setName(module.getName().toUpperCase());
         module.setBasePath("/".concat(module.getBasePath()));
 
         Module savedModule = moduleRepository.save(module);
@@ -64,11 +65,11 @@ public class ModuleServiceImpl implements ModuleService {
                 .orElseThrow(() -> new ModuleNotFoundException(id));
 
         if (request.getName() != null) {
-            module.setName(request.getName());
+            module.setName(request.getName().toUpperCase());
         }
 
         if (request.getBasePath() != null) {
-            module.setBasePath(request.getBasePath());
+            module.setBasePath("/".concat(request.getBasePath()));
         }
 
         Module updatedModule = moduleRepository.save(module);

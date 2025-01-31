@@ -90,9 +90,9 @@ public class AccountServiceImplTest {
 		account = Account.builder()
 				.id(1L)
 				.accountNumber(TEST_ACCOUNT_NUMBER)
-				.type(AccountType.CHECKING.name())
+				.type(AccountType.CHECKING)
 				.balance(INITIAL_BALANCE)
-				.status(AccountStatus.ACTIVE.name())
+				.status(AccountStatus.ACTIVE)
 				.owner(user)
 				.build();
 	}
@@ -107,9 +107,9 @@ public class AccountServiceImplTest {
 		Account savedAccount = Account.builder()
 				.id(1L)
 				.accountNumber(TEST_ACCOUNT_NUMBER)
-				.type(AccountType.CHECKING.name())
+				.type(AccountType.CHECKING)
 				.balance(INITIAL_BALANCE)
-				.status(AccountStatus.ACTIVE.name())
+				.status(AccountStatus.ACTIVE)
 				.owner(user)
 				.build();
 
@@ -208,7 +208,7 @@ public class AccountServiceImplTest {
 		Account updatedAccount = Account.builder()
 				.id(1L)
 				.accountNumber(TEST_ACCOUNT_NUMBER)
-				.type(AccountType.SAVINGS.name())
+				.type(AccountType.SAVINGS)
 				.balance(BigDecimal.valueOf(2000.00))
 				.build();
 
@@ -333,7 +333,7 @@ public class AccountServiceImplTest {
 		Account savedAccount = Account.builder()
 				.id(1L)
 				.accountNumber(TEST_ACCOUNT_NUMBER)
-				.type(AccountType.CHECKING.name())
+				.type(AccountType.CHECKING)
 				.balance(BigDecimal.valueOf(400))
 				.build();
 

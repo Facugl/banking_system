@@ -22,15 +22,15 @@ import lombok.Setter;
 @Builder
 public class TransferRequest {
 
-    @Pattern(regexp = "^[0-9]{10,20}$", message = "Account number must be a valid number with 10 to 20 digits.")
-    @NotBlank(message = "Target account number is required.")
+    @Pattern(regexp = "^[0-9]{10,20}$", message = "The account number must be a valid number with 10 to 20 digits.")
+    @NotBlank(message = "The target account number is required.")
     private String targetAccountNumber;
 
-    @NotNull(message = "Amount is required")
-    @DecimalMin(value = "0.01", message = "Transfer amount must be greater than zero.")
+    @NotNull(message = "The amount is required")
+    @DecimalMin(value = "0.01", message = "The transfer amount must be greater than zero.")
     private BigDecimal amount;
 
-    @Size(max = 255, message = "Comment must not exceed 255 characters.")
+    @Size(max = 255, message = "The comment must not exceed 255 characters.")
     private String comment;
 
 }

@@ -36,6 +36,7 @@ public class RoleServiceImpl implements RoleService {
         }
 
         Role role = roleMapper.toEntity(request);
+        role.setName(role.getName().toUpperCase());
 
         Role savedRole = roleRepository.save(role);
 
@@ -62,7 +63,7 @@ public class RoleServiceImpl implements RoleService {
     public List<RoleResponse> getAllRoles() {
         return roleRepository.findAll()
                 .stream()
-                .map(roleMapper::toResponse)
+                .map(role -> roleMapper.toResponse(role))
                 .collect(Collectors.toList());
     }
 

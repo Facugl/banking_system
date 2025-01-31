@@ -1,6 +1,6 @@
 package com.facugl.banking_system_server.admin.modules.dto.request;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -16,10 +16,10 @@ import lombok.Setter;
 @Builder
 public class ModuleCreateRequest {
 
-    @NotNull(message = "The name cannot be null.")
+    @NotBlank(message = "The name cannot be blank.")
     private String name;
 
-    @NotNull(message = "The base path cannot be null.")
+    @NotBlank(message = "The base path cannot be blank.")
     private String basePath;
 
 }

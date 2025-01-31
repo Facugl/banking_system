@@ -18,4 +18,5 @@ public class ModuleUpdateRequest {
     private String name;
 
     private String basePath;
+
 }

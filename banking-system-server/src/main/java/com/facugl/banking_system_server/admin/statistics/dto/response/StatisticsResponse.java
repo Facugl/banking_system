@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import com.facugl.banking_system_server.transactions.persistence.entity.TransactionType;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,7 +23,7 @@ public class StatisticsResponse {
 
     private BigDecimal totalBalance;
 
-    private Map<TransactionType, Long> transactionsByType;
+    private Map<String, Long> transactionsByType;
 
     private List<AccountGrowthResponse> accountGrowth;
 

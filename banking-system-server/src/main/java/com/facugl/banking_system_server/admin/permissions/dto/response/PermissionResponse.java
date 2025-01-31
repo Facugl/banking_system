@@ -14,8 +14,13 @@ import lombok.Setter;
 @Setter
 @Builder
 public class PermissionResponse {
+
     private Long id;
+
     private String operation;
+
     private String module;
+
     private String role;
+
 }

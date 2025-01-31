@@ -1,6 +1,6 @@
 package com.facugl.banking_system_server.admin.permissions.dto.request;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -16,9 +16,10 @@ import lombok.Setter;
 @Builder
 public class PermissionRequest {
 
-    @NotNull(message = "The role cannot be null.")
+    @NotBlank(message = "The role cannot be blank.")
     private String role;
 
-    @NotNull(message = "The operation cannot be null.")
+    @NotBlank(message = "The operation cannot be blank.")
     private String operation;
+
 }

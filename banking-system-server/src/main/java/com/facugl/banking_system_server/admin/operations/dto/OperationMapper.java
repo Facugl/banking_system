@@ -1,7 +1,9 @@
 package com.facugl.banking_system_server.admin.operations.dto;
 
+import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 import com.facugl.banking_system_server.admin.modules.persistence.entity.Module;
 import com.facugl.banking_system_server.admin.operations.dto.request.OperationCreateRequest;
@@ -11,19 +13,25 @@ import com.facugl.banking_system_server.admin.operations.persistence.entity.Oper
 @Mapper(componentModel = "spring")
 public interface OperationMapper {
 
+    @Mapping(target = "id", ignore = true)
     @Mapping(source = "request.name", target = "name")
     @Mapping(source = "request.path", target = "path")
     @Mapping(source = "request.httpMethod", target = "httpMethod")
     @Mapping(source = "request.permitAll", target = "permitAll")
-    @Mapping(source = "module", target = "module")
-    Operation toEntity(OperationCreateRequest request, Module module);
+    @Mapping(source = "moduleId", target = "module", qualifiedByName = "mapModule")
+    Operation toEntity(OperationCreateRequest request, @Context OperationMapperHelper helper);
 
-    @Mapping(source = "operation.id", target = "id")
-    @Mapping(source = "operation.name", target = "name")
-    @Mapping(source = "operation.path", target = "path")
-    @Mapping(source = "operation.httpMethod", target = "httpMethod")
-    @Mapping(source = "operation.permitAll", target = "permitAll")
-    @Mapping(source = "operation.module.name", target = "moduleName")
-    OperationResponse toResponse(Operation operation);
+    @Mapping(source = "module", target = "moduleName", qualifiedByName = "mapModuleName")
+    OperationResponse toResponse(Operation operation, @Context OperationMapperHelper helper);
+
+    @Named("mapModule")
+    default Module mapModule(Long id, @Context OperationMapperHelper helper) {
+        return helper.mapModule(id);
+    }
+
+    @Named("mapModuleName")
+    default String mapModuleName(Module module, @Context OperationMapperHelper helper) {
+        return helper.mapModuleName(module);
+    }
 
 }

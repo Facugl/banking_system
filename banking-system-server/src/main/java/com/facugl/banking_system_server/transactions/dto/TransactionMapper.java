@@ -1,20 +1,23 @@
 package com.facugl.banking_system_server.transactions.dto;
 
-import java.util.List;
-
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
+import com.facugl.banking_system_server.accounts.persistence.entity.Account;
 import com.facugl.banking_system_server.transactions.dto.response.TransactionResponse;
 import com.facugl.banking_system_server.transactions.persistence.entity.Transaction;
 
 @Mapper(componentModel = "spring")
 public interface TransactionMapper {
 
-    @Mapping(source = "sourceAccount.accountNumber", target = "sourceAccount")
-    @Mapping(source = "targetAccount.accountNumber", target = "targetAccount")
+    @Mapping(source = "sourceAccount", target = "sourceAccount", qualifiedByName = "mapAccountNumber")
+    @Mapping(source = "targetAccount", target = "targetAccount", qualifiedByName = "mapAccountNumber")
     TransactionResponse toResponse(Transaction transaction);
 
-    List<TransactionResponse> toResponseList(List<Transaction> transactions);
+    @Named("mapAccountNumber")
+    default String mapAccountNumber(Account account) {
+        return (account != null) ? account.getAccountNumber() : null;
+    }
 
 }

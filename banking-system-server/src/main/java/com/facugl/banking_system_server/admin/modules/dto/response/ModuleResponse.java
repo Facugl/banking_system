@@ -14,7 +14,11 @@ import lombok.Setter;
 @Setter
 @Builder
 public class ModuleResponse {
+
     private Long id;
+
     private String name;
+
     private String basePath;
+
 }

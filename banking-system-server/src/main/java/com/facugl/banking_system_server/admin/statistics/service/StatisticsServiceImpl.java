@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.facugl.banking_system_server.accounts.persistence.entity.AccountType;
 import com.facugl.banking_system_server.accounts.persistence.repository.AccountRepository;
 import com.facugl.banking_system_server.admin.statistics.dto.response.AccountGrowthResponse;
 import com.facugl.banking_system_server.admin.statistics.dto.response.StatisticsResponse;
@@ -32,7 +33,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 		BigDecimal totalBalance = accountRepository.sumTotalBalance();
 		Long totalTransactions = transactionRepository.count();
 
-		Map<TransactionType, Long> transactionsByType = transformTransactionsByType(
+		Map<String, Long> transactionsByType = transformTransactionsByType(
 				transactionRepository.countByType());
 
 		List<AccountGrowthResponse> accountGrowth = calculateAccountGrowth();
@@ -50,10 +51,10 @@ public class StatisticsServiceImpl implements StatisticsService {
 				.build();
 	}
 
-	private Map<TransactionType, Long> transformTransactionsByType(List<Object[]> rawData) {
+	private Map<String, Long> transformTransactionsByType(List<Object[]> rawData) {
 		return rawData.stream()
 				.collect(Collectors.toMap(
-						result -> (TransactionType) result[0],
+						result -> ((TransactionType) result[0]).name(),
 						result -> (Long) result[1]));
 	}
 
@@ -91,7 +92,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 	private Map<String, BigDecimal> transformAverageBalanceByAccountType(List<Object[]> rawData) {
 		return rawData.stream()
 				.collect(Collectors.toMap(
-						result -> (String) result[0],
+						result -> ((AccountType) result[0]).name(),
 						result -> BigDecimal.valueOf((Double) result[1])));
 	}
 

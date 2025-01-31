@@ -15,6 +15,7 @@ import com.facugl.banking_system_server.accounts.exception.AccountNotFoundExcept
 import com.facugl.banking_system_server.accounts.exception.InsufficientBalanceException;
 import com.facugl.banking_system_server.admin.modules.exception.ModuleAlreadyExistsException;
 import com.facugl.banking_system_server.admin.modules.exception.ModuleNotFoundException;
+import com.facugl.banking_system_server.admin.operations.exception.OperationNotFoundException;
 import com.facugl.banking_system_server.admin.permissions.exception.GrantedPermissionNotFoundException;
 import com.facugl.banking_system_server.admin.roles.exception.RoleAlreadyExistsException;
 import com.facugl.banking_system_server.admin.roles.exception.RoleNotFoundException;
@@ -145,6 +146,22 @@ public class GlobalExceptionHandler {
 				.body(errorResponse);
 	}
 
+	@ExceptionHandler(OperationNotFoundException.class)
+	public ResponseEntity<ErrorResponse> handleOperationNotFound(OperationNotFoundException ex,
+			HttpServletRequest request) {
+		ErrorResponse errorResponse = ErrorResponse.builder()
+				.frontendMessage("The requested opearion was not found.")
+				.backendMessage(ex.getMessage())
+				.status(HttpStatus.NOT_FOUND.value())
+				.path(request.getRequestURI())
+				.timestamp(now())
+				.build();
+
+		return ResponseEntity
+				.status(HttpStatus.NOT_FOUND)
+				.body(errorResponse);
+	}
+
 	@ExceptionHandler(GrantedPermissionNotFoundException.class)
 	public ResponseEntity<ErrorResponse> handleGrantedPermissionNotFound(GrantedPermissionNotFoundException ex,
 			HttpServletRequest request) {
@@ -165,7 +182,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ErrorResponse> handleModuleAlreadyExists(ModuleAlreadyExistsException ex,
 			HttpServletRequest request) {
 		ErrorResponse errorResponse = ErrorResponse.builder()
-				.frontendMessage("The requested module was not found.")
+				.frontendMessage("The module already exists. Please use a different value.")
 				.backendMessage(ex.getMessage())
 				.status(HttpStatus.CONFLICT.value())
 				.path(request.getRequestURI())
@@ -181,7 +198,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ErrorResponse> handleRoleAlreadyExists(RoleAlreadyExistsException ex,
 			HttpServletRequest request) {
 		ErrorResponse errorResponse = ErrorResponse.builder()
-				.frontendMessage("The requested role was not found.")
+				.frontendMessage("The role already exists. Please use a different value.")
 				.backendMessage(ex.getMessage())
 				.status(HttpStatus.CONFLICT.value())
 				.path(request.getRequestURI())

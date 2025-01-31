@@ -14,8 +14,8 @@ public interface AccountMapper {
     @Mapping(target = "accountNumber", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "owner", ignore = true)
-    @Mapping(target = "transactions", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "transactions", ignore = true)
     Account toEntity(AccountCreateRequest request);
 
     @Mapping(source = "owner.username", target = "owner")

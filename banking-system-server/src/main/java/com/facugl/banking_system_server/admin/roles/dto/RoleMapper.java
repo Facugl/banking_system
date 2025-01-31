@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 import com.facugl.banking_system_server.admin.permissions.persistence.entity.GrantedPermission;
 import com.facugl.banking_system_server.admin.roles.dto.request.RoleRequest;
@@ -19,9 +20,10 @@ public interface RoleMapper {
     @Mapping(target = "permissions", ignore = true)
     Role toEntity(RoleRequest request);
 
-    @Mapping(source = "permissions", target = "permissions")
+    @Mapping(source = "permissions", target = "permissions", qualifiedByName = "mapPermissions")
     RoleResponse toResponse(Role role);
 
+    @Named("mapPermissions")
     default List<String> mapPermissions(List<GrantedPermission> permissions) {
         if (permissions == null) {
             return Collections.emptyList();

@@ -1,6 +1,6 @@
 package com.facugl.banking_system_server.admin.roles.dto.request;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,8 +15,8 @@ import lombok.Setter;
 @Builder
 public class RoleRequest {
 
-    @Size(min = 4, message = "Role name must have at least 4 characters.")
-    @NotNull(message = "Role name cannot be null.")
+    @Size(min = 4, message = "The name must have at least 4 characters.")
+    @NotBlank(message = "The name cannot be blank.")
     private String name;
 
 }

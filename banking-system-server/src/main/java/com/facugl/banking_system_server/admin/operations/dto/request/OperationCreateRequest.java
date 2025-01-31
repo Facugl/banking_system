@@ -1,5 +1,6 @@
 package com.facugl.banking_system_server.admin.operations.dto.request;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -17,22 +18,23 @@ import lombok.Setter;
 @Builder
 public class OperationCreateRequest {
 
-    @NotBlank(message = "Operation name cannot be blank.")
-    @Size(min = 3, max = 100, message = "Operation name must be between 3 and 100 characters.")
+    @NotBlank(message = "The name cannot be blank.")
+    @Size(min = 3, max = 100, message = "The name must be between 3 and 100 characters.")
     private String name;
 
-    @NotNull(message = "Path cannot be null.")
+    @NotNull(message = "The path cannot be null.")
     @Pattern(regexp = "(^$|/[0-9]*)", message = "The path field must be either an empty string or match the pattern '/[0-9]*'.")
     private String path;
 
-    @NotBlank(message = "HTTP method cannot be blank.")
-    @Pattern(regexp = "^(GET|POST|PUT|DELETE|PATCH)$", message = "HTTP method must be one of GET, POST, PUT, DELETE, PATCH.")
+    @NotBlank(message = "The HTTP method cannot be blank.")
+    @Pattern(regexp = "^(get|post|put|delete|patch)$", message = "The HTTP method must be one of get, post, put, delete, patch.")
     private String httpMethod;
 
-    @NotNull(message = "PermitAll flag cannot be null.")
+    @NotNull(message = "The permitAll flag cannot be null.")
     private Boolean permitAll;
 
-    @NotNull(message = "Module ID cannot be null.")
+    @Min(value = 1, message = "The module ID must be greater than or equal to 1.")
+    @NotNull(message = "The module ID cannot be null.")
     private Long moduleId;
 
 }
