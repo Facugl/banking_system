@@ -1,10 +1,11 @@
-import RegisterForm from './components/RegisterForm';
+import { BrowserRouter as Router } from 'react-router-dom';
+import AppRoutes from './routes/AppRoutes';
 
 const App = () => {
   return (
-    <div>
-      <RegisterForm />
-    </div>
+    <Router>
+      <AppRoutes />
+    </Router>
   );
 };
 
