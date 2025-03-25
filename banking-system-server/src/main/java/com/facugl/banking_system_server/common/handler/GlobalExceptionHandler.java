@@ -19,6 +19,7 @@ import com.facugl.banking_system_server.admin.operations.exception.OperationNotF
 import com.facugl.banking_system_server.admin.permissions.exception.GrantedPermissionNotFoundException;
 import com.facugl.banking_system_server.admin.roles.exception.RoleAlreadyExistsException;
 import com.facugl.banking_system_server.admin.roles.exception.RoleNotFoundException;
+import com.facugl.banking_system_server.users.exception.InvalidPasswordException;
 import com.facugl.banking_system_server.users.exception.UserNotFoundException;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -87,6 +88,22 @@ public class GlobalExceptionHandler {
 			HttpServletRequest request) {
 		ErrorResponse errorResponse = ErrorResponse.builder()
 				.frontendMessage("Insufficient balance in account.")
+				.backendMessage(ex.getMessage())
+				.status(HttpStatus.BAD_REQUEST.value())
+				.path(request.getRequestURI())
+				.timestamp(now())
+				.build();
+
+		return ResponseEntity
+				.status(HttpStatus.BAD_REQUEST)
+				.body(errorResponse);
+	}
+
+	@ExceptionHandler(InvalidPasswordException.class)
+	public ResponseEntity<ErrorResponse> handleInvalidPasswordException(InvalidPasswordException ex,
+			HttpServletRequest request) {
+		ErrorResponse errorResponse = ErrorResponse.builder()
+				.frontendMessage("Please verify that the passwords are the same.")
 				.backendMessage(ex.getMessage())
 				.status(HttpStatus.BAD_REQUEST.value())
 				.path(request.getRequestURI())

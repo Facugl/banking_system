@@ -48,11 +48,11 @@ public class UserServiceImpl implements UserService {
 
     private void validatePassword(CustomerRequest request) {
         if (!StringUtils.hasText(request.getPassword()) || !StringUtils.hasText(request.getRepeatedPassword())) {
-            throw new InvalidPasswordException("Password don't match");
+            throw new InvalidPasswordException();
         }
 
         if (!request.getPassword().equals(request.getRepeatedPassword())) {
-            throw new InvalidPasswordException("Password don't match");
+            throw new InvalidPasswordException();
         }
     }
 
