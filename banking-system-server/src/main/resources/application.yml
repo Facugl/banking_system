@@ -1,13 +1,10 @@
 spring:
   profiles:
     active: dev
-
   application:
     name: banking-system-server
-
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-
   jpa:
     defer-datasource-initialization: true
     properties:
@@ -19,3 +16,4 @@ security:
     role: "CUSTOMER"
   jwt:
     expiration-in-minutes: ${JWT_EXPIRATION_MINUTES:30}
+    secret: ${JWT_SECRET:default-secret-key-32-chars-or-more}

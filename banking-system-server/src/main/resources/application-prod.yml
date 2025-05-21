@@ -7,11 +7,9 @@ spring:
     url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
-
   sql:
     init:
       mode: never
-
   jpa:
     hibernate:
       ddl-auto: update
@@ -20,8 +18,10 @@ spring:
     properties:
       hibernate:
         format_sql: false
-
   logging:
     level:
       org.hibernate.SQL: INFO
       org.hibernate.jdbc.datasource.init.ScriptUtils: INFO
+# security:
+#   jwt:
+#     secret: ${JWT_SECRET:default-secret-key-32-chars-or-more}

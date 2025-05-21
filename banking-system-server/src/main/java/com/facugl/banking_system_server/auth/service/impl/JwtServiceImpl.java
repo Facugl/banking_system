@@ -14,23 +14,30 @@ import com.facugl.banking_system_server.auth.service.JwtService;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class JwtServiceImpl implements JwtService {
 
+    @Value("${security.jwt.secret}")
+    private String JWT_SECRET;
+
     @Value("${security.jwt.expiration-in-minutes}")
     private Long EXPIRATION_IN_MINUTES;
 
-    private static final SecretKey SECRET_KEY = Jwts.SIG.HS256.key().build();
+    private SecretKey getSecretKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(JWT_SECRET);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
 
     @Override
     public String generateToken(UserDetails user, Map<String, Object> extraClaims) {
-
         Date issuedAt = new Date(System.currentTimeMillis());
         Date expiration = new Date(issuedAt.getTime() + (EXPIRATION_IN_MINUTES * 60 * 1000));
 
-        String jwt = Jwts.builder()
+        return Jwts.builder()
                 .header()
                 .type("JWT")
                 .and()
@@ -38,10 +45,8 @@ public class JwtServiceImpl implements JwtService {
                 .subject(user.getUsername())
                 .issuedAt(issuedAt)
                 .expiration(expiration)
-                .signWith(SECRET_KEY)
+                .signWith(getSecretKey())
                 .compact();
-
-        return jwt;
     }
 
     @Override
@@ -50,7 +55,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private Claims extractAllClaims(String jwt) {
-        return Jwts.parser().verifyWith(SECRET_KEY).build().parseSignedClaims(jwt).getPayload();
+        return Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(jwt).getPayload();
     }
 
     public String extractJwtFromRequest(HttpServletRequest request) {

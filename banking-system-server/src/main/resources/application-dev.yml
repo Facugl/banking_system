@@ -7,17 +7,17 @@ spring:
     url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
-
   sql:
     init:
       mode: always
-
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: true
-
   logging:
     level:
       org.hibernate.SQL: DEBUG
       org.hibernate.jdbc.datasource.init.ScriptUtils: DEBUG
+# security:
+#   jwt:
+#     secret: ${JWT_SECRET:default-secret-key-32-chars-or-more}
