@@ -4,11 +4,11 @@ const registerSchema = yup.object().shape({
   name: yup
     .string()
     .required('Name is required')
-    .min(3, 'Name must be at least 3 characters'),
+    .min(4, 'Name must be at least 4 characters'),
   username: yup
     .string()
     .required('Username is required')
-    .min(3, 'Username must be at least 3 characters'),
+    .min(4, 'Username must be at least 4 characters'),
   password: yup
     .string()
     .required('Password is required')

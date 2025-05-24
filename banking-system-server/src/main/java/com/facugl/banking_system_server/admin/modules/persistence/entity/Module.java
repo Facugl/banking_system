@@ -25,9 +25,10 @@ public class Module {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
     private String name;
 
-    @Column(name = "base_path")
+    @Column(name = "base_path", unique = true)
     private String basePath;
 
 }

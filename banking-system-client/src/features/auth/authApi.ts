@@ -1,10 +1,10 @@
-import axiosInstance from '../../../services/axiosInstance';
+import axiosInstance from '../../services/axiosInstance';
 import {
   AuthenticateResponse,
   AuthenticateRequest,
   RegisterRequest,
   RegisterResponse,
-} from '../types';
+} from './types';
 
 export const authenticateApi = async (credentials: AuthenticateRequest) => {
   const { data } = await axiosInstance.post<AuthenticateResponse>(
@@ -17,7 +17,7 @@ export const authenticateApi = async (credentials: AuthenticateRequest) => {
 
 export const registerApi = async (customer: RegisterRequest) => {
   const { data } = await axiosInstance.post<RegisterResponse>(
-    '/auth/register',
+    '/users',
     customer,
   );
 
@@ -25,7 +25,9 @@ export const registerApi = async (customer: RegisterRequest) => {
 };
 
 export const logoutApi = async () => {
-  const { data } = await axiosInstance.post('/auth/logout');
+  const { data } = await axiosInstance.post<{ message: string }>(
+    '/auth/logout',
+  );
 
   return data;
 };

@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,7 +23,9 @@ import lombok.Setter;
 @Setter
 @Builder
 @Entity
-@Table(name = "operations")
+@Table(name = "operations", uniqueConstraints = {
+        @UniqueConstraint(name = "unique_operation", columnNames = { "path", "http_method", "modules_id" })
+})
 public class Operation {
 
     @Id

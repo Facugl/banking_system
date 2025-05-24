@@ -5,19 +5,40 @@ import {
   LoginPage,
   RegisterPage,
   UnauthorizedPage,
+  CustomerPanelPage,
 } from '../pages';
+import { ROLES } from '../utils/constants';
 import RolesView from '../features/roles/views/RolesView';
 import AccountsView from '../features/accounts/views/AccountsView';
 import StatisticsView from '../features/statistics/views/StatisticsView';
-import { ROLES } from '../utils/constants';
 import ModulesView from '../features/modules/views/ModulesView';
+import {
+  AccountOverviewView,
+  ProfileView,
+  TransactionsView,
+  TransfersView,
+} from '../features/customer/views';
 
 const AppRoutes = () => (
   <Routes>
     <Route path='/' element={<HomeRedirect />} />
 
-    <Route path='/login' element={<LoginPage />} />
-    <Route path='/register' element={<RegisterPage />} />
+    <Route
+      path='/login'
+      element={
+        <PrivateRoute publicRoute>
+          <LoginPage />
+        </PrivateRoute>
+      }
+    />
+    <Route
+      path='/register'
+      element={
+        <PrivateRoute publicRoute>
+          <RegisterPage />
+        </PrivateRoute>
+      }
+    />
 
     <Route
       path='/dashboard'
@@ -54,6 +75,49 @@ const AppRoutes = () => (
             allowedRoles={[ROLES.ADMINISTRATOR, ROLES.EMPLOYEE, ROLES.CUSTOMER]}
           >
             <AccountsView />
+          </PrivateRoute>
+        }
+      />
+    </Route>
+
+    <Route
+      path='/customer-panel'
+      element={
+        <PrivateRoute allowedRoles={[ROLES.CUSTOMER]}>
+          <CustomerPanelPage />
+        </PrivateRoute>
+      }
+    >
+      <Route index element={<AccountOverviewView />} />
+      <Route
+        path='accounts'
+        element={
+          <PrivateRoute allowedRoles={[ROLES.CUSTOMER]}>
+            <AccountsView />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path='transactions'
+        element={
+          <PrivateRoute allowedRoles={[ROLES.CUSTOMER]}>
+            <TransactionsView />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path='transfers'
+        element={
+          <PrivateRoute allowedRoles={[ROLES.CUSTOMER]}>
+            <TransfersView />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path='profile'
+        element={
+          <PrivateRoute allowedRoles={[ROLES.CUSTOMER]}>
+            <ProfileView />
           </PrivateRoute>
         }
       />

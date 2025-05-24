@@ -1,3 +1,9 @@
+export interface AuthError {
+  frontendMessage: string;
+  backendMessage: string;
+  status: number;
+}
+
 export interface AuthenticateRequest {
   username: string;
   password: string;
@@ -14,11 +20,11 @@ export interface AuthenticateResponse {
 }
 
 export interface RegisterResponse {
+  jwt: string;
   id: number;
   username: string;
   name: string;
   role: string;
-  token: string;
 }
 
 export interface DecodedToken {
@@ -27,12 +33,15 @@ export interface DecodedToken {
 }
 
 export interface AuthState {
-  id: number;
-  username: string;
-  name: string;
-  role: string;
   token: string;
   isLoading: boolean;
-  success: boolean;
-  error: string | null;
+  loginSuccess: boolean;
+  registerSuccess: boolean;
+  logoutSuccess: boolean;
+  justLoggedIn: boolean;
+  error: AuthError | null;
+  id?: number;
+  username?: string;
+  name?: string;
+  role: string | null;
 }

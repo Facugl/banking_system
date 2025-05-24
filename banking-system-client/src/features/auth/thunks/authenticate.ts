@@ -1,21 +1,31 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { jwtDecode } from 'jwt-decode';
-import { AuthenticateRequest, DecodedToken } from '../types';
-import { authenticateApi } from '../services/authApi';
+import { AuthenticateRequest, AuthenticateResponse, AuthError } from '../types';
+import { authenticateApi } from '../authApi';
+import { decodeTokenRole } from '../../../utils/jwt';
 
-export const authenticate = createAsyncThunk(
+const authenticate = createAsyncThunk<
+  AuthenticateResponse,
+  AuthenticateRequest,
+  { rejectValue: AuthError }
+>(
   'auth/authenticate',
   async (credentials: AuthenticateRequest, { rejectWithValue }) => {
     try {
       const response = await authenticateApi(credentials);
-      const token = response.jwt;
-      const decoded: DecodedToken = jwtDecode(token);
-
-      return { token, role: decoded.role };
+      const jwt = response.jwt;
+      const role = decodeTokenRole(jwt) || '';
+      return { jwt, role };
     } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || 'Login failed, please try again.',
-      );
+      if (error.response && error.response.data) {
+        return rejectWithValue(error.response.data as AuthError);
+      }
+      return rejectWithValue({
+        frontendMessage: 'An unexpected error occurred during authentication',
+        backendMessage: error.message || 'Unknown error',
+        status: error.response?.status || 500,
+      } as AuthError);
     }
   },
 );
+
+export default authenticate;
