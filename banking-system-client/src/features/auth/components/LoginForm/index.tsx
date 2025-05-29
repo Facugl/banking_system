@@ -2,15 +2,9 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { CircularProgress } from '@mui/material';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import loginSchema from '../../validation/loginSchema';
-import { useAppSelector, useAppDispatch } from '../../../../store/hooks';
-import { authenticate } from '../../thunks';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { AuthenticateRequest } from '../../types';
-import { ROLES } from '../../../../utils/constants';
-import { useEffect } from 'react';
-import { showError, showSuccess } from '../../../../utils/toast';
-import { clearSuccess } from '../../authSlice';
-import { store } from '../../../../store/store';
+import { useAuth } from '../../hooks/useAuth';
 import {
   LoginContainer,
   LoginTitle,
@@ -21,11 +15,7 @@ import {
 } from './styles';
 
 const LoginForm: React.FC = () => {
-  const { isLoading, error, loginSuccess, role } = useAppSelector(
-    (state) => state.auth,
-  );
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
+  const { isLoading, error, handleLogin } = useAuth();
 
   const {
     register,
@@ -35,35 +25,9 @@ const LoginForm: React.FC = () => {
     resolver: yupResolver(loginSchema),
   });
 
-  const onSubmit: SubmitHandler<AuthenticateRequest> = async (data) => {
-    await dispatch(authenticate(data));
+  const onSubmit: SubmitHandler<AuthenticateRequest> = (data) => {
+    handleLogin(data);
   };
-
-  useEffect(() => {
-    if (loginSuccess) {
-      showSuccess('Successful login! 👍');
-      dispatch(clearSuccess());
-
-      setTimeout(() => {
-        const currentRole = role ?? store.getState().auth.role ?? '';
-        if (currentRole === ROLES.CUSTOMER) {
-          navigate('/customer-panel');
-        } else if (
-          [ROLES.ADMINISTRATOR, ROLES.EMPLOYEE].includes(currentRole)
-        ) {
-          navigate('/dashboard');
-        } else {
-          navigate('/unauthorized');
-        }
-      }, 2000);
-    }
-  }, [loginSuccess, dispatch, navigate, role]);
-
-  useEffect(() => {
-    if (error) {
-      showError(error.frontendMessage);
-    }
-  }, [error]);
 
   return (
     <LoginContainer>

@@ -1,14 +1,10 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { CircularProgress } from '@mui/material';
-import React, { useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
-import { registerCustomer } from '../../thunks';
 import registerSchema from '../../validation/registerSchema';
 import { RegisterRequest } from '../../types';
-import { useNavigate, Link } from 'react-router-dom';
-import { showError, showSuccess } from '../../../../utils/toast';
-import { clearSuccess } from '../../authSlice';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 import {
   RegisterContainer,
   RegisterTitle,
@@ -17,13 +13,17 @@ import {
   ErrorMessage,
   LoginPrompt,
 } from './styles';
+import { useEffect } from 'react';
+import { showSuccess } from '../../../../utils/toast';
+import { clearSuccess } from '../../authSlice';
+import { useAppDispatch } from '../../../../store/hooks';
 
 const RegisterForm: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { isLoading, error, registerSuccess } = useAppSelector(
-    (state) => state.auth,
-  );
   const navigate = useNavigate();
+  const { isLoading, error, registerSuccess, handleRegister } = useAuth({
+    skipRegisterSuccessHandling: true,
+  });
 
   const {
     register,
@@ -34,8 +34,8 @@ const RegisterForm: React.FC = () => {
     resolver: yupResolver(registerSchema),
   });
 
-  const onSubmit: SubmitHandler<RegisterRequest> = async (data) => {
-    await dispatch(registerCustomer(data));
+  const onSubmit: SubmitHandler<RegisterRequest> = (data) => {
+    handleRegister(data);
   };
 
   useEffect(() => {
@@ -49,12 +49,6 @@ const RegisterForm: React.FC = () => {
       });
     }
   }, [registerSuccess, dispatch, reset, navigate]);
-
-  useEffect(() => {
-    if (error) {
-      showError(error.frontendMessage);
-    }
-  }, [error]);
 
   return (
     <RegisterContainer>

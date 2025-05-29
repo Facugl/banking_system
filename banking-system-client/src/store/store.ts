@@ -3,13 +3,13 @@ import authReducer from '../features/auth/authSlice';
 import modulesSlice from '../features/modules/modulesSlice';
 import rolesSlice from '../features/roles/rolesSlice';
 import accountsSlice from '../features/accounts/accountsSlice';
-import statisticsSlice from '../features/statistics/statisticsSlice';
+import statisticsReducer from '../features/statistics/statisticsSlice';
 import { configureResponseInterceptor } from '../services/axiosInstance';
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
-    statistics: statisticsSlice,
+    statistics: statisticsReducer,
     accounts: accountsSlice,
     modules: modulesSlice,
     roles: rolesSlice,
