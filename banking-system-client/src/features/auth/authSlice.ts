@@ -2,9 +2,10 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AuthError, AuthState, RegisterResponse } from './types';
 import { decodeTokenRole } from '../../utils/jwt';
 import { authenticate, logout, registerCustomer } from './thunks';
+import { toast } from 'react-toastify';
 
 const initialState: AuthState = {
-  token: sessionStorage.getItem('authToken') || '',
+  token: sessionStorage.getItem('authToken') ?? '',
   isLoading: false,
   loginSuccess: false,
   registerSuccess: false,
@@ -14,7 +15,9 @@ const initialState: AuthState = {
   id: undefined,
   username: undefined,
   name: undefined,
-  role: decodeTokenRole(sessionStorage.getItem('authToken')) || null,
+  role: sessionStorage.getItem('authToken')
+    ? decodeTokenRole(sessionStorage.getItem('authToken')) || null
+    : null,
 };
 
 const authSlice = createSlice({
@@ -34,6 +37,7 @@ const authSlice = createSlice({
         state.isLoading = true;
         state.error = null;
         state.loginSuccess = false;
+        toast.dismiss();
       })
       .addCase(
         authenticate.fulfilled,
@@ -74,6 +78,7 @@ const authSlice = createSlice({
         state.isLoading = true;
         state.loginSuccess = false;
         state.error = null;
+        toast.dismiss();
       })
       .addCase(
         registerCustomer.fulfilled,
@@ -107,6 +112,7 @@ const authSlice = createSlice({
         state.isLoading = true;
         state.error = null;
         state.logoutSuccess = false;
+        toast.dismiss();
       })
       .addCase(
         logout.fulfilled,
@@ -123,6 +129,7 @@ const authSlice = createSlice({
           state.username = undefined;
           state.name = undefined;
           sessionStorage.removeItem('authToken');
+          toast.dismiss();
         },
       )
       .addCase(

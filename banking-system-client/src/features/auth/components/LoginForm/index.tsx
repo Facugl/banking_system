@@ -13,9 +13,12 @@ import {
   ErrorMessage,
   RegisterPrompt,
 } from './styles';
+import { toast } from 'react-toastify';
 
 const LoginForm: React.FC = () => {
-  const { isLoading, error, handleLogin } = useAuth();
+  const { isLoading, error, handleLogin } = useAuth({
+    showSuccessToast: true,
+  });
 
   const {
     register,
@@ -26,6 +29,7 @@ const LoginForm: React.FC = () => {
   });
 
   const onSubmit: SubmitHandler<AuthenticateRequest> = (data) => {
+    toast.dismiss();
     handleLogin(data);
   };
 

@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { HomeRedirect, PrivateRoute } from '../components';
 import {
   DashboardPage,
@@ -43,9 +43,7 @@ const AppRoutes = () => (
     <Route
       path='/dashboard'
       element={
-        <PrivateRoute
-          allowedRoles={[ROLES.ADMINISTRATOR, ROLES.EMPLOYEE, ROLES.CUSTOMER]}
-        >
+        <PrivateRoute allowedRoles={[ROLES.ADMINISTRATOR, ROLES.EMPLOYEE]}>
           <DashboardPage />
         </PrivateRoute>
       }
@@ -71,9 +69,7 @@ const AppRoutes = () => (
       <Route
         path='accounts'
         element={
-          <PrivateRoute
-            allowedRoles={[ROLES.ADMINISTRATOR, ROLES.EMPLOYEE, ROLES.CUSTOMER]}
-          >
+          <PrivateRoute allowedRoles={[ROLES.ADMINISTRATOR, ROLES.EMPLOYEE]}>
             <AccountsView />
           </PrivateRoute>
         }
@@ -124,6 +120,7 @@ const AppRoutes = () => (
     </Route>
 
     <Route path='/unauthorized' element={<UnauthorizedPage />} />
+    <Route path='*' element={<Navigate to='/unauthorized' replace />} />
   </Routes>
 );
 

@@ -1,22 +1,26 @@
 import styled from '@emotion/styled';
 import { Box } from '@mui/material';
 
-export const LoginPageContainer = styled(Box)`
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background-color: #f7fafc;
-  background-image: linear-gradient(135deg, #f0f4f8 0%, #f7fafc 100%);
-  padding: 2rem;
+export const LoginPageContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  minHeight: '100vh',
+  backgroundColor: theme.palette.background.default,
+  backgroundImage:
+    'linear-gradient(135deg, ' +
+    theme.palette.background.sidebar +
+    ' 0%, ' +
+    theme.palette.background.default +
+    ' 100%)',
+  padding: '2rem',
+  [theme.breakpoints.down('sm')]: {
+    padding: '1rem',
+  },
+}));
 
-  @media (max-width: 600px) {
-    padding: 1rem;
-  }
-`;
-
-export const LoginBackground = styled(Box)`
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
+export const LoginBackground = styled(Box)({
+  flex: 1,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+});

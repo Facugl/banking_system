@@ -23,6 +23,7 @@ const RegisterForm: React.FC = () => {
   const navigate = useNavigate();
   const { isLoading, error, registerSuccess, handleRegister } = useAuth({
     skipRegisterSuccessHandling: true,
+    showSuccessToast: false,
   });
 
   const {
@@ -41,6 +42,7 @@ const RegisterForm: React.FC = () => {
   useEffect(() => {
     if (registerSuccess) {
       showSuccess('Successful registration! 👍', {
+        toastId: 'register-success',
         onClose: () => {
           dispatch(clearSuccess());
           reset();

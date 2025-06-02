@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { getStatistics } from './thunks/getStatistics';
-import { StatisticsState } from './types';
+import { StatisticsError, StatisticsState } from './types';
 
 const initialState: StatisticsState = {
   statistics: null,
@@ -24,7 +24,7 @@ const statisticsSlice = createSlice({
       })
       .addCase(getStatistics.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload as string;
+        state.error = action.payload as StatisticsError;
       });
   },
 });
