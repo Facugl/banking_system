@@ -86,14 +86,6 @@ const AppRoutes = () => (
     >
       <Route index element={<AccountOverviewView />} />
       <Route
-        path='accounts'
-        element={
-          <PrivateRoute allowedRoles={[ROLES.CUSTOMER]}>
-            <AccountsView />
-          </PrivateRoute>
-        }
-      />
-      <Route
         path='transactions'
         element={
           <PrivateRoute allowedRoles={[ROLES.CUSTOMER]}>

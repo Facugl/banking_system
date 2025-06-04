@@ -17,6 +17,8 @@ export interface RegisterRequest extends AuthenticateRequest {
 export interface AuthenticateResponse {
   jwt: string;
   role: string;
+  username?: string;
+  name?: string;
 }
 
 export interface RegisterResponse {
@@ -28,8 +30,12 @@ export interface RegisterResponse {
 }
 
 export interface DecodedToken {
-  role: string;
-  exp: number;
+  role?: string;
+  sub?: string;
+  username?: string;
+  given_name?: string;
+  name?: string;
+  exp?: number;
 }
 
 export interface AuthState {

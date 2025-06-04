@@ -55,15 +55,11 @@ const Sidebar: React.FC = () => {
       path: '/dashboard/roles',
       roles: [ROLES.ADMINISTRATOR, ROLES.EMPLOYEE],
     },
-    // Shared Accounts menu item
     {
       text: 'Accounts',
       icon: <AccountCircleIcon />,
-      path:
-        role === ROLES.CUSTOMER
-          ? '/customer-panel/accounts'
-          : '/dashboard/accounts',
-      roles: [ROLES.ADMINISTRATOR, ROLES.EMPLOYEE, ROLES.CUSTOMER],
+      path: '/dashboard/accounts',
+      roles: [ROLES.ADMINISTRATOR, ROLES.EMPLOYEE],
     },
     // Customer-specific menu items
     {

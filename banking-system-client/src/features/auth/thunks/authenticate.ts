@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { AuthenticateRequest, AuthenticateResponse, AuthError } from '../types';
 import { authenticateApi } from '../authApi';
-import { decodeTokenRole } from '../../../utils/jwt';
+import { decodeToken } from '../../../utils/jwt';
 
 const authenticate = createAsyncThunk<
   AuthenticateResponse,
@@ -13,8 +13,9 @@ const authenticate = createAsyncThunk<
     try {
       const response = await authenticateApi(credentials);
       const jwt = response.jwt;
-      const role = decodeTokenRole(jwt) || '';
-      return { jwt, role };
+      const { role, username, name } = decodeToken(jwt);
+
+      return { jwt, role: role || '', username, name };
     } catch (error: any) {
       if (error.response && error.response.data) {
         return rejectWithValue(error.response.data as AuthError);

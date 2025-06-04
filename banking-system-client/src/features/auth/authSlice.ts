@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AuthError, AuthState, RegisterResponse } from './types';
-import { decodeTokenRole } from '../../utils/jwt';
+import { decodeToken } from '../../utils/jwt';
 import { authenticate, logout, registerCustomer } from './thunks';
 import { toast } from 'react-toastify';
 
@@ -15,9 +15,19 @@ const initialState: AuthState = {
   id: undefined,
   username: undefined,
   name: undefined,
-  role: sessionStorage.getItem('authToken')
-    ? decodeTokenRole(sessionStorage.getItem('authToken')) || null
-    : null,
+  role: null,
+  ...(() => {
+    const token = sessionStorage.getItem('authToken');
+    if (token) {
+      const decoded = decodeToken(token);
+      return {
+        role: decoded.role || null,
+        username: decoded.username || undefined,
+        name: decoded.name || undefined,
+      };
+    }
+    return {};
+  })(),
 };
 
 const authSlice = createSlice({
@@ -41,8 +51,16 @@ const authSlice = createSlice({
       })
       .addCase(
         authenticate.fulfilled,
-        (state, action: PayloadAction<{ jwt: string; role: string }>) => {
-          const { jwt, role } = action.payload;
+        (
+          state,
+          action: PayloadAction<{
+            jwt: string;
+            role: string;
+            username?: string;
+            name?: string;
+          }>,
+        ) => {
+          const { jwt, role, username, name } = action.payload;
           state.isLoading = false;
           state.loginSuccess = true;
           state.justLoggedIn = true;
@@ -50,8 +68,8 @@ const authSlice = createSlice({
           state.token = jwt;
           state.role = role;
           state.id = undefined;
-          state.username = undefined;
-          state.name = undefined;
+          state.username = username;
+          state.name = name;
           sessionStorage.setItem('authToken', jwt);
         },
       )
