@@ -1,14 +1,10 @@
 import axiosInstance from '../../services/axiosInstance';
-import {
-  AuthenticateResponse,
-  AuthenticateRequest,
-  RegisterRequest,
-  RegisterResponse,
-} from './types';
+import { ApiEndpoints } from '../../utils/constants';
+import { AuthResponse, AuthenticateRequest, RegisterRequest } from './types';
 
 export const authenticateApi = async (credentials: AuthenticateRequest) => {
-  const { data } = await axiosInstance.post<AuthenticateResponse>(
-    '/auth/authenticate',
+  const { data } = await axiosInstance.post<AuthResponse>(
+    ApiEndpoints.AUTHENTICATE,
     credentials,
   );
 
@@ -16,8 +12,8 @@ export const authenticateApi = async (credentials: AuthenticateRequest) => {
 };
 
 export const registerApi = async (customer: RegisterRequest) => {
-  const { data } = await axiosInstance.post<RegisterResponse>(
-    '/users',
+  const { data } = await axiosInstance.post<AuthResponse>(
+    ApiEndpoints.REGISTER,
     customer,
   );
 
@@ -26,7 +22,7 @@ export const registerApi = async (customer: RegisterRequest) => {
 
 export const logoutApi = async () => {
   const { data } = await axiosInstance.post<{ message: string }>(
-    '/auth/logout',
+    ApiEndpoints.LOGOUT,
   );
 
   return data;

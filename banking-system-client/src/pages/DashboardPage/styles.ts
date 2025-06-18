@@ -1,8 +1,8 @@
 import styled from '@emotion/styled';
-import { AppBar, Box, BoxProps, Container, Toolbar } from '@mui/material';
+import { AppBar, Box, Container, Toolbar, BoxProps } from '@mui/material';
 
 interface MainContentProps extends BoxProps {
-  component?: React.ElementType; // Acepta el prop 'component' (puede ser 'main', 'div', etc.)
+  component?: React.ElementType;
 }
 
 export const DashboardRoot = styled(Box)`
@@ -21,13 +21,21 @@ export const StyledAppBar = styled(AppBar)`
 export const StyledToolbar = styled(Toolbar)`
   display: flex;
   justify-content: space-between;
-  padding: 0 1.5rem;
+  padding: 0 1rem;
+
+  @media (min-width: 600px) {
+    padding: 0 1.5rem;
+  }
 `;
 
 export const MainContent = styled(Box)<MainContentProps>`
   flex-grow: 1;
   padding: 2rem;
   overflow-y: auto;
+
+  @media (max-width: 960px) {
+    padding: 1.5rem;
+  }
 
   @media (max-width: 600px) {
     padding: 1rem;
@@ -36,4 +44,9 @@ export const MainContent = styled(Box)<MainContentProps>`
 
 export const ContentContainer = styled(Container)`
   padding-top: 1.5rem;
+
+  @media (max-width: 600px) {
+    padding-left: 0;
+    padding-right: 0;
+  }
 `;

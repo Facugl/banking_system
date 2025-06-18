@@ -1,30 +1,30 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { AuthenticateRequest, AuthenticateResponse, AuthError } from '../types';
+import { AuthenticateRequest, AuthResponse } from '../types';
 import { authenticateApi } from '../authApi';
-import { decodeToken } from '../../../utils/jwt';
+import { AppError } from '../../../types';
+import { Messages, HttpStatus } from '../../../utils/constants';
+import getProfile from '../../customer/thunks/getProfile';
 
 const authenticate = createAsyncThunk<
-  AuthenticateResponse,
+  AuthResponse,
   AuthenticateRequest,
-  { rejectValue: AuthError }
+  { rejectValue: AppError }
 >(
   'auth/authenticate',
-  async (credentials: AuthenticateRequest, { rejectWithValue }) => {
+  async (credentials: AuthenticateRequest, { rejectWithValue, dispatch }) => {
     try {
-      const response = await authenticateApi(credentials);
-      const jwt = response.jwt;
-      const { role, username, name } = decodeToken(jwt);
+      const { jwt } = await authenticateApi(credentials);
+      sessionStorage.setItem('authToken', jwt);
 
-      return { jwt, role: role || '', username, name };
+      await dispatch(getProfile());
+
+      return { jwt };
     } catch (error: any) {
-      if (error.response && error.response.data) {
-        return rejectWithValue(error.response.data as AuthError);
-      }
       return rejectWithValue({
-        frontendMessage: 'An unexpected error occurred during authentication',
-        backendMessage: error.message || 'Unknown error',
-        status: error.response?.status || 500,
-      } as AuthError);
+        frontendMessage: Messages.AUTHENTICATION_FAILED,
+        backendMessage: error.message || Messages.UNKNOWN,
+        status: error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      });
     }
   },
 );

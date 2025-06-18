@@ -1,48 +1,37 @@
 import { Navigate } from 'react-router-dom';
-import { useAppSelector } from '../../store/hooks';
-import { PrivateRouteProp } from './types';
-import { CenteredBox } from './styles';
-import { CircularProgress } from '@mui/material';
-import { ROLES } from '../../utils/constants';
+import { ROLES, Routes } from '../../utils/constants';
+import { useAuthSession } from '../../hooks/useAuthSession';
 
-const PrivateRoute: React.FC<PrivateRouteProp> = ({
-  allowedRoles = [],
+interface PrivateRouteProps {
+  allowedRoles?: string[];
+  publicRoute?: boolean;
+  children?: React.ReactNode;
+}
+
+const PrivateRoute = ({
+  allowedRoles,
   publicRoute = false,
   children,
-}) => {
-  const { token, role, isLoading, justLoggedIn } = useAppSelector(
-    (state) => state.auth,
-  );
+}: PrivateRouteProps) => {
+  const { token, profile } = useAuthSession();
+  const isAuthenticated = !!token;
+  const userRole = profile?.role;
 
-  const authReady = !isLoading && (role !== null || !token);
-
-  if (!authReady) {
-    return (
-      <CenteredBox>
-        <CircularProgress size={24} />
-      </CenteredBox>
-    );
-  }
-
-  if (publicRoute && token && !justLoggedIn) {
-    if (role === ROLES.CUSTOMER) {
-      return <Navigate to='/customer-panel' replace />;
+  if (publicRoute) {
+    if (isAuthenticated && userRole) {
+      const redirectTo =
+        userRole === ROLES.CUSTOMER ? Routes.CUSTOMER_PANEL : Routes.DASHBOARD;
+      return <Navigate to={redirectTo} replace />;
     }
-    if (role === ROLES.ADMINISTRATOR || role === ROLES.EMPLOYEE) {
-      return <Navigate to='/dashboard' replace />;
-    }
-
     return <>{children}</>;
   }
 
-  if (!publicRoute && !token) {
-    return <Navigate to='/login' replace />;
+  if (!isAuthenticated || !userRole) {
+    return <Navigate to={Routes.LOGIN} replace />;
   }
 
-  if (!publicRoute && allowedRoles.length > 0) {
-    if (!role || !allowedRoles.includes(role)) {
-      return <Navigate to='/unauthorized' replace />;
-    }
+  if (allowedRoles && !allowedRoles.includes(userRole)) {
+    return <Navigate to={Routes.UNAUTHORIZED} replace />;
   }
 
   return <>{children}</>;

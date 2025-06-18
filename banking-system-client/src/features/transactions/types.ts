@@ -1,4 +1,4 @@
-import type { Account } from '../accounts/types';
+import { AppError } from '../../types';
 
 export enum TransactionType {
   DEPOSIT = 'DEPOSIT',
@@ -20,22 +20,21 @@ export interface TransactionResponse {
 export interface Transaction {
   id: number;
   transactionNumber: string;
-  sourceAccount: Account | null;
-  targetAccount: Account | null;
+  sourceAccount: string | null;
+  targetAccount: string | null;
   amount: number;
   transactionDate: string;
   type: TransactionType;
   comment?: string;
 }
 
-// Por si necesito un tipo simplificado para Account
 export interface SimpleAccount {
   id: number;
   accountNumber: string;
 }
 
 export interface TransactionsState {
-  transactions: TransactionResponse[];
+  transactions: Transaction[];
   isLoading: boolean;
-  error: string | null;
+  error: AppError | null;
 }

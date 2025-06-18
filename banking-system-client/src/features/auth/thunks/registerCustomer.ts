@@ -1,25 +1,28 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { registerApi } from '../authApi';
-import { AuthError, RegisterRequest, RegisterResponse } from '../types';
+import { RegisterRequest, AuthResponse } from '../types';
+import { AppError } from '../../../types';
+import { Messages, HttpStatus } from '../../../utils/constants';
+import getProfile from '../../customer/thunks/getProfile';
 
 const registerCustomer = createAsyncThunk<
-  RegisterResponse,
+  AuthResponse,
   RegisterRequest,
-  { rejectValue: AuthError }
->('users', async (customer: RegisterRequest, { rejectWithValue }) => {
+  { rejectValue: AppError }
+>('users', async (customer: RegisterRequest, { rejectWithValue, dispatch }) => {
   try {
-    const response = await registerApi(customer);
-    const { jwt, ...customerData } = response;
-    return { jwt, ...customerData };
+    const { jwt } = await registerApi(customer);
+    sessionStorage.setItem('authToken', jwt);
+
+    await dispatch(getProfile());
+
+    return { jwt };
   } catch (error: any) {
-    if (error.response && error.response.data) {
-      return rejectWithValue(error.response.data as AuthError);
-    }
     return rejectWithValue({
-      frontendMessage: 'An unexpected error occurred during registration',
-      backendMessage: error.message || 'Unknown error',
-      status: error.response?.status || 500,
-    } as AuthError);
+      frontendMessage: Messages.REGISTRATION_FAILED,
+      backendMessage: error.message || Messages.UNKNOWN,
+      status: error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+    });
   }
 });
 

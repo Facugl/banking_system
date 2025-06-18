@@ -1,26 +1,26 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { AuthenticateRequest, RegisterRequest } from '../types';
-import { useNavigate } from 'react-router-dom';
+import {
+  AuthenticateRequest,
+  RegisterRequest,
+  UseAuthOptions,
+  UseAuthReturn,
+} from '../types';
 import { showError, showSuccess } from '../../../utils/toast';
-import { ROLES } from '../../../utils/constants';
+import { Messages, Role, ToastIds } from '../../../utils/constants';
 import { authenticate, logout, registerCustomer } from '../thunks';
 import { clearSuccess } from '../authSlice';
 
-interface UseAuthOptions {
-  skipRegisterSuccessHandling?: boolean;
-  showSuccessToast?: boolean;
-}
+export const useAuth = (options: UseAuthOptions = {}): UseAuthReturn => {
+  const { showSuccessToast = true } = options;
 
-export const useAuth = ({
-  skipRegisterSuccessHandling = false,
-  showSuccessToast = true,
-}: UseAuthOptions = {}) => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
-  const hasShownSuccessRef = useRef(false);
-  const { isLoading, error, loginSuccess, registerSuccess, role } =
-    useAppSelector((state) => state.auth);
+
+  const { isLoading, error, loginSuccess, registerSuccess } = useAppSelector(
+    (state) => state.auth,
+  );
+  const { profile } = useAppSelector((state) => state.customer);
+  const role = profile?.role as Role;
 
   const handleLogin = (credentials: AuthenticateRequest) => {
     dispatch(authenticate(credentials));
@@ -35,53 +35,35 @@ export const useAuth = ({
   };
 
   useEffect(() => {
-    if (
-      (loginSuccess || (registerSuccess && !skipRegisterSuccessHandling)) &&
-      !hasShownSuccessRef.current &&
-      showSuccessToast
-    ) {
-      hasShownSuccessRef.current = true;
-      showSuccess('Successful login! 👍', {
-        toastId: 'login-success',
-        autoClose: 2000,
+    if (loginSuccess && showSuccessToast) {
+      showSuccess(Messages.LOGIN_SUCCESS, {
+        toastId: ToastIds.LOGIN_SUCCESS,
       });
       dispatch(clearSuccess());
-
-      setTimeout(() => {
-        const currentRole = role ?? '';
-        if (currentRole === ROLES.CUSTOMER) {
-          navigate('/customer-panel');
-        } else if (
-          [ROLES.ADMINISTRATOR, ROLES.EMPLOYEE].includes(currentRole)
-        ) {
-          navigate('/dashboard');
-        } else {
-          navigate('/unauthorized');
-        }
-        hasShownSuccessRef.current = false;
-      }, 2000);
     }
-  }, [
-    loginSuccess,
-    registerSuccess,
-    dispatch,
-    navigate,
-    skipRegisterSuccessHandling,
-    showSuccessToast,
-  ]);
+  }, [loginSuccess, showSuccessToast, dispatch]);
+
+  useEffect(() => {
+    if (registerSuccess && showSuccessToast) {
+      showSuccess(Messages.REGISTER_SUCCESS, {
+        toastId: ToastIds.REGISTER_SUCCESS,
+      });
+      dispatch(clearSuccess());
+    }
+  }, [registerSuccess, showSuccessToast, dispatch]);
 
   useEffect(() => {
     if (error) {
-      showError(error.frontendMessage, { toastId: 'auth-error' });
+      showError(error.frontendMessage, { toastId: ToastIds.AUTH_ERROR });
     }
   }, [error]);
 
   return {
     isLoading,
     error,
+    role,
     loginSuccess,
     registerSuccess,
-    role,
     handleLogin,
     handleRegister,
     handleLogout,

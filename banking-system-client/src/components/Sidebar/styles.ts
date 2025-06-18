@@ -1,7 +1,12 @@
 import styled from '@emotion/styled';
-import { Drawer, ListItemButton, Toolbar, Typography } from '@mui/material';
-import type { TypographyProps } from '@mui/material/Typography';
-import type { ListItemButtonProps } from '@mui/material/ListItemButton';
+import {
+  Drawer,
+  ListItemButton,
+  Toolbar,
+  Typography,
+  TypographyProps,
+  ListItemButtonProps,
+} from '@mui/material';
 
 export const StyledDrawer = styled(Drawer)`
   width: 260px;
@@ -16,7 +21,7 @@ export const StyledDrawer = styled(Drawer)`
 `;
 
 export const LogoContainer = styled(Toolbar)`
-  padding: 1.5rem 1rem;
+  padding: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -27,6 +32,11 @@ export const BrandName = styled(Typography)<TypographyProps>`
   color: #1a365d;
   font-size: 1.25rem;
   text-align: center;
+
+  @media (max-width: 600px) {
+    font-size: 1rem;
+  }
+
   position: relative;
 
   &::after {
@@ -42,7 +52,7 @@ export const BrandName = styled(Typography)<TypographyProps>`
   }
 `;
 
-interface StyledListItemProps extends Omit<ListItemButtonProps, 'isActive'> {
+interface StyledListItemProps extends ListItemButtonProps {
   isActive?: boolean;
   to?: string;
 }
@@ -60,11 +70,11 @@ export const StyledListItem = styled(ListItemButton, {
       ? `
     background-color: rgba(26, 54, 93, 0.08);
     border-left: 4px solid #1A365D;
-    
+
     .MuiListItemIcon-root {
       color: #1A365D;
     }
-    
+
     .MuiTypography-root {
       font-weight: 600;
       color: #1A365D;

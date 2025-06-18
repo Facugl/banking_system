@@ -1,65 +1,77 @@
-import { useForm } from 'react-hook-form';
-import { Typography, Box, TextField, Button } from '@mui/material';
-import { useAppSelector } from '../../../../store/hooks';
-
-interface ProfileForm {
-  email: string;
-  phone: string;
-}
+import { Typography, Chip, CardContent } from '@mui/material';
+import { useProfile } from '../../hooks/useProfile';
+import ErrorMessage from '../../../../components/ErrorMessage';
+import LoadingSpinner from '../../../../components/LoadingSpinner';
+import EmptyState from '../../../../components/EmptyState';
+import { getInitials } from '../../../../utils/getInitialsUtils';
+import {
+  ProfileCard,
+  AvatarContainer,
+  InfoRow,
+  StyledAvatar,
+  PageWrapper,
+  SectionTitle,
+  PermissionsWrapper,
+} from './styles';
+import { Messages, permissionLabels } from '../../../../utils/constants';
 
 const ProfileView: React.FC = () => {
-  //   const user = useAppSelector((state) => state.auth.user);
-  const user = {
-    email: 'email@gmail.com',
-    phone: '12121212',
-  };
+  const { profile, isLoading, error } = useProfile();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<ProfileForm>({
-    defaultValues: {
-      email: user?.email || '',
-      phone: user?.phone || '',
-    },
-  });
-
-  const onSubmit = (data: ProfileForm) => {
-    console.log('Update Profile:', data);
-    // Dispatch update profile action to Redux
-  };
+  if (isLoading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage message={error.frontendMessage} />;
+  if (!profile) return <EmptyState message={Messages.NOT_FOUND} />;
 
   return (
-    <Box>
-      <Typography variant='h6' gutterBottom>
-        Profile
-      </Typography>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <TextField
-          label='Email'
-          fullWidth
-          {...register('email', {
-            required: 'Email is required',
-            pattern: /^\S+@\S+$/i,
-          })}
-          error={!!errors.email}
-          helperText={errors.email?.message}
-          margin='normal'
-        />
-        <TextField
-          label='Phone'
-          fullWidth
-          {...register('phone', { required: 'Phone is required' })}
-          error={!!errors.phone}
-          helperText={errors.phone?.message}
-          margin='normal'
-        />
-        <Button type='submit' variant='contained' sx={{ mt: 2 }}>
-          Update Profile
-        </Button>
-      </form>
-    </Box>
+    <PageWrapper>
+      <SectionTitle variant='h4'>My Profile</SectionTitle>
+      <ProfileCard>
+        <CardContent>
+          <AvatarContainer>
+            <StyledAvatar>{getInitials(profile.name)}</StyledAvatar>
+          </AvatarContainer>
+
+          <InfoRow>
+            <Typography variant='h6' color='text.secondary'>
+              Full Name:
+            </Typography>
+            <Typography variant='body1'>{profile.name}</Typography>
+          </InfoRow>
+
+          <InfoRow>
+            <Typography variant='h6' color='text.secondary'>
+              Username:
+            </Typography>
+            <Typography variant='body1'>{profile.username}</Typography>
+          </InfoRow>
+
+          <InfoRow>
+            <Typography variant='h6' color='text.secondary'>
+              Role:
+            </Typography>
+            <Typography variant='body1'>{profile.role}</Typography>
+          </InfoRow>
+
+          {profile.role !== 'CUSTOMER' && (
+            <InfoRow>
+              <Typography variant='h6' color='text.secondary'>
+                Permissions:
+              </Typography>
+              <PermissionsWrapper>
+                {profile.authorities.map((authority) => (
+                  <Chip
+                    key={authority}
+                    label={permissionLabels[authority] || authority}
+                    color='primary'
+                    variant='outlined'
+                  />
+                ))}
+              </PermissionsWrapper>
+            </InfoRow>
+          )}
+        </CardContent>
+      </ProfileCard>
+    </PageWrapper>
   );
 };
 

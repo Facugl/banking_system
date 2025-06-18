@@ -1,8 +1,5 @@
-export interface AuthError {
-  frontendMessage: string;
-  backendMessage: string;
-  status: number;
-}
+import { AppError } from '../../types';
+import { Role } from '../../utils/constants';
 
 export interface AuthenticateRequest {
   username: string;
@@ -14,40 +11,32 @@ export interface RegisterRequest extends AuthenticateRequest {
   repeatedPassword: string;
 }
 
-export interface AuthenticateResponse {
+export interface AuthResponse {
   jwt: string;
-  role: string;
-  username?: string;
-  name?: string;
-}
-
-export interface RegisterResponse {
-  jwt: string;
-  id: number;
-  username: string;
-  name: string;
-  role: string;
-}
-
-export interface DecodedToken {
-  role?: string;
-  sub?: string;
-  username?: string;
-  given_name?: string;
-  name?: string;
-  exp?: number;
 }
 
 export interface AuthState {
   token: string;
   isLoading: boolean;
+  sessionLoading: boolean;
   loginSuccess: boolean;
   registerSuccess: boolean;
   logoutSuccess: boolean;
   justLoggedIn: boolean;
-  error: AuthError | null;
-  id?: number;
-  username?: string;
-  name?: string;
-  role: string | null;
+  error: AppError | null;
+}
+
+export interface UseAuthOptions {
+  showSuccessToast?: boolean;
+}
+
+export interface UseAuthReturn {
+  isLoading: boolean;
+  error: AppError | null;
+  role: Role | undefined;
+  loginSuccess: boolean;
+  registerSuccess: boolean;
+  handleLogin: (credentials: AuthenticateRequest) => void;
+  handleRegister: (customer: RegisterRequest) => void;
+  handleLogout: () => void;
 }

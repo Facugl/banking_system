@@ -2,8 +2,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { CircularProgress } from '@mui/material';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import loginSchema from '../../validation/loginSchema';
-import { Link } from 'react-router-dom';
-import { AuthenticateRequest } from '../../types';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import {
   LoginContainer,
@@ -13,25 +12,49 @@ import {
   ErrorMessage,
   RegisterPrompt,
 } from './styles';
-import { toast } from 'react-toastify';
+import { useEffect } from 'react';
+import { clearSuccess } from '../../authSlice';
+import { useAppDispatch } from '../../../../store/hooks';
+import { Messages, ROLES, Routes, ToastIds } from '../../../../utils/constants';
+import { showSuccess } from '../../../../utils/toast';
+import { AuthenticateRequest } from '../../types';
 
 const LoginForm: React.FC = () => {
-  const { isLoading, error, handleLogin } = useAuth({
-    showSuccessToast: true,
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { isLoading, error, loginSuccess, handleLogin, role } = useAuth({
+    showSuccessToast: false,
   });
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<AuthenticateRequest>({
     resolver: yupResolver(loginSchema),
   });
 
   const onSubmit: SubmitHandler<AuthenticateRequest> = (data) => {
-    toast.dismiss();
     handleLogin(data);
   };
+
+  useEffect(() => {
+    if (loginSuccess) {
+      showSuccess(Messages.LOGIN_SUCCESS, {
+        toastId: ToastIds.LOGIN_SUCCESS,
+        onClose: () => {
+          dispatch(clearSuccess());
+          reset();
+          if (role === ROLES.CUSTOMER) {
+            navigate(Routes.CUSTOMER_PANEL);
+          } else if (role === ROLES.ADMINISTRATOR || role === ROLES.EMPLOYEE) {
+            navigate(Routes.DASHBOARD);
+          }
+        },
+      });
+    }
+  }, [loginSuccess, dispatch, reset, navigate, role]);
 
   return (
     <LoginContainer>
@@ -65,7 +88,7 @@ const LoginForm: React.FC = () => {
         </LoginButton>
       </form>
       <RegisterPrompt>
-        Don't have an account? <Link to='/register'>Register here</Link>
+        Don't have an account? <Link to={Routes.REGISTER}>Register here</Link>
       </RegisterPrompt>
     </LoginContainer>
   );

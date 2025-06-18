@@ -14,15 +14,15 @@ import {
   LoginPrompt,
 } from './styles';
 import { useEffect } from 'react';
-import { showSuccess } from '../../../../utils/toast';
 import { clearSuccess } from '../../authSlice';
 import { useAppDispatch } from '../../../../store/hooks';
+import { Messages, Routes, ToastIds } from '../../../../utils/constants';
+import { showSuccess } from '../../../../utils/toast';
 
 const RegisterForm: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { isLoading, error, registerSuccess, handleRegister } = useAuth({
-    skipRegisterSuccessHandling: true,
     showSuccessToast: false,
   });
 
@@ -41,12 +41,12 @@ const RegisterForm: React.FC = () => {
 
   useEffect(() => {
     if (registerSuccess) {
-      showSuccess('Successful registration! 👍', {
-        toastId: 'register-success',
+      showSuccess(Messages.REGISTER_SUCCESS, {
+        toastId: ToastIds.REGISTER_SUCCESS,
         onClose: () => {
           dispatch(clearSuccess());
           reset();
-          navigate('/login');
+          navigate(Routes.LOGIN);
         },
       });
     }
@@ -60,7 +60,7 @@ const RegisterForm: React.FC = () => {
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <StyledTextField
-          label='Name'
+          label='Full Name'
           fullWidth
           {...register('name')}
           error={!!errors.name}
@@ -101,7 +101,7 @@ const RegisterForm: React.FC = () => {
         </RegisterButton>
       </form>
       <LoginPrompt>
-        Already have an account? <Link to='/login'>Log in here</Link>
+        Already have an account? <Link to={Routes.LOGIN}>Log in here</Link>
       </LoginPrompt>
     </RegisterContainer>
   );

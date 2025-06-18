@@ -1,5 +1,4 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { HomeRedirect, PrivateRoute } from '../components';
 import {
   DashboardPage,
   LoginPage,
@@ -7,24 +6,22 @@ import {
   UnauthorizedPage,
   CustomerPanelPage,
 } from '../pages';
-import { ROLES } from '../utils/constants';
+import { ROLES, Routes as Path } from '../utils/constants';
 import RolesView from '../features/roles/views/RolesView';
 import AccountsView from '../features/accounts/views/AccountsView';
 import StatisticsView from '../features/statistics/views/StatisticsView';
 import ModulesView from '../features/modules/views/ModulesView';
-import {
-  AccountOverviewView,
-  ProfileView,
-  TransactionsView,
-  TransfersView,
-} from '../features/customer/views';
+import TransactionsView from '../features/transactions/TransactionsView';
+import CustomerAccountsView from '../features/accounts/views/CustomerAccountsView';
+import ProfileView from '../features/customer/views/ProfileView';
+import LandingPage from '../pages/LandingPage';
+import { PrivateRoute } from '../components';
 
 const AppRoutes = () => (
   <Routes>
-    <Route path='/' element={<HomeRedirect />} />
-
+    <Route path='/' element={<LandingPage />} />
     <Route
-      path='/login'
+      path={Path.LOGIN}
       element={
         <PrivateRoute publicRoute>
           <LoginPage />
@@ -32,16 +29,15 @@ const AppRoutes = () => (
       }
     />
     <Route
-      path='/register'
+      path={Path.REGISTER}
       element={
         <PrivateRoute publicRoute>
           <RegisterPage />
         </PrivateRoute>
       }
     />
-
     <Route
-      path='/dashboard'
+      path={Path.DASHBOARD}
       element={
         <PrivateRoute allowedRoles={[ROLES.ADMINISTRATOR, ROLES.EMPLOYEE]}>
           <DashboardPage />
@@ -49,70 +45,24 @@ const AppRoutes = () => (
       }
     >
       <Route index element={<StatisticsView />} />
-
-      <Route
-        path='modules'
-        element={
-          <PrivateRoute allowedRoles={[ROLES.ADMINISTRATOR, ROLES.EMPLOYEE]}>
-            <ModulesView />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path='roles'
-        element={
-          <PrivateRoute allowedRoles={[ROLES.ADMINISTRATOR, ROLES.EMPLOYEE]}>
-            <RolesView />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path='accounts'
-        element={
-          <PrivateRoute allowedRoles={[ROLES.ADMINISTRATOR, ROLES.EMPLOYEE]}>
-            <AccountsView />
-          </PrivateRoute>
-        }
-      />
+      <Route path='modules' element={<ModulesView />} />
+      <Route path='roles' element={<RolesView />} />
+      <Route path='accounts' element={<AccountsView />} />
     </Route>
-
     <Route
-      path='/customer-panel'
+      path={Path.CUSTOMER_PANEL}
       element={
         <PrivateRoute allowedRoles={[ROLES.CUSTOMER]}>
           <CustomerPanelPage />
         </PrivateRoute>
       }
     >
-      <Route index element={<AccountOverviewView />} />
-      <Route
-        path='transactions'
-        element={
-          <PrivateRoute allowedRoles={[ROLES.CUSTOMER]}>
-            <TransactionsView />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path='transfers'
-        element={
-          <PrivateRoute allowedRoles={[ROLES.CUSTOMER]}>
-            <TransfersView />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path='profile'
-        element={
-          <PrivateRoute allowedRoles={[ROLES.CUSTOMER]}>
-            <ProfileView />
-          </PrivateRoute>
-        }
-      />
+      <Route index element={<CustomerAccountsView />} />
+      <Route path='transactions' element={<TransactionsView />} />
+      <Route path='profile' element={<ProfileView />} />
     </Route>
-
-    <Route path='/unauthorized' element={<UnauthorizedPage />} />
-    <Route path='*' element={<Navigate to='/unauthorized' replace />} />
+    <Route path={Path.UNAUTHORIZED} element={<UnauthorizedPage />} />
+    <Route path='*' element={<Navigate to={Path.UNAUTHORIZED} replace />} />
   </Routes>
 );
 

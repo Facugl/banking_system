@@ -1,24 +1,27 @@
 import { BrowserRouter as Router } from 'react-router-dom';
+import { useAppSelector } from './store/hooks';
 import AppRoutes from './routes/AppRoutes';
-import { useAppDispatch, useAppSelector } from './store/hooks';
-import { useEffect } from 'react';
-import { logout } from './features/auth/thunks';
+import React, { useMemo } from 'react';
+import { createSelector } from 'reselect';
+import { RootState } from './store/store';
+
+const selectAuthLoading = createSelector(
+  (state: RootState) => state.auth.isLoading,
+  (isLoading) => isLoading,
+);
 
 const App = () => {
-  const dispatch = useAppDispatch();
-  const { token, role } = useAppSelector((state) => state.auth);
+  const authLoading = useAppSelector(selectAuthLoading);
 
-  useEffect(() => {
-    if (token && role === null) {
-      dispatch(logout());
-    }
-  }, [token, role, dispatch]);
+  const content = useMemo(() => {
+    return (
+      <Router>
+        <AppRoutes />
+      </Router>
+    );
+  }, [authLoading]);
 
-  return (
-    <Router>
-      <AppRoutes />
-    </Router>
-  );
+  return content;
 };
 
-export default App;
+export default React.memo(App);

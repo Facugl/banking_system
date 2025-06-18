@@ -5,21 +5,20 @@ import {
   ErrorMessage,
   BackButton,
 } from './styles';
+import { Messages, HttpStatus, Routes } from '../../utils/constants';
 
 const UnauthorizedPage: React.FC = () => {
   return (
     <UnauthorizedContainer>
-      <ErrorCode variant='h1'>401</ErrorCode>
-      <ErrorMessage variant='h5'>
-        You are not authorized to access this page
-      </ErrorMessage>
+      <ErrorCode variant='h1'>{HttpStatus.UNAUTHORIZED}</ErrorCode>
+      <ErrorMessage variant='h5'>{Messages.UNAUTHORIZED}</ErrorMessage>
       <BackButton
         variant='contained'
         component={Link}
-        to='/login'
-        aria-label='Navigate back to login page'
+        to={Routes.HOME}
+        aria-label='Navigate back to home page'
       >
-        Back to login
+        Back to Home
       </BackButton>
     </UnauthorizedContainer>
   );

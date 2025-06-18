@@ -4,10 +4,8 @@ import { List, ListItemIcon, ListItemText, Divider } from '@mui/material';
 import {
   Home as HomeIcon,
   Group as GroupIcon,
-  Lock as LockIcon,
   Settings as SettingsIcon,
   AccountCircle as AccountCircleIcon,
-  SwapHoriz as TransferIcon,
   History as HistoryIcon,
   Person as ProfileIcon,
 } from '@mui/icons-material';
@@ -17,79 +15,70 @@ import {
   BrandName,
   StyledListItem,
 } from './styles';
-import { ROLES } from '../../utils/constants';
+import { ROLES, Role, Routes } from '../../utils/constants';
 
-const Sidebar: React.FC = () => {
+interface SidebarProps {
+  mobileOpen: boolean;
+  onDrawerToggle: () => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onDrawerToggle }) => {
   const location = useLocation();
-  const role = useAppSelector((state) => state.auth.role);
+  const profile = useAppSelector((state) => state.customer.profile);
+  const role = profile?.role as Role | undefined;
 
-  const menuItems = [
-    // Admin/Employee menu items
+  const menuItems: Array<{
+    text: string;
+    icon: JSX.Element;
+    path: string;
+    roles: Role[];
+  }> = [
     {
       text: 'Home',
       icon: <HomeIcon />,
-      path: '/dashboard',
+      path: Routes.DASHBOARD,
       roles: [ROLES.ADMINISTRATOR, ROLES.EMPLOYEE],
     },
     {
       text: 'Modules',
       icon: <SettingsIcon />,
-      path: '/dashboard/modules',
+      path: Routes.DASHBOARD_MODULES,
       roles: [ROLES.ADMINISTRATOR, ROLES.EMPLOYEE],
-    },
-    {
-      text: 'Operations',
-      icon: <SettingsIcon />,
-      path: '/dashboard/operations',
-      roles: [ROLES.ADMINISTRATOR],
-    },
-    {
-      text: 'Permissions',
-      icon: <LockIcon />,
-      path: '/dashboard/permissions',
-      roles: [ROLES.ADMINISTRATOR],
     },
     {
       text: 'Roles',
       icon: <GroupIcon />,
-      path: '/dashboard/roles',
+      path: Routes.DASHBOARD_ROLES,
       roles: [ROLES.ADMINISTRATOR, ROLES.EMPLOYEE],
     },
     {
       text: 'Accounts',
       icon: <AccountCircleIcon />,
-      path: '/dashboard/accounts',
+      path: Routes.DASHBOARD_ACCOUNTS,
       roles: [ROLES.ADMINISTRATOR, ROLES.EMPLOYEE],
     },
-    // Customer-specific menu items
     {
-      text: 'Account Overview',
+      text: 'Home',
       icon: <HomeIcon />,
-      path: '/customer-panel',
+      path: Routes.CUSTOMER_PANEL,
       roles: [ROLES.CUSTOMER],
     },
     {
       text: 'Transactions',
       icon: <HistoryIcon />,
-      path: '/customer-panel/transactions',
-      roles: [ROLES.CUSTOMER],
-    },
-    {
-      text: 'Transfers',
-      icon: <TransferIcon />,
-      path: '/customer-panel/transfers',
+      path: Routes.CUSTOMER_TRANSACTIONS,
       roles: [ROLES.CUSTOMER],
     },
     {
       text: 'Profile',
       icon: <ProfileIcon />,
-      path: '/customer-panel/profile',
+      path: Routes.CUSTOMER_PROFILE,
       roles: [ROLES.CUSTOMER],
     },
   ];
 
-  return (
-    <StyledDrawer variant='permanent' anchor='left'>
+  const drawerContent = (
+    <>
       <LogoContainer>
         <BrandName variant='h6' noWrap component='div'>
           Banking System
@@ -104,14 +93,41 @@ const Sidebar: React.FC = () => {
               key={item.text}
               component={Link}
               to={item.path}
-              isActive={location.pathname.startsWith(item.path)}
+              isActive={
+                item.path === Routes.CUSTOMER_PANEL ||
+                item.path === Routes.DASHBOARD
+                  ? location.pathname === item.path
+                  : location.pathname.startsWith(item.path)
+              }
             >
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
             </StyledListItem>
           ))}
       </List>
-    </StyledDrawer>
+    </>
+  );
+
+  return (
+    <>
+      <StyledDrawer
+        variant='temporary'
+        open={mobileOpen}
+        onClose={onDrawerToggle}
+        ModalProps={{ keepMounted: true }}
+        sx={{ display: { xs: 'block', md: 'none' } }}
+      >
+        {drawerContent}
+      </StyledDrawer>
+
+      <StyledDrawer
+        variant='permanent'
+        open
+        sx={{ display: { xs: 'none', md: 'block' } }}
+      >
+        {drawerContent}
+      </StyledDrawer>
+    </>
   );
 };
 
