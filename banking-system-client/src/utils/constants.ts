@@ -63,6 +63,7 @@ export const Messages = {
   TRANSACTIONS_FETCH_ERROR: 'Failed to fetch transactions.',
   TRANSACTIONS_NOT_FOUND: 'No transactions found.',
   TRANSACTION_NOT_FOUND: 'No transaction found.',
+  COMMENT_NOT_EMPTY: 'Comment cannot be empty',
 } as const;
 
 export const ApiEndpoints = {

@@ -1,13 +1,4 @@
-import {
-  Container,
-  Typography,
-  Grid,
-  Box,
-  Stack,
-  TextField,
-  Button,
-  Avatar,
-} from '@mui/material';
+import { Grid, Stack, TextField, Button, Typography } from '@mui/material';
 import {
   Email as EmailIcon,
   Phone as PhoneIcon,
@@ -15,36 +6,35 @@ import {
   Schedule as ScheduleIcon,
 } from '@mui/icons-material';
 import ModernCard, { CardContent } from '../../../../components/ModernCard';
+import {
+  StyledContainer,
+  SectionHeader,
+  SectionSubtitle,
+  StyledCardTitle,
+  ContactItem,
+  ContactAvatar,
+  StyledForm,
+} from './styles';
 
 const ContactSection = () => {
   return (
-    <Container maxWidth='lg' sx={{ py: 10 }} id='contact'>
-      <Box textAlign='center' mb={8}>
-        <Typography
-          variant='h2'
-          component='h2'
-          gutterBottom
-          sx={{ fontWeight: 'bold' }}
-        >
+    <StyledContainer maxWidth='lg' id='contact'>
+      <SectionHeader>
+        <Typography variant='h2' component='h2' gutterBottom>
           Get in Touch
         </Typography>
-        <Typography variant='h6' color='text.secondary'>
+        <SectionSubtitle variant='h6'>
           We're here to help you with all your banking needs
-        </Typography>
-      </Box>
+        </SectionSubtitle>
+      </SectionHeader>
 
       <Grid container spacing={6}>
         <Grid item xs={12} lg={6}>
           <ModernCard>
             <CardContent sx={{ p: 4 }}>
-              <Typography
-                variant='h4'
-                component='h3'
-                gutterBottom
-                sx={{ fontWeight: 'bold' }}
-              >
+              <StyledCardTitle variant='h4' component='h3' gutterBottom>
                 Contact Information
-              </Typography>
+              </StyledCardTitle>
               <Stack spacing={3} sx={{ mt: 4 }}>
                 {[
                   {
@@ -52,7 +42,11 @@ const ContactSection = () => {
                     title: 'Email',
                     info: 'support@horizonbank.com',
                   },
-                  { icon: PhoneIcon, title: 'Phone', info: '(800) 123-4567' },
+                  {
+                    icon: PhoneIcon,
+                    title: 'Phone',
+                    info: '(800) 123-4567',
+                  },
                   {
                     icon: LocationOnIcon,
                     title: 'Address',
@@ -64,22 +58,19 @@ const ContactSection = () => {
                     info: 'Monday–Friday, 9:00 AM–5:00 PM',
                   },
                 ].map((contact, index) => (
-                  <Box
-                    key={index}
-                    sx={{ display: 'flex', alignItems: 'center', gap: 2 }}
-                  >
-                    <Avatar sx={{ backgroundColor: '#f3f4f6' }}>
+                  <ContactItem key={index}>
+                    <ContactAvatar>
                       <contact.icon sx={{ color: 'primary.main' }} />
-                    </Avatar>
-                    <Box>
+                    </ContactAvatar>
+                    <div>
                       <Typography variant='h6' sx={{ fontWeight: 'bold' }}>
                         {contact.title}
                       </Typography>
                       <Typography color='text.secondary'>
                         {contact.info}
                       </Typography>
-                    </Box>
-                  </Box>
+                    </div>
+                  </ContactItem>
                 ))}
               </Stack>
             </CardContent>
@@ -89,28 +80,17 @@ const ContactSection = () => {
         <Grid item xs={12} lg={6}>
           <ModernCard>
             <CardContent sx={{ p: 4 }}>
-              <Typography
-                variant='h4'
-                component='h3'
-                gutterBottom
-                sx={{ fontWeight: 'bold' }}
-              >
+              <StyledCardTitle variant='h4' component='h3' gutterBottom>
                 Send us a Message
-              </Typography>
-              <Box component='form' sx={{ mt: 3 }}>
+              </StyledCardTitle>
+              <StyledForm component='form'>
                 <Stack spacing={3}>
-                  <TextField
-                    fullWidth
-                    label='Full Name'
-                    variant='outlined'
-                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
-                  />
+                  <TextField fullWidth label='Full Name' variant='outlined' />
                   <TextField
                     fullWidth
                     label='Email Address'
                     type='email'
                     variant='outlined'
-                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
                   />
                   <TextField
                     fullWidth
@@ -118,23 +98,17 @@ const ContactSection = () => {
                     multiline
                     rows={4}
                     variant='outlined'
-                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
                   />
-                  <Button
-                    variant='contained'
-                    size='large'
-                    disabled
-                    sx={{ borderRadius: 2, py: 1.5 }}
-                  >
+                  <Button variant='contained' size='large' disabled>
                     Submit Message (Coming Soon)
                   </Button>
                 </Stack>
-              </Box>
+              </StyledForm>
             </CardContent>
           </ModernCard>
         </Grid>
       </Grid>
-    </Container>
+    </StyledContainer>
   );
 };
 

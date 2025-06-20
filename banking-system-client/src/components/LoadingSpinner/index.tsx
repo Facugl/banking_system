@@ -13,8 +13,8 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
       display='flex'
       justifyContent='center'
       alignItems='center'
-      // minHeight='200px'
       width='100%'
+      sx={{ margin: ' 12px 0' }}
     >
       <CircularProgress size={size} {...props} />
     </Box>

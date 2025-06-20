@@ -4,9 +4,9 @@ import { Messages } from '../../../../utils/constants';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { ErrorMessage, LoadingSpinner } from '../../../../components';
-import { WithdrawModalProps } from '../../types';
+import { WithdrawFormValues, WithdrawModalProps } from '../../types';
 import { withdrawValidationSchema } from '../../validation/withdrawValidationSchema';
-import { StyledModalBox, StyledForm, ButtonContainer } from './styles';
+import { StyledModalBox, StyledForm, ButtonContainer } from '../styled';
 
 const WithdrawModal: React.FC<WithdrawModalProps> = ({
   open,
@@ -24,14 +24,17 @@ const WithdrawModal: React.FC<WithdrawModalProps> = ({
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<{ amount: number }>({
+  } = useForm<WithdrawFormValues>({
     resolver: yupResolver(withdrawValidationSchema),
-    defaultValues: { amount: 0 },
+    defaultValues: { amount: 0, comment: '' },
   });
 
-  const onSubmit = async (data: { amount: number }) => {
+  const onSubmit = async (data: WithdrawFormValues) => {
     try {
-      await handleWithdraw(accountNumber, { amount: data.amount });
+      await handleWithdraw(accountNumber, {
+        amount: data.amount,
+        comment: data.comment || undefined,
+      });
       reset();
       onSuccess();
       onClose();
@@ -42,44 +45,67 @@ const WithdrawModal: React.FC<WithdrawModalProps> = ({
   };
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open} onClose={onClose} aria-labelledby='withdraw-modal-title'>
       <StyledModalBox>
-        <Typography variant='h6' mb={2}>
+        <Typography id='withdraw-modal-title' variant='h6' mb={2}>
           Withdraw from Account {accountNumber}
         </Typography>
 
         {error && <ErrorMessage message={error.frontendMessage} />}
-        {isLoading && <LoadingSpinner size={24} />}
+        {isLoading && <LoadingSpinner />}
 
-        {!isLoading && (
-          <StyledForm onSubmit={handleSubmit(onSubmit)}>
-            <Controller
-              name='amount'
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label='Amount'
-                  type='number'
-                  fullWidth
-                  margin='normal'
-                  disabled={isLoading}
-                  error={!!errors.amount}
-                  helperText={errors.amount?.message}
-                  inputProps={{ min: 0.01, step: 0.01 }}
-                />
-              )}
-            />
-            <ButtonContainer>
-              <Button variant='contained' type='submit' disabled={isLoading}>
-                Withdraw
-              </Button>
-              <Button variant='outlined' onClick={onClose} disabled={isLoading}>
-                Cancel
-              </Button>
-            </ButtonContainer>
-          </StyledForm>
-        )}
+        <StyledForm component='form' onSubmit={handleSubmit(onSubmit)}>
+          <Controller
+            name='amount'
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label='Amount'
+                type='number'
+                fullWidth
+                margin='normal'
+                disabled={isLoading}
+                error={!!errors.amount}
+                helperText={errors.amount?.message}
+                inputProps={{ min: 0.01, step: 0.01 }}
+              />
+            )}
+          />
+          <Controller
+            name='comment'
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label='Comment (optional)'
+                fullWidth
+                margin='normal'
+                disabled={isLoading}
+                error={!!errors.comment}
+                helperText={errors.comment?.message}
+              />
+            )}
+          />
+          <ButtonContainer>
+            <Button
+              variant='contained'
+              type='submit'
+              disabled={isLoading}
+              aria-label='Confirm withdrawal'
+            >
+              Withdraw
+            </Button>
+            <Button
+              variant='outlined'
+              onClick={onClose}
+              disabled={isLoading}
+              aria-label='Cancel withdrawal'
+            >
+              Cancel
+            </Button>
+          </ButtonContainer>
+        </StyledForm>
       </StyledModalBox>
     </Modal>
   );

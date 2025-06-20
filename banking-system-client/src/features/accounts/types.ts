@@ -56,6 +56,8 @@ export interface UseAccountActionsReturn {
   isLoading: boolean;
   error: AppError | null;
   resetAccountsFetch: () => void;
+  isFetchingAccounts: boolean;
+  isOperating: boolean;
 }
 
 export interface AccountCreateRequest {
@@ -86,25 +88,12 @@ export interface TransferFormValues {
   sourceAccountNumber: string;
   targetAccountNumber: string;
   amount: number;
+  comment?: string;
 }
 
 export interface AccountCardProps {
   account: Account;
   isLoading?: boolean;
-}
-
-export interface TransferFormProps {
-  accounts: { accountNumber: string; type: string }[];
-  sourceAccountNumber?: string;
-  onSubmit: (data: TransferFormValues) => Promise<void>;
-}
-
-export interface WithdrawModalProps {
-  open: boolean;
-  accountNumber: string;
-  onClose: () => void;
-  onSuccess: () => void;
-  onError: (message: string) => void;
 }
 
 export interface AccountsTableProps {
@@ -129,6 +118,7 @@ export interface EditModalProps {
 export interface TransferModalProps {
   open: boolean;
   sourceAccountNumber: string;
+  comment?: string;
   onClose: () => void;
   onSuccess: () => void;
   onError: (message: string) => void;
@@ -137,9 +127,36 @@ export interface TransferModalProps {
 export interface DepositModalProps {
   open: boolean;
   accountNumber: string;
+  comment?: string;
   onClose: () => void;
   onSuccess: () => void;
   onError: (message: string) => void;
+}
+
+export interface WithdrawModalProps {
+  open: boolean;
+  accountNumber: string;
+  comment?: string;
+  onClose: () => void;
+  onSuccess: () => void;
+  onError: (message: string) => void;
+}
+
+export interface DepositFormValues {
+  amount: number;
+  comment?: string;
+}
+
+export interface WithdrawFormValues {
+  amount: number;
+  comment?: string;
+}
+
+export interface TransferFormValues {
+  sourceAccountNumber: string;
+  targetAccountNumber: string;
+  amount: number;
+  comment?: string;
 }
 
 export interface AccountStatusRequest {
@@ -152,4 +169,6 @@ export interface AccountsState {
   isLoading: boolean;
   error: AppError | null;
   hasFetchedAccounts: boolean;
+  isFetchingAccounts: boolean;
+  isOperating: boolean;
 }

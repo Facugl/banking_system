@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Button, Typography } from '@mui/material';
+import { Button, Grid } from '@mui/material';
 import { useAppSelector } from '../../../../store/hooks';
 import {
   ErrorMessage,
@@ -30,28 +30,27 @@ import {
 const CustomerAccountsView: React.FC = () => {
   const { profile, isSessionLoading: profileLoading } = useAuthSession();
 
-  const {
-    accounts,
-    isLoading: accountsLoading,
-    error: accountsError,
-  } = useAppSelector((state) => state.accounts);
+  const { accounts, error: accountsError } = useAppSelector(
+    (state) => state.accounts,
+  );
 
   const {
     handleGetAccounts,
     handleCreateAccount,
-    isLoading: operationLoading,
+    isOperating,
     error: operationError,
   } = useAccountActions();
 
   const hasFetchedRef = useRef(false);
   const [isModalOpen, setModalOpen] = useState(false);
+  const [hasLoadedAccounts, setHasLoadedAccounts] = useState(false);
 
   useEffect(() => {
-    if (profile && !accountsLoading && !hasFetchedRef.current) {
-      handleGetAccounts();
+    if (profile && !hasFetchedRef.current) {
+      handleGetAccounts().finally(() => setHasLoadedAccounts(true));
       hasFetchedRef.current = true;
     }
-  }, [profile, accountsLoading, handleGetAccounts]);
+  }, [profile, handleGetAccounts]);
 
   const handleSubmit = async (
     data: AccountCreateRequest | AccountUpdateRequest,
@@ -75,10 +74,10 @@ const CustomerAccountsView: React.FC = () => {
     }
   };
 
-  if (profileLoading || accountsLoading) {
+  if (profileLoading || !hasLoadedAccounts) {
     return (
       <StyledLoadingContainer>
-        <LoadingSpinner size={24} />
+        <LoadingSpinner />
       </StyledLoadingContainer>
     );
   }
@@ -100,13 +99,14 @@ const CustomerAccountsView: React.FC = () => {
         <Button
           variant='contained'
           onClick={() => setModalOpen(true)}
-          disabled={operationLoading}
+          disabled={isOperating}
           sx={{
             borderRadius: (theme) => theme.shape.borderRadius,
             px: { xs: 2, sm: 3 },
-            py: 1,
+            py: { xs: 1, sm: 1.5 },
             fontSize: { xs: '0.875rem', sm: '1rem' },
           }}
+          aria-label='Add new account'
         >
           Add Account
         </Button>
@@ -118,9 +118,13 @@ const CustomerAccountsView: React.FC = () => {
             Your Accounts
           </StyledAccountsTitle>
           <StyledAccountsGrid>
-            {accounts.map((account) => (
-              <AccountCard key={account.accountNumber} account={account} />
-            ))}
+            <Grid container spacing={{ xs: 2, sm: 3 }}>
+              {accounts.map((account) => (
+                <Grid item xs={12} sm={6} md={4} key={account.accountNumber}>
+                  <AccountCard account={account} />
+                </Grid>
+              ))}
+            </Grid>
           </StyledAccountsGrid>
         </>
       ) : (
@@ -132,7 +136,7 @@ const CustomerAccountsView: React.FC = () => {
         account={null}
         onClose={() => setModalOpen(false)}
         onSave={handleSubmit}
-        isLoading={operationLoading}
+        isLoading={isOperating}
         error={operationError?.frontendMessage || null}
         isAdmin={false}
       />

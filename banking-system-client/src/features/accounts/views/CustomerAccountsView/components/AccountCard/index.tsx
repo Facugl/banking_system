@@ -30,10 +30,11 @@ import {
   StyledButtonContainer,
   StyledInactiveMessage,
 } from './styles';
+import { LoadingSpinner } from '../../../../../../components';
 
 interface AccountCardProps {
   account: Account;
-  isLoading?: boolean;
+  isOperating?: boolean;
 }
 
 const AccountCard: React.FC<AccountCardProps> = ({ account }) => {
@@ -42,7 +43,7 @@ const AccountCard: React.FC<AccountCardProps> = ({ account }) => {
   const [withdrawModalOpen, setWithdrawModalOpen] = useState(false);
   const [transferModalOpen, setTransferModalOpen] = useState(false);
   const [confirmDeactivateOpen, setConfirmDeactivateOpen] = useState(false);
-  const { handleGetAccountBalance, handleChangeAccountStatus } =
+  const { handleGetAccountBalance, handleChangeAccountStatus, isOperating } =
     useAccountActions({
       showErrorToast: false,
     });
@@ -143,8 +144,8 @@ const AccountCard: React.FC<AccountCardProps> = ({ account }) => {
         toastId: ToastIds.ACCOUNT_STATUS_SUCCESS,
       });
       setConfirmDeactivateOpen(false);
-    } catch (err) {
-      showError('Failed to deactivate account', {
+    } catch (err: any) {
+      showError(err.message || 'Failed to deactivate account', {
         toastId: ToastIds.ACCOUNT_ERROR,
       });
       setConfirmDeactivateOpen(false);
@@ -201,7 +202,7 @@ const AccountCard: React.FC<AccountCardProps> = ({ account }) => {
               <IconButton
                 size='small'
                 onClick={handleRefreshBalance}
-                disabled={!isActive}
+                disabled={!isActive || isOperating}
               >
                 <Refresh />
               </IconButton>
@@ -212,17 +213,29 @@ const AccountCard: React.FC<AccountCardProps> = ({ account }) => {
           {isActive ? (
             <>
               <Tooltip title='Deposit'>
-                <Button variant='outlined' onClick={handleOpenDepositModal}>
+                <Button
+                  variant='outlined'
+                  onClick={handleOpenDepositModal}
+                  disabled={isOperating}
+                >
                   Deposit
                 </Button>
               </Tooltip>
               <Tooltip title='Withdraw'>
-                <Button variant='outlined' onClick={handleOpenWithdrawModal}>
+                <Button
+                  variant='outlined'
+                  onClick={handleOpenWithdrawModal}
+                  disabled={isOperating}
+                >
                   Withdraw
                 </Button>
               </Tooltip>
               <Tooltip title='Transfer'>
-                <Button variant='outlined' onClick={handleOpenTransferModal}>
+                <Button
+                  variant='outlined'
+                  onClick={handleOpenTransferModal}
+                  disabled={isOperating}
+                >
                   Transfer
                 </Button>
               </Tooltip>
@@ -231,6 +244,7 @@ const AccountCard: React.FC<AccountCardProps> = ({ account }) => {
                   variant='outlined'
                   color='error'
                   onClick={handleDeactivate}
+                  disabled={isOperating}
                 >
                   Deactivate
                 </Button>
@@ -270,19 +284,33 @@ const AccountCard: React.FC<AccountCardProps> = ({ account }) => {
       )}
       <Dialog
         open={confirmDeactivateOpen}
-        onClose={() => setConfirmDeactivateOpen(false)}
+        onClose={() => !isOperating && setConfirmDeactivateOpen(false)}
       >
-        <DialogTitle>Confirm Deactivation</DialogTitle>
+        <DialogTitle>Confirm Account Deactivation</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to deactivate account {account.accountNumber}?
+            Are you sure you want to deactivate account{' '}
+            <strong>{account.accountNumber}</strong>? This action will prevent
+            deposits, withdrawals, and transfers until the account is
+            reactivated.
           </DialogContentText>
+
+          {isOperating && <LoadingSpinner />}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmDeactivateOpen(false)}>
+        <DialogActions sx={{ justifyContent: 'center' }}>
+          <Button
+            onClick={() => setConfirmDeactivateOpen(false)}
+            disabled={isOperating}
+            variant='outlined'
+          >
             Cancel
           </Button>
-          <Button onClick={confirmDeactivate} color='error' variant='contained'>
+          <Button
+            onClick={confirmDeactivate}
+            color='error'
+            variant='contained'
+            disabled={isOperating}
+          >
             Deactivate
           </Button>
         </DialogActions>

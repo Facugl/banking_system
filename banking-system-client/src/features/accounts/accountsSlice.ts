@@ -22,6 +22,8 @@ const initialState: AccountsState = {
   isLoading: false,
   error: null,
   hasFetchedAccounts: false,
+  isFetchingAccounts: false,
+  isOperating: false,
 };
 
 const accountsSlice = createSlice({
@@ -36,16 +38,19 @@ const accountsSlice = createSlice({
     builder
       .addCase(getAccount.pending, (state) => {
         state.isLoading = true;
+        state.isFetchingAccounts = true;
         state.error = null;
       })
       .addCase(getAccount.fulfilled, (state, { payload }) => {
         state.isLoading = false;
+        state.isFetchingAccounts = false;
         state.accountByNumber[payload.accountNumber] = payload;
       })
       .addCase(
         getAccount.rejected,
         (state, action: PayloadAction<AppError | undefined>) => {
           state.isLoading = false;
+          state.isFetchingAccounts = false;
           state.error = action.payload ?? {
             frontendMessage: Messages.ACCOUNT_FETCH_ERROR,
             backendMessage: Messages.UNKNOWN,
@@ -55,12 +60,14 @@ const accountsSlice = createSlice({
       )
       .addCase(getAccounts.pending, (state) => {
         state.isLoading = true;
+        state.isFetchingAccounts = true;
         state.error = null;
       })
       .addCase(
         getAccounts.fulfilled,
         (state, action: PayloadAction<Account[]>) => {
           state.isLoading = false;
+          state.isFetchingAccounts = false;
           state.accounts = action.payload;
           state.accountByNumber = action.payload.reduce(
             (acc, account) => {
@@ -76,6 +83,7 @@ const accountsSlice = createSlice({
         getAccounts.rejected,
         (state, action: PayloadAction<AppError | undefined>) => {
           state.isLoading = false;
+          state.isFetchingAccounts = false;
           state.error = action.payload ?? {
             frontendMessage: Messages.ACCOUNTS_FETCH_ERROR,
             backendMessage: Messages.UNKNOWN,
@@ -85,12 +93,16 @@ const accountsSlice = createSlice({
       )
       .addCase(createAccount.pending, (state) => {
         state.isLoading = true;
+        state.isOperating = true;
+        state.isFetchingAccounts = true;
         state.error = null;
       })
       .addCase(
         createAccount.fulfilled,
         (state, action: PayloadAction<Account>) => {
           state.isLoading = false;
+          state.isOperating = false;
+          state.isFetchingAccounts = false;
           state.accounts.push(action.payload);
           state.accountByNumber[action.payload.accountNumber] = action.payload;
         },
@@ -99,6 +111,8 @@ const accountsSlice = createSlice({
         createAccount.rejected,
         (state, action: PayloadAction<AppError | undefined>) => {
           state.isLoading = false;
+          state.isOperating = false;
+          state.isFetchingAccounts = false;
           state.error = action.payload ?? {
             frontendMessage: Messages.ACCOUNT_CREATE_FAILED,
             backendMessage: Messages.UNKNOWN,
@@ -108,10 +122,12 @@ const accountsSlice = createSlice({
       )
       .addCase(updateAccount.pending, (state) => {
         state.isLoading = true;
+        state.isFetchingAccounts = true;
         state.error = null;
       })
       .addCase(updateAccount.fulfilled, (state, { payload }) => {
         state.isLoading = false;
+        state.isFetchingAccounts = false;
         const index = state.accounts.findIndex(
           (account) => account.accountNumber === payload.accountNumber,
         );
@@ -124,6 +140,7 @@ const accountsSlice = createSlice({
         updateAccount.rejected,
         (state, action: PayloadAction<AppError | undefined>) => {
           state.isLoading = false;
+          state.isFetchingAccounts = false;
           state.error = action.payload ?? {
             frontendMessage: Messages.ACCOUNT_UPDATE_FAILED,
             backendMessage: Messages.UNKNOWN,
@@ -133,10 +150,12 @@ const accountsSlice = createSlice({
       )
       .addCase(deleteAccount.pending, (state) => {
         state.isLoading = true;
+        state.isFetchingAccounts = true;
         state.error = null;
       })
       .addCase(deleteAccount.fulfilled, (state, { payload }) => {
         state.isLoading = false;
+        state.isFetchingAccounts = false;
         state.accounts = state.accounts.filter(
           (account) => account.accountNumber !== payload,
         );
@@ -146,6 +165,7 @@ const accountsSlice = createSlice({
         deleteAccount.rejected,
         (state, action: PayloadAction<AppError | undefined>) => {
           state.isLoading = false;
+          state.isFetchingAccounts = false;
           state.error = action.payload ?? {
             frontendMessage: Messages.ACCOUNT_DELETE_FAILED,
             backendMessage: Messages.UNKNOWN,
@@ -155,10 +175,14 @@ const accountsSlice = createSlice({
       )
       .addCase(changeAccountStatus.pending, (state) => {
         state.isLoading = true;
+        state.isOperating = true;
+        state.isFetchingAccounts = true;
         state.error = null;
       })
       .addCase(changeAccountStatus.fulfilled, (state, { payload }) => {
         state.isLoading = false;
+        state.isOperating = false;
+        state.isFetchingAccounts = false;
         const index = state.accounts.findIndex(
           (account) => account.accountNumber === payload.accountNumber,
         );
@@ -171,6 +195,8 @@ const accountsSlice = createSlice({
         changeAccountStatus.rejected,
         (state, action: PayloadAction<AppError | undefined>) => {
           state.isLoading = false;
+          state.isOperating = false;
+          state.isFetchingAccounts = false;
           state.error = action.payload ?? {
             frontendMessage: Messages.ACCOUNT_STATUS_UPDATE_FAILED,
             backendMessage: Messages.UNKNOWN,
@@ -180,10 +206,12 @@ const accountsSlice = createSlice({
       )
       .addCase(getAccountBalance.pending, (state) => {
         state.isLoading = true;
+        state.isFetchingAccounts = true;
         state.error = null;
       })
       .addCase(getAccountBalance.fulfilled, (state, { payload, meta }) => {
         state.isLoading = false;
+        state.isFetchingAccounts = false;
         const accountNumber = meta.arg;
         const account = state.accountByNumber[accountNumber];
         if (account) {
@@ -200,6 +228,7 @@ const accountsSlice = createSlice({
         getAccountBalance.rejected,
         (state, action: PayloadAction<AppError | undefined>) => {
           state.isLoading = false;
+          state.isFetchingAccounts = false;
           state.error = action.payload ?? {
             frontendMessage: Messages.FETCH_ACCOUNT_BALANCE_FAILED,
             backendMessage: Messages.UNKNOWN,
@@ -209,12 +238,14 @@ const accountsSlice = createSlice({
       )
       .addCase(deposit.pending, (state) => {
         state.isLoading = true;
+        state.isFetchingAccounts = true;
         state.error = null;
       })
       .addCase(
         deposit.fulfilled,
         (state, { payload }: PayloadAction<TransactionResponse>) => {
           state.isLoading = false;
+          state.isFetchingAccounts = false;
           const index = state.accounts.findIndex(
             (account) => account.accountNumber === payload.targetAccount,
           );
@@ -229,6 +260,7 @@ const accountsSlice = createSlice({
         deposit.rejected,
         (state, action: PayloadAction<AppError | undefined>) => {
           state.isLoading = false;
+          state.isFetchingAccounts = false;
           state.error = action.payload ?? {
             frontendMessage: Messages.DEPOSIT_FAILED,
             backendMessage: Messages.UNKNOWN,
@@ -238,12 +270,14 @@ const accountsSlice = createSlice({
       )
       .addCase(withdraw.pending, (state) => {
         state.isLoading = true;
+        state.isFetchingAccounts = true;
         state.error = null;
       })
       .addCase(
         withdraw.fulfilled,
         (state, { payload }: PayloadAction<TransactionResponse>) => {
           state.isLoading = false;
+          state.isFetchingAccounts = false;
           const index = state.accounts.findIndex(
             (account) => account.accountNumber === payload.sourceAccount,
           );
@@ -258,6 +292,7 @@ const accountsSlice = createSlice({
         withdraw.rejected,
         (state, action: PayloadAction<AppError | undefined>) => {
           state.isLoading = false;
+          state.isFetchingAccounts = false;
           state.error = action.payload ?? {
             frontendMessage: Messages.WITHDRAW_FAILED,
             backendMessage: Messages.UNKNOWN,
@@ -265,10 +300,16 @@ const accountsSlice = createSlice({
           };
         },
       )
+      .addCase(transfer.pending, (state) => {
+        state.isLoading = true;
+        state.isFetchingAccounts = true;
+        state.error = null;
+      })
       .addCase(
         transfer.fulfilled,
         (state, { payload }: PayloadAction<TransactionResponse>) => {
           state.isLoading = false;
+          state.isFetchingAccounts = false;
           const sourceIndex = state.accounts.findIndex(
             (account) => account.accountNumber === payload.sourceAccount,
           );
@@ -291,6 +332,7 @@ const accountsSlice = createSlice({
         transfer.rejected,
         (state, action: PayloadAction<AppError | undefined>) => {
           state.isLoading = false;
+          state.isFetchingAccounts = false;
           state.error = action.payload ?? {
             frontendMessage: Messages.TRANSFER_FAILED,
             backendMessage: Messages.UNKNOWN,

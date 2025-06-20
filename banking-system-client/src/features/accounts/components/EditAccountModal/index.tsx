@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Modal, MenuItem } from '@mui/material';
+import { Modal, MenuItem, Typography, TextField } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
@@ -11,12 +11,8 @@ import {
 } from '../../types';
 import { ErrorMessage, LoadingSpinner } from '../../../../components';
 import { editAccountValidationSchema } from '../../validation/editAccountValidationSchema';
-import {
-  StyledModalBox,
-  StyledTextField,
-  ButtonContainer,
-  StyledButton,
-} from './styles';
+import { StyledModalBox, StyledForm, ButtonContainer } from '../styled';
+import { Button } from '@mui/material';
 
 const EditAccountModal: React.FC<EditModalProps> = ({
   open,
@@ -70,94 +66,111 @@ const EditAccountModal: React.FC<EditModalProps> = ({
   };
 
   return (
-    <Modal open={open} onClose={onClose}>
-      <StyledModalBox component='form' onSubmit={handleSubmit(onSubmit)}>
+    <Modal
+      open={open}
+      onClose={onClose}
+      aria-labelledby='edit-account-modal-title'
+    >
+      <StyledModalBox>
+        <Typography id='edit-account-modal-title' variant='h6' mb={2}>
+          {account ? 'Edit Account' : 'Create Account'}
+        </Typography>
+
         {error && <ErrorMessage message={error} />}
-        {isLoading && <LoadingSpinner size={24} />}
+        {isLoading && <LoadingSpinner />}
 
-        <Controller
-          name='type'
-          control={control}
-          render={({ field, fieldState: { error } }) => (
-            <StyledTextField
-              {...field}
-              fullWidth
-              select
-              label='Type'
-              error={!!error}
-              helperText={error?.message}
-              value={field.value ?? ''}
-              onChange={(e) => field.onChange(e.target.value || undefined)}
-            >
-              <MenuItem value=''>
-                <em>None</em>
-              </MenuItem>
-              {Object.values(AccountType).map((type) => (
-                <MenuItem key={type} value={type}>
-                  {type}
+        <StyledForm component='form' onSubmit={handleSubmit(onSubmit)}>
+          <Controller
+            name='type'
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <TextField
+                {...field}
+                fullWidth
+                select
+                label='Type'
+                error={!!error}
+                helperText={error?.message}
+                value={field.value ?? ''}
+                onChange={(e) => field.onChange(e.target.value || undefined)}
+              >
+                <MenuItem value=''>
+                  <em>None</em>
                 </MenuItem>
-              ))}
-            </StyledTextField>
-          )}
-        />
-
-        <Controller
-          name='balance'
-          control={control}
-          render={({ field, fieldState: { error } }) => (
-            <StyledTextField
-              {...field}
-              fullWidth
-              label='Balance'
-              type='number'
-              error={!!error}
-              helperText={error?.message}
-              value={field.value ?? ''}
-              onChange={(e) =>
-                field.onChange(
-                  e.target.value ? Number(e.target.value) : undefined,
-                )
-              }
-              disabled={!isAdmin && !!account}
-            />
-          )}
-        />
-
-        <Controller
-          name='status'
-          control={control}
-          render={({ field, fieldState: { error } }) => (
-            <StyledTextField
-              {...field}
-              fullWidth
-              select
-              label='Status'
-              error={!!error}
-              helperText={error?.message}
-              disabled={!isAdmin}
-              value={field.value ?? ''}
-              onChange={(e) => field.onChange(e.target.value || undefined)}
-            >
-              <MenuItem value=''>
-                <em>None</em>
-              </MenuItem>
-              {Object.values(AccountStatus).map((status) => (
-                <MenuItem key={status} value={status}>
-                  {status}
+                {Object.values(AccountType).map((type) => (
+                  <MenuItem key={type} value={type}>
+                    {type}
+                  </MenuItem>
+                ))}
+              </TextField>
+            )}
+          />
+          <Controller
+            name='balance'
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <TextField
+                {...field}
+                fullWidth
+                label='Balance'
+                type='number'
+                error={!!error}
+                helperText={error?.message}
+                value={field.value ?? ''}
+                onChange={(e) =>
+                  field.onChange(
+                    e.target.value ? Number(e.target.value) : undefined,
+                  )
+                }
+                disabled={!isAdmin && !!account}
+              />
+            )}
+          />
+          <Controller
+            name='status'
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <TextField
+                {...field}
+                fullWidth
+                select
+                label='Status'
+                error={!!error}
+                helperText={error?.message}
+                disabled={!isAdmin}
+                value={field.value ?? ''}
+                onChange={(e) => field.onChange(e.target.value || undefined)}
+              >
+                <MenuItem value=''>
+                  <em>None</em>
                 </MenuItem>
-              ))}
-            </StyledTextField>
-          )}
-        />
-
-        <ButtonContainer>
-          <StyledButton variant='text' onClick={onClose}>
-            Cancel
-          </StyledButton>
-          <StyledButton variant='contained' type='submit'>
-            Save
-          </StyledButton>
-        </ButtonContainer>
+                {Object.values(AccountStatus).map((status) => (
+                  <MenuItem key={status} value={status}>
+                    {status}
+                  </MenuItem>
+                ))}
+              </TextField>
+            )}
+          />
+          <ButtonContainer>
+            <Button
+              variant='text'
+              onClick={onClose}
+              disabled={isLoading}
+              aria-label='Cancel account edit'
+            >
+              Cancel
+            </Button>
+            <Button
+              variant='contained'
+              type='submit'
+              disabled={isLoading}
+              aria-label='Save account'
+            >
+              Save
+            </Button>
+          </ButtonContainer>
+        </StyledForm>
       </StyledModalBox>
     </Modal>
   );

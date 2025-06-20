@@ -134,7 +134,7 @@ const AccountsTable: React.FC<AccountsTableProps> = ({
 
   return (
     <Box sx={{ height: 400, width: '100%' }}>
-      {isLoading && <LoadingSpinner size={24} />}
+      {isLoading && <LoadingSpinner />}
       <DataGrid
         getRowId={(row) => row.accountNumber}
         rows={accounts}

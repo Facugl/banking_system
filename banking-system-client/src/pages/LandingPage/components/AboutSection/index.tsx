@@ -1,42 +1,37 @@
-import { Container, Typography, Box, Grid } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
 import ModernCard, { CardContent } from '../../../../components/ModernCard';
 import StatsBox from '../../../../components/StatsBox';
+import {
+  StyledContainer,
+  SectionHeader,
+  SectionSubtitle,
+  StyledCardTitle,
+  BulletPoint,
+  ValuesWrapper,
+  StatGridContainer,
+} from './styles';
 
 const AboutSection = () => {
   return (
-    <Container maxWidth='lg' sx={{ py: 10 }} id='about'>
-      <Box textAlign='center' mb={8}>
-        <Typography
-          variant='h2'
-          component='h2'
-          gutterBottom
-          sx={{ fontWeight: 'bold' }}
-        >
+    <StyledContainer maxWidth='lg' id='about'>
+      <SectionHeader>
+        <Typography variant='h2' component='h2' gutterBottom>
           About Horizon Bank
         </Typography>
-        <Typography
-          variant='h6'
-          color='text.secondary'
-          sx={{ maxWidth: '800px', mx: 'auto' }}
-        >
+        <SectionSubtitle variant='h6'>
           Founded in 1990, we've been dedicated to providing secure and
           innovative banking solutions for over three decades.
-        </Typography>
-      </Box>
+        </SectionSubtitle>
+      </SectionHeader>
 
       <Grid container spacing={4}>
         <Grid item xs={12} md={6}>
           <ModernCard>
             <CardContent sx={{ p: 4 }}>
-              <Typography
-                variant='h4'
-                component='h3'
-                gutterBottom
-                sx={{ fontWeight: 'bold' }}
-              >
+              <StyledCardTitle variant='h4' component='h3' gutterBottom>
                 Our Values
-              </Typography>
-              <Box sx={{ mt: 3 }}>
+              </StyledCardTitle>
+              <ValuesWrapper>
                 {[
                   {
                     title: 'Integrity',
@@ -51,36 +46,19 @@ const AboutSection = () => {
                     desc: 'Your success is our priority',
                   },
                 ].map((value, index) => (
-                  <Box
-                    key={index}
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: 2,
-                      mb: 3,
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        width: 8,
-                        height: 8,
-                        borderRadius: '50%',
-                        backgroundColor: 'primary.main',
-                        mt: 1,
-                        flexShrink: 0,
-                      }}
-                    />
-                    <Box>
+                  <BulletPoint key={index}>
+                    <div className='dot' />
+                    <div>
                       <Typography variant='h6' sx={{ fontWeight: 'bold' }}>
                         {value.title}
                       </Typography>
                       <Typography color='text.secondary'>
                         {value.desc}
                       </Typography>
-                    </Box>
-                  </Box>
+                    </div>
+                  </BulletPoint>
                 ))}
-              </Box>
+              </ValuesWrapper>
             </CardContent>
           </ModernCard>
         </Grid>
@@ -88,14 +66,9 @@ const AboutSection = () => {
         <Grid item xs={12} md={6}>
           <ModernCard>
             <CardContent sx={{ p: 4 }}>
-              <Typography
-                variant='h4'
-                component='h3'
-                gutterBottom
-                sx={{ fontWeight: 'bold' }}
-              >
+              <StyledCardTitle variant='h4' component='h3' gutterBottom>
                 Our History
-              </Typography>
+              </StyledCardTitle>
               <Typography
                 color='text.secondary'
                 sx={{ mb: 4, lineHeight: 1.7 }}
@@ -103,22 +76,22 @@ const AboutSection = () => {
                 From a local institution to a trusted name, we've grown to serve
                 thousands of customers with reliable financial services.
               </Typography>
-              <Grid container spacing={2}>
+              <StatGridContainer container spacing={2}>
                 {[
                   { number: '30+', label: 'Years' },
                   { number: '50K+', label: 'Customers' },
                   { number: '99.9%', label: 'Uptime' },
                 ].map((stat, index) => (
-                  <Grid item xs={4} key={index}>
+                  <Grid item xs={12} sm={4} key={index}>
                     <StatsBox number={stat.number} label={stat.label} />
                   </Grid>
                 ))}
-              </Grid>
+              </StatGridContainer>
             </CardContent>
           </ModernCard>
         </Grid>
       </Grid>
-    </Container>
+    </StyledContainer>
   );
 };
 

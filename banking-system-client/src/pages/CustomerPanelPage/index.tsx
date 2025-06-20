@@ -31,7 +31,7 @@ const CustomerPanelPage: React.FC = () => {
             <IconButton
               onClick={handleDrawerToggle}
               edge='start'
-              sx={{ mr: 2 }}
+              sx={{ mr: 1 }}
             >
               <MenuIcon />
             </IconButton>

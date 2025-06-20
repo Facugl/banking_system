@@ -2,8 +2,7 @@ import { Box, Container, Typography, Stack, Button } from '@mui/material';
 import { ChevronRight as ChevronRightIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { Fade } from '@mui/material';
-import { HeroSectionStyled } from './styles';
-import GradientButton from '../../../../components/GradientButton';
+import { HeroSectionStyled, GradientButtonStyled } from './styles';
 
 const HeroSection = () => {
   const navigate = useNavigate();
@@ -18,9 +17,9 @@ const HeroSection = () => {
               component='h1'
               gutterBottom
               sx={{
-                fontSize: { xs: '2.5rem', md: '4rem', lg: '5rem' },
                 fontWeight: 'bold',
-                mb: 3,
+                fontSize: { xs: '2rem', sm: '3rem', md: '4rem', lg: '5rem' },
+                mb: { xs: 2, md: 3 },
               }}
             >
               Welcome to{' '}
@@ -40,10 +39,10 @@ const HeroSection = () => {
               variant='h5'
               paragraph
               sx={{
-                mb: 4,
+                mb: { xs: 3, md: 4 },
                 opacity: 0.9,
-                fontSize: { xs: '1.2rem', md: '1.5rem' },
-                maxWidth: '800px',
+                fontSize: { xs: '1rem', sm: '1.25rem', md: '1.5rem' },
+                maxWidth: { xs: '100%', md: '800px' },
                 mx: 'auto',
               }}
             >
@@ -52,17 +51,22 @@ const HeroSection = () => {
             </Typography>
             <Stack
               direction={{ xs: 'column', sm: 'row' }}
-              spacing={2}
+              spacing={{ xs: 1, sm: 2 }}
               justifyContent='center'
-              sx={{ mt: 4 }}
+              sx={{ mt: { xs: 3, md: 4 } }}
             >
-              <GradientButton
+              <GradientButtonStyled
                 size='large'
                 onClick={() => navigate('/register')}
                 endIcon={<ChevronRightIcon />}
+                sx={{
+                  fontSize: { xs: '0.9rem', md: '1rem' },
+                  py: { xs: 1, md: 1.5 },
+                }}
+                aria-label='Open an account'
               >
                 Open an Account
-              </GradientButton>
+              </GradientButtonStyled>
               <Button
                 variant='outlined'
                 size='large'
@@ -70,11 +74,14 @@ const HeroSection = () => {
                 sx={{
                   borderColor: 'white',
                   color: 'white',
+                  fontSize: { xs: '0.9rem', md: '1rem' },
+                  py: { xs: 1, md: 1.5 },
                   '&:hover': {
                     borderColor: 'white',
                     backgroundColor: 'rgba(255, 255, 255, 0.1)',
                   },
                 }}
+                aria-label='Sign in'
               >
                 Sign In
               </Button>

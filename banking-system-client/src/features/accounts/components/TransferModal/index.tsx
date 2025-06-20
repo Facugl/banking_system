@@ -1,25 +1,17 @@
-import { Modal, Typography, Button } from '@mui/material';
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { Modal, Typography, Button, TextField, MenuItem } from '@mui/material';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { createSelector } from 'reselect';
-import { Account, TransferFormValues, TransferModalProps } from '../../types';
-import { useAccountActions } from '../../hooks/useAccountActions';
-import TransferForm from '../TransferForm';
 import { useAppSelector } from '../../../../store/hooks';
-import { Messages, ToastIds } from '../../../../utils/constants';
-import {
-  LoadingSpinner,
-  ErrorMessage,
-  EmptyState,
-} from '../../../../components';
-import { showError, showSuccess } from '../../../../utils/toast';
+import { useAccountActions } from '../../hooks/useAccountActions';
+import { StyledModalBox, StyledForm, ButtonContainer } from '../styled';
+import { TransferFormValues, TransferModalProps, Account } from '../../types';
+import { transferValidationSchema } from '../../validation/transferValidationSchema';
+import { Messages } from '../../../../utils/constants';
+import { ErrorMessage, LoadingSpinner } from '../../../../components';
+import { showError } from '../../../../utils/toast';
 import { RootState } from '../../../../store/store';
-import {
-  StyledModalBox,
-  LoadingContainer,
-  ErrorContainer,
-  EmptyContainer,
-  ButtonContainer,
-} from './styles';
 
 const selectAccounts = createSelector(
   (state: RootState) => state.accounts.accounts,
@@ -45,110 +37,170 @@ const TransferModal: React.FC<TransferModalProps> = ({
   const accounts = useAppSelector(selectAccounts);
   const hasFetched = useRef(false);
 
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<TransferFormValues>({
+    resolver: yupResolver(transferValidationSchema),
+    context: { accounts },
+    defaultValues: {
+      sourceAccountNumber: sourceAccountNumber || '',
+      targetAccountNumber: '',
+      amount: 0,
+      comment: '',
+    },
+    mode: 'onChange',
+  });
+
   useEffect(() => {
     if (open && !hasFetched.current) {
       hasFetched.current = true;
       handleGetAccounts().catch((err) => {
-        const message = err.message || Messages.ACCOUNTS_FETCH_ERROR;
-        showError(message);
-        onError(message);
+        const msg = err.message || Messages.ACCOUNTS_FETCH_ERROR;
+        showError(msg);
+        onError(msg);
       });
     }
   }, [open, handleGetAccounts, onError]);
 
-  const handleSubmit = useCallback(
-    async (data: TransferFormValues) => {
-      try {
-        await handleTransfer(data.sourceAccountNumber, {
-          targetAccountNumber: data.targetAccountNumber,
-          amount: data.amount,
-        });
-        showSuccess('Successful transfer', {
-          toastId: ToastIds.TRANSFER_SUCCESS,
-        });
-        onSuccess();
-        onClose();
-      } catch (err: any) {
-        const errorMessage = err.message || Messages.TRANSFER_FAILED;
-        showError(errorMessage);
-        onError(errorMessage);
-      }
-    },
-    [handleTransfer, onSuccess, onClose, onError],
+  const onSubmit = async (data: TransferFormValues) => {
+    try {
+      await handleTransfer(data.sourceAccountNumber, {
+        targetAccountNumber: data.targetAccountNumber,
+        amount: data.amount,
+        comment: data.comment || undefined,
+      });
+      reset();
+      onSuccess();
+      onClose();
+    } catch (err: any) {
+      const msg = err.message || Messages.TRANSFER_FAILED;
+      showError(msg);
+      onError(msg);
+    }
+  };
+
+  const filteredAccounts = accounts.filter(
+    (acc) => acc.accountNumber !== sourceAccountNumber,
   );
 
-  if (isLoading) {
-    return (
-      <Modal open={open} onClose={onClose}>
-        <LoadingContainer>
-          <LoadingSpinner size={24} />
-        </LoadingContainer>
-      </Modal>
-    );
-  }
-
-  if (error) {
-    return (
-      <Modal open={open} onClose={onClose}>
-        <ErrorContainer>
-          <Typography variant='h6' sx={{ mb: 2 }}>
-            Error
-          </Typography>
-          <ErrorMessage message={error.frontendMessage} />
-          <ButtonContainer>
-            <Button
-              variant='contained'
-              onClick={() =>
-                handleGetAccounts().catch((err) => {
-                  const message = err.message || Messages.ACCOUNTS_FETCH_ERROR;
-                  showError(message);
-                  onError(message);
-                })
-              }
-            >
-              Retry
-            </Button>
-            <Button variant='outlined' onClick={onClose}>
-              Close
-            </Button>
-          </ButtonContainer>
-        </ErrorContainer>
-      </Modal>
-    );
-  }
-
-  if (accounts.length <= 1) {
-    return (
-      <Modal open={open} onClose={onClose}>
-        <EmptyContainer>
-          <Typography variant='h6' sx={{ mb: 2 }}>
-            No accounts available
-          </Typography>
-          <EmptyState message='You need at least two accounts to make a transfer.' />
-          <ButtonContainer>
-            <Button variant='outlined' onClick={onClose}>
-              Close
-            </Button>
-          </ButtonContainer>
-        </EmptyContainer>
-      </Modal>
-    );
-  }
-
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open} onClose={onClose} aria-labelledby='transfer-modal-title'>
       <StyledModalBox>
-        <Typography variant='h6' sx={{ mb: 2 }}>
+        <Typography id='transfer-modal-title' variant='h6' mb={2}>
           Transfer from Account {sourceAccountNumber}
         </Typography>
-        <TransferForm
-          accounts={accounts}
-          sourceAccountNumber={sourceAccountNumber}
-          onSubmit={handleSubmit}
-        />
+
+        {error && <ErrorMessage message={error.frontendMessage} />}
+        {isLoading && <LoadingSpinner />}
+
+        {accounts.length <= 1 ? (
+          <Typography>No accounts available to transfer.</Typography>
+        ) : (
+          <StyledForm component='form' onSubmit={handleSubmit(onSubmit)}>
+            <Controller
+              name='sourceAccountNumber'
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  select
+                  label='Source Account'
+                  fullWidth
+                  margin='normal'
+                  disabled={!!sourceAccountNumber || isLoading}
+                  error={!!errors.sourceAccountNumber}
+                  helperText={errors.sourceAccountNumber?.message}
+                >
+                  <MenuItem value=''>Select an account</MenuItem>
+                  {accounts.map((acc) => (
+                    <MenuItem key={acc.accountNumber} value={acc.accountNumber}>
+                      {acc.type} - {acc.accountNumber}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              )}
+            />
+            <Controller
+              name='targetAccountNumber'
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  select
+                  label='Target Account'
+                  fullWidth
+                  margin='normal'
+                  disabled={isLoading}
+                  error={!!errors.targetAccountNumber}
+                  helperText={errors.targetAccountNumber?.message}
+                >
+                  <MenuItem value=''>Select an account</MenuItem>
+                  {filteredAccounts.map((acc) => (
+                    <MenuItem key={acc.accountNumber} value={acc.accountNumber}>
+                      {acc.type} - {acc.accountNumber}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              )}
+            />
+            <Controller
+              name='amount'
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label='Amount'
+                  type='number'
+                  fullWidth
+                  margin='normal'
+                  disabled={isLoading}
+                  error={!!errors.amount}
+                  helperText={errors.amount?.message}
+                  inputProps={{ min: 0.01, step: 0.01 }}
+                />
+              )}
+            />
+            <Controller
+              name='comment'
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label='Comment (optional)'
+                  fullWidth
+                  margin='normal'
+                  disabled={isLoading}
+                  error={!!errors.comment}
+                  helperText={errors.comment?.message}
+                />
+              )}
+            />
+            <ButtonContainer>
+              <Button
+                variant='contained'
+                type='submit'
+                disabled={isLoading}
+                aria-label='Confirm transfer'
+              >
+                Transfer
+              </Button>
+              <Button
+                variant='outlined'
+                onClick={onClose}
+                disabled={isLoading}
+                aria-label='Cancel transfer'
+              >
+                Cancel
+              </Button>
+            </ButtonContainer>
+          </StyledForm>
+        )}
       </StyledModalBox>
     </Modal>
   );
 };
 
-export default React.memo(TransferModal);
+export default TransferModal;

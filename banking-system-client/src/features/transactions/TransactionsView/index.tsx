@@ -44,19 +44,7 @@ const TransactionsView: React.FC = () => {
   };
 
   if (isLoading && transactions.length === 0) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '100vh',
-          bgcolor: 'background.paper',
-        }}
-      >
-        <LoadingSpinner size={24} />
-      </Box>
-    );
+    return <LoadingSpinner />;
   }
 
   return (

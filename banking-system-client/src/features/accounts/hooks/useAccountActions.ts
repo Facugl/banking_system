@@ -48,9 +48,13 @@ export const useAccountActions = ({
   showErrorToast = true,
 }: UseAccountActionsOptions = {}): UseAccountActionsReturn => {
   const dispatch = useAppDispatch();
-  const { isLoading, error, hasFetchedAccounts } = useAppSelector(
-    (state) => state.accounts,
-  );
+  const {
+    isLoading,
+    error,
+    hasFetchedAccounts,
+    isFetchingAccounts,
+    isOperating,
+  } = useAppSelector((state) => state.accounts);
 
   const handleCreateAccount = async (account: AccountCreateRequest) => {
     await withAsyncAction(
@@ -206,5 +210,7 @@ export const useAccountActions = ({
     isLoading,
     error,
     resetAccountsFetch,
+    isFetchingAccounts,
+    isOperating,
   };
 };

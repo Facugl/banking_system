@@ -1,285 +1,163 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { Box, Button } from '@mui/material';
+import { AccountsTable, EditAccountModal } from '../../components';
+import { useAppDispatch, useAppSelector } from '../../../../store/hooks';
 import {
-  IconButton,
-  Button,
-  Tooltip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-} from '@mui/material';
-import { Visibility, VisibilityOff, Refresh } from '@mui/icons-material';
-import { AccountCardProps, AccountStatus } from '../../types';
+  Account,
+  AccountStatus,
+  AccountUpdateRequest,
+  AccountCreateRequest,
+} from '../../types';
 import { useAccountActions } from '../../hooks/useAccountActions';
-import { maskAccountNumber } from '../../../../utils/maskAccountNumber';
-import { showError, showSuccess } from '../../../../utils/toast';
-import { ToastIds } from '../../../../utils/constants';
 import {
-  StyledAccountInfo,
-  StyledAccountNumber,
-  StyledAccountType,
-  StyledBalanceContainer,
-  StyledBalanceText,
-  StyledButtonContainer,
-  StyledCard,
-  StyledInactiveMessage,
-} from './styles';
-import { DepositModal, TransferModal, WithdrawModal } from '../../components';
+  ErrorMessage,
+  EmptyState,
+  LoadingSpinner,
+} from '../../../../components';
+import { Messages } from '../../../../utils/constants';
 
-const AccountCard: React.FC<AccountCardProps> = ({ account }) => {
-  const [showFullNumber, setShowFullNumber] = useState(false);
-  const [depositModalOpen, setDepositModalOpen] = useState(false);
-  const [withdrawModalOpen, setWithdrawModalOpen] = useState(false);
-  const [transferModalOpen, setTransferModalOpen] = useState(false);
-  const [confirmDeactivateOpen, setConfirmDeactivateOpen] = useState(false);
-  const { handleGetAccountBalance, handleChangeAccountStatus } =
-    useAccountActions({
-      showErrorToast: false,
-    });
-  const isActive = account.status === AccountStatus.ACTIVE;
+const AccountsView: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const {
+    accounts,
+    isLoading: accountsLoading,
+    error,
+  } = useAppSelector((state) => state.accounts);
+  const {
+    handleGetAccounts,
+    handleCreateAccount,
+    handleUpdateAccount,
+    handleDeleteAccount,
+    handleChangeAccountStatus,
+  } = useAccountActions();
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
+  const [operationLoading, setOperationLoading] = useState(false);
+  const [operationError, setOperationError] = useState<string | null>(null);
+  const hasFetchedRef = useRef(false);
 
-  const toggleVisibility = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setShowFullNumber((prev) => !prev);
+  useEffect(() => {
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
+    handleGetAccounts();
+  }, [handleGetAccounts]);
+
+  const resetAndFetch = async () => {
+    dispatch({ type: 'accounts/resetFetch' });
+    hasFetchedRef.current = false;
+    await handleGetAccounts();
   };
 
-  const displayedNumber = maskAccountNumber(
-    account.accountNumber,
-    showFullNumber,
-  );
+  const handleEdit = (account: Account) => {
+    setSelectedAccount(account);
+    setModalOpen(true);
+  };
 
-  const handleCopyToClipboard = async () => {
-    const text = account.accountNumber;
+  const handleSave = async (
+    accountData: AccountUpdateRequest | AccountCreateRequest,
+  ) => {
     try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(text);
-        showSuccess('Account number copied to clipboard!', {
-          toastId: ToastIds.ACCOUNT_CREATE_SUCCESS,
-        });
+      setOperationLoading(true);
+      setOperationError(null);
+      if (selectedAccount?.accountNumber) {
+        await handleUpdateAccount(
+          selectedAccount.accountNumber,
+          accountData as AccountUpdateRequest,
+        );
       } else {
-        const textarea = document.createElement('textarea');
-        textarea.value = text;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-        showSuccess('Account number copied to clipboard!', {
-          toastId: ToastIds.ACCOUNT_CREATE_SUCCESS,
-        });
+        await handleCreateAccount(accountData as AccountCreateRequest);
       }
-    } catch (err) {
-      showError('Failed to copy account number', {
-        toastId: ToastIds.ACCOUNT_ERROR,
-      });
+      await resetAndFetch();
+      setModalOpen(false);
+      setSelectedAccount(null);
+    } catch {
+      setOperationError('Failed to save account.');
+    } finally {
+      setOperationLoading(false);
     }
   };
 
-  const handleRefreshBalance = async () => {
-    if (!isActive) {
-      showError('Cannot refresh balance for inactive account', {
-        toastId: ToastIds.BALANCE_ERROR,
-      });
-      return;
-    }
+  const handleDelete = async (account: Account) => {
     try {
-      await handleGetAccountBalance(account.accountNumber);
-    } catch (err) {
-      showError('Error when updating balance', {
-        toastId: ToastIds.BALANCE_ERROR,
-      });
+      setOperationLoading(true);
+      await handleDeleteAccount(account.accountNumber);
+      await resetAndFetch();
+    } finally {
+      setOperationLoading(false);
     }
   };
 
-  const handleOpenDepositModal = () => {
-    if (!isActive) {
-      showError('Cannot deposit to inactive account', {
-        toastId: ToastIds.ACCOUNT_ERROR,
-      });
-      return;
-    }
-    setDepositModalOpen(true);
-  };
-
-  const handleOpenWithdrawModal = () => {
-    if (!isActive) {
-      showError('Cannot withdraw from inactive account', {
-        toastId: ToastIds.ACCOUNT_ERROR,
-      });
-      return;
-    }
-    setWithdrawModalOpen(true);
-  };
-
-  const handleOpenTransferModal = () => {
-    if (!isActive) {
-      showError('Cannot transfer from inactive account', {
-        toastId: ToastIds.ACCOUNT_ERROR,
-      });
-      return;
-    }
-    setTransferModalOpen(true);
-  };
-
-  const handleDeactivate = () => {
-    setConfirmDeactivateOpen(true);
-  };
-
-  const confirmDeactivate = async () => {
+  const handleChangeStatus = async (
+    account: Account,
+    newStatus: AccountStatus,
+  ) => {
     try {
+      setOperationLoading(true);
       await handleChangeAccountStatus(account.accountNumber, {
-        status: AccountStatus.INACTIVE,
+        status: newStatus,
       });
-      showSuccess('Account deactivated successfully!', {
-        toastId: ToastIds.ACCOUNT_STATUS_SUCCESS,
-      });
-      setConfirmDeactivateOpen(false);
-    } catch (err) {
-      showError('Failed to deactivate account', {
-        toastId: ToastIds.ACCOUNT_ERROR,
-      });
-      setConfirmDeactivateOpen(false);
+      await resetAndFetch();
+    } finally {
+      setOperationLoading(false);
     }
   };
 
-  const handleSuccess = useCallback(() => {
-    handleGetAccountBalance(account.accountNumber).catch(() => {
-      showError('Error when updating balance', {
-        toastId: ToastIds.BALANCE_ERROR,
-      });
-    });
-    setDepositModalOpen(false);
-    setWithdrawModalOpen(false);
-    setTransferModalOpen(false);
-  }, [handleGetAccountBalance, account.accountNumber]);
+  if (error) {
+    return (
+      <ErrorMessage
+        message={error?.frontendMessage || Messages.ACCOUNTS_FETCH_ERROR}
+      />
+    );
+  }
 
-  const handleError = (message: string) => {
-    showError(message, { toastId: ToastIds.ACCOUNT_ERROR });
-  };
+  // if (accountsLoading) {
+  //   return (
+  //     <LoadingSpinner />
+  //   );
+  // }
+
+  // if (!accounts.length) {
+  //   return (
+  //     <EmptyState message='No accounts available. Create one to get started!' />
+  //   );
+  // }
 
   return (
-    <>
-      <StyledCard>
-        <StyledAccountType variant='subtitle1' component='h3'>
-          {account.type}
-        </StyledAccountType>
-        <StyledAccountInfo>
-          <Tooltip title={account.accountNumber} arrow>
-            <StyledAccountNumber
-              variant='body2'
-              component='p'
-              onClick={handleCopyToClipboard}
-            >
-              Account Number: {displayedNumber}
-            </StyledAccountNumber>
-          </Tooltip>
-          <IconButton onClick={toggleVisibility} size='small'>
-            {showFullNumber ? <VisibilityOff /> : <Visibility />}
-          </IconButton>
-        </StyledAccountInfo>
-        <StyledBalanceContainer>
-          <StyledBalanceText variant='body2' component='p'>
-            Balance: ${account.balance.toFixed(2)}
-          </StyledBalanceText>
-          <Tooltip
-            title={
-              isActive
-                ? 'Refresh Balance'
-                : 'Cannot refresh balance for inactive account'
-            }
-          >
-            <span>
-              <IconButton
-                size='small'
-                onClick={handleRefreshBalance}
-                disabled={!isActive}
-              >
-                <Refresh />
-              </IconButton>
-            </span>
-          </Tooltip>
-        </StyledBalanceContainer>
-        <StyledButtonContainer>
-          {isActive ? (
-            <>
-              <Tooltip title='Deposit'>
-                <Button variant='outlined' onClick={handleOpenDepositModal}>
-                  Deposit
-                </Button>
-              </Tooltip>
-              <Tooltip title='Withdraw'>
-                <Button variant='outlined' onClick={handleOpenWithdrawModal}>
-                  Withdraw
-                </Button>
-              </Tooltip>
-              <Tooltip title='Transfer'>
-                <Button variant='outlined' onClick={handleOpenTransferModal}>
-                  Transfer
-                </Button>
-              </Tooltip>
-              <Tooltip title='Deactivate Account'>
-                <Button
-                  variant='outlined'
-                  color='error'
-                  onClick={handleDeactivate}
-                >
-                  Deactivate
-                </Button>
-              </Tooltip>
-            </>
-          ) : (
-            <StyledInactiveMessage variant='body2' component='p'>
-              This account is inactive. Contact support to reactivate.
-            </StyledInactiveMessage>
-          )}
-        </StyledButtonContainer>
-      </StyledCard>
-      {isActive && (
-        <>
-          <DepositModal
-            open={depositModalOpen}
-            accountNumber={account.accountNumber}
-            onClose={() => setDepositModalOpen(false)}
-            onSuccess={handleSuccess}
-            onError={handleError}
-          />
-          <WithdrawModal
-            open={withdrawModalOpen}
-            accountNumber={account.accountNumber}
-            onClose={() => setWithdrawModalOpen(false)}
-            onSuccess={handleSuccess}
-            onError={handleError}
-          />
-          <TransferModal
-            open={transferModalOpen}
-            sourceAccountNumber={account.accountNumber}
-            onClose={() => setTransferModalOpen(false)}
-            onSuccess={handleSuccess}
-            onError={handleError}
-          />
-        </>
-      )}
-      <Dialog
-        open={confirmDeactivateOpen}
-        onClose={() => setConfirmDeactivateOpen(false)}
-      >
-        <DialogTitle>Confirm Deactivation</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to deactivate account {account.accountNumber}?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmDeactivateOpen(false)}>
-            Cancel
-          </Button>
-          <Button onClick={confirmDeactivate} color='error' variant='contained'>
-            Deactivate
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </>
+    <Box p={2}>
+      <Box display='flex' justifyContent='space-between' mb={2}>
+        <Button
+          variant='contained'
+          onClick={() => {
+            setSelectedAccount(null);
+            setModalOpen(true);
+          }}
+          disabled={accountsLoading || operationLoading}
+        >
+          Add Account
+        </Button>
+      </Box>
+      <AccountsTable
+        accounts={accounts}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onChangeStatus={handleChangeStatus}
+      />
+
+      <EditAccountModal
+        open={isModalOpen}
+        account={selectedAccount}
+        onClose={() => {
+          setModalOpen(false);
+          setSelectedAccount(null);
+          setOperationError(null);
+        }}
+        onSave={handleSave}
+        isLoading={operationLoading}
+        error={operationError}
+        isAdmin={true}
+      />
+    </Box>
   );
 };
 
-export default React.memo(AccountCard);
+export default AccountsView;

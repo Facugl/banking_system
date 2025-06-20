@@ -1,18 +1,12 @@
-import { Modal, Typography } from '@mui/material';
+import { Modal, Typography, TextField, Button } from '@mui/material';
 import { useAccountActions } from '../../hooks/useAccountActions';
 import { Messages } from '../../../../utils/constants';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { ErrorMessage, LoadingSpinner } from '../../../../components';
-import { depostiValidationSchema } from '../../validation/depositValidationSchema';
-import { DepositModalProps } from '../../types';
-import {
-  StyledModalBox,
-  StyledForm,
-  StyledTextField,
-  ButtonContainer,
-  StyledButton,
-} from './styles';
+import { DepositFormValues, DepositModalProps } from '../../types';
+import { StyledModalBox, StyledForm, ButtonContainer } from '../styled';
+import { depositValidationSchema } from '../../validation/depositValidationSchema';
 
 const DepositModal: React.FC<DepositModalProps> = ({
   open,
@@ -30,14 +24,17 @@ const DepositModal: React.FC<DepositModalProps> = ({
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<{ amount: number }>({
-    resolver: yupResolver(depostiValidationSchema),
-    defaultValues: { amount: 0 },
+  } = useForm<DepositFormValues>({
+    resolver: yupResolver(depositValidationSchema),
+    defaultValues: { amount: 0, comment: '' },
   });
 
-  const onSubmit = async (data: { amount: number }) => {
+  const onSubmit = async (data: DepositFormValues) => {
     try {
-      await handleDeposit(accountNumber, { amount: data.amount });
+      await handleDeposit(accountNumber, {
+        amount: data.amount,
+        comment: data.comment || undefined,
+      });
       reset();
       onSuccess();
       onClose();
@@ -47,20 +44,20 @@ const DepositModal: React.FC<DepositModalProps> = ({
   };
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open} onClose={onClose} aria-labelledby='deposit-modal-title'>
       <StyledModalBox>
-        <Typography variant='h6' sx={{ mb: 2 }}>
+        <Typography id='deposit-modal-title' variant='h6' sx={{ mb: 2 }}>
           Deposit to Account {accountNumber}
         </Typography>
         {error && <ErrorMessage message={error.frontendMessage} />}
-        {isLoading && <LoadingSpinner size={24} />}
+        {isLoading && <LoadingSpinner />}
 
-        <StyledForm onSubmit={handleSubmit(onSubmit)}>
+        <StyledForm component='form' onSubmit={handleSubmit(onSubmit)}>
           <Controller
             name='amount'
             control={control}
             render={({ field }) => (
-              <StyledTextField
+              <TextField
                 {...field}
                 label='Amount'
                 type='number'
@@ -73,21 +70,38 @@ const DepositModal: React.FC<DepositModalProps> = ({
               />
             )}
           />
+          <Controller
+            name='comment'
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label='Comment (optional)'
+                fullWidth
+                margin='normal'
+                disabled={isLoading}
+                error={!!errors.comment}
+                helperText={errors.comment?.message}
+              />
+            )}
+          />
           <ButtonContainer>
-            <StyledButton
+            <Button
               variant='contained'
               type='submit'
               disabled={isLoading}
+              aria-label='Confirm deposit'
             >
               Deposit
-            </StyledButton>
-            <StyledButton
+            </Button>
+            <Button
               variant='outlined'
               onClick={onClose}
               disabled={isLoading}
+              aria-label='Cancel deposit'
             >
               Cancel
-            </StyledButton>
+            </Button>
           </ButtonContainer>
         </StyledForm>
       </StyledModalBox>

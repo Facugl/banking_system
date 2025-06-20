@@ -28,4 +28,10 @@ export const transferValidationSchema = yup.object().shape({
     .required(Messages.AMOUNT_REQUIRED)
     .positive(Messages.INVALID_AMOUNT)
     .typeError(Messages.INVALID_AMOUNT),
+  comment: yup
+    .string()
+    .optional()
+    .test('no-empty', Messages.COMMENT_NOT_EMPTY, (value) => {
+      return !value || value.trim().length > 0;
+    }),
 });
