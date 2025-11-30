@@ -37,7 +37,7 @@ importers:
         version: 1.9.0
       banking-system-client:
         specifier: 'file:'
-        version: file:(@mui/system@6.4.1(@emotion/react@11.14.0(@types/react@18.3.22)(react@18.3.1))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@18.3.22)(react@18.3.1))(@types/react@18.3.22)(react@18.3.1))(@types/react@18.3.22)(react@18.3.1))(@types/react@18.3.22)(redux@5.0.1)
+        version: file:(@types/react@18.3.22)(redux@5.0.1)
       jwt-decode:
         specifier: ^4.0.0
         version: 4.0.0
@@ -3133,13 +3133,14 @@ snapshots:
 
   balanced-match@1.0.2: {}
 
-  banking-system-client@file:(@mui/system@6.4.1(@emotion/react@11.14.0(@types/react@18.3.22)(react@18.3.1))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@18.3.22)(react@18.3.1))(@types/react@18.3.22)(react@18.3.1))(@types/react@18.3.22)(react@18.3.1))(@types/react@18.3.22)(redux@5.0.1):
+  banking-system-client@file:(@types/react@18.3.22)(redux@5.0.1):
     dependencies:
       '@emotion/react': 11.14.0(@types/react@18.3.22)(react@18.3.1)
       '@emotion/styled': 11.14.0(@emotion/react@11.14.0(@types/react@18.3.22)(react@18.3.1))(@types/react@18.3.22)(react@18.3.1)
       '@hookform/resolvers': 3.10.0(react-hook-form@7.56.4(react@18.3.1))
       '@mui/icons-material': 6.4.11(@mui/material@6.4.11(@emotion/react@11.14.0(@types/react@18.3.22)(react@18.3.1))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@18.3.22)(react@18.3.1))(@types/react@18.3.22)(react@18.3.1))(@types/react@18.3.22)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.22)(react@18.3.1)
       '@mui/material': 6.4.11(@emotion/react@11.14.0(@types/react@18.3.22)(react@18.3.1))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@18.3.22)(react@18.3.1))(@types/react@18.3.22)(react@18.3.1))(@types/react@18.3.22)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@mui/system': 6.4.1(@emotion/react@11.14.0(@types/react@18.3.22)(react@18.3.1))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@18.3.22)(react@18.3.1))(@types/react@18.3.22)(react@18.3.1))(@types/react@18.3.22)(react@18.3.1)
       '@mui/x-data-grid': 7.29.4(@emotion/react@11.14.0(@types/react@18.3.22)(react@18.3.1))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@18.3.22)(react@18.3.1))(@types/react@18.3.22)(react@18.3.1))(@mui/material@6.4.11(@emotion/react@11.14.0(@types/react@18.3.22)(react@18.3.1))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@18.3.22)(react@18.3.1))(@types/react@18.3.22)(react@18.3.1))(@types/react@18.3.22)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@mui/system@6.4.1(@emotion/react@11.14.0(@types/react@18.3.22)(react@18.3.1))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@18.3.22)(react@18.3.1))(@types/react@18.3.22)(react@18.3.1))(@types/react@18.3.22)(react@18.3.1))(@types/react@18.3.22)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@reduxjs/toolkit': 2.8.2(react-redux@9.2.0(@types/react@18.3.22)(react@18.3.1)(redux@5.0.1))(react@18.3.1)
       axios: 1.9.0
@@ -3155,7 +3156,6 @@ snapshots:
       yup: 1.6.1
     transitivePeerDependencies:
       - '@mui/material-pigment-css'
-      - '@mui/system'
       - '@types/react'
       - debug
       - redux

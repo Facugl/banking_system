@@ -86,6 +86,8 @@ public class StatisticsServiceImpl implements StatisticsService {
 					cumulativeTotal));
 		}
 
+
+
 		return responses;
 	}
 

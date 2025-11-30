@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 import { Card, CardContent, Typography } from '@mui/material';
 
 export const StyledCard = styled(Card)(({ theme }) => ({
+  width: '100%',
   backgroundColor: theme.palette.background.paper,
   borderRadius: theme.shape.borderRadius,
   boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',

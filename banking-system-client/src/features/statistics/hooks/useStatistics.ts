@@ -2,14 +2,17 @@ import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { getStatistics } from '../thunks/getStatistics';
 import { showError } from '../../../utils/toast';
-import { ROLES } from '../../../utils/constants';
+import { Role, ROLES } from '../../../utils/constants';
 
 export const useStatistics = () => {
   const dispatch = useAppDispatch();
   const { isLoading, statistics, error } = useAppSelector(
     (state) => state.statistics,
   );
-  const { role } = useAppSelector((state) => state.auth);
+  const { profile } = useAppSelector(
+      (state) => state.customer,
+    );
+    const role = profile?.role as Role;
 
   useEffect(() => {
     if (role === ROLES.ADMINISTRATOR || role === ROLES.EMPLOYEE) {

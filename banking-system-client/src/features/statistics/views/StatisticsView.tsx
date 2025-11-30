@@ -52,7 +52,7 @@ const StatisticsView: React.FC = () => {
 
   return (
     <Grid2 container spacing={3}>
-      <Grid2 size={{ xs: 12 }}>
+      <Grid2 size={{ xs: 12}}>
         <StatisticsCards {...statistics} />
       </Grid2>
       <Grid2 size={{ xs: 12, md: 6 }}>

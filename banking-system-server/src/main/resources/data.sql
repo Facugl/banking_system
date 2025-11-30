@@ -178,7 +178,7 @@ WHERE NOT EXISTS (SELECT 1 FROM operations WHERE name = 'DELETE_ONE_ROLE' AND mo
 
 INSERT INTO operations (name, path, http_method, permit_all, modules_id) 
 SELECT 'READ_STATISTICS', '', 'GET', false, 9
-WHERE NOT EXISTS (SELECT 1 FROM operations WHERE name = 'DELETE_ONE_ROLE' AND modules_id = 9);
+WHERE NOT EXISTS (SELECT 1 FROM operations WHERE name = 'READ_STATISTICS' AND modules_id = 9);
 
 -- CREACIÓN DE ROLES
 INSERT INTO roles (name)

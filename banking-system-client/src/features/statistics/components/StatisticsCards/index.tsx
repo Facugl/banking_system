@@ -1,3 +1,4 @@
+import { Stack } from '@mui/material';
 import { StatisticsCardsProps } from '../../types';
 import {
   StyledCard,
@@ -12,7 +13,7 @@ const StatisticsCards: React.FC<StatisticsCardsProps> = ({
   totalBalance,
 }) => {
   return (
-    <>
+    <Stack maxWidth={{lg: '1068px'}}  direction={{ xs: 'column', sm: 'row' }} spacing={2}>
       <StyledCard>
         <StyledCardContent>
           <StyledTitle variant='subtitle1'>Total Accounts</StyledTitle>
@@ -33,7 +34,7 @@ const StatisticsCards: React.FC<StatisticsCardsProps> = ({
           <StyledValue variant='h4'>${totalBalance.toFixed(2)}</StyledValue>
         </StyledCardContent>
       </StyledCard>
-    </>
+    </Stack>
   );
 };
 

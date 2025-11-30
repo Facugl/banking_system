@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { getModules } from '../thunks';
 import { DataGrid } from '@mui/x-data-grid';
-import { Button } from '@mui/material';
+import { Box, Button, Stack } from '@mui/material';
 
 const ModulesTable: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -21,20 +21,20 @@ const ModulesTable: React.FC = () => {
       headerName: 'Actions',
       width: 200,
       renderCell: (_params: any) => (
-        <div>
+        <Stack direction= 'row' justifyContent='space-between'>
           <Button variant='outlined' color='primary' size='small'>
             Edit
           </Button>
           <Button variant='outlined' color='secondary' size='small'>
             Delete
           </Button>
-        </div>
+        </Stack>
       ),
     },
   ];
 
   return (
-    <div style={{ height: 400, width: '100%' }}>
+    <Box style={{ height: 400, width: '100%' }}>
       {loading ? (
         <p>Loading...</p>
       ) : (
@@ -50,7 +50,7 @@ const ModulesTable: React.FC = () => {
           pageSizeOptions={[2, 5, 10]}
         />
       )}
-    </div>
+    </Box>
   );
 };
 
