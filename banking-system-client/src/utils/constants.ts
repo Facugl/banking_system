@@ -66,6 +66,14 @@ export const Messages = {
   COMMENT_NOT_EMPTY: 'Comment cannot be empty',
 } as const;
 
+export const RoleMessages = {
+  FETCH_SUCCESS: 'Roles loaded successfully.',
+  CREATE_SUCCESS: 'Role created successfully.',
+  UPDATE_SUCCESS: 'Role updated successfully.',
+  DELETE_SUCCESS: 'Role deleted successfully.',
+  ERROR: 'An error occurred while managing roles.',
+} as const;
+
 export const ApiEndpoints = {
   PROFILE: '/auth/profile',
   AUTHENTICATE: '/auth/authenticate',

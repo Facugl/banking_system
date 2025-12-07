@@ -1,62 +1,72 @@
-import { useState, useEffect } from 'react';
-import { Modal, Box, Button, TextField } from '@mui/material';
-import { Role } from '../types';
+import { useEffect } from 'react';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+} from '@mui/material';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { RoleResponse } from '../types';
+import { roleSchema } from '../validation/roleSchema';
 
-interface EditModalProps {
+interface EditRoleModalProps {
   open: boolean;
-  role: Role | null;
+  role: RoleResponse | null;
   onClose: () => void;
   onSave: (id: number | null, name: string) => void;
 }
 
-const EditRoleModal: React.FC<EditModalProps> = ({
+const EditRoleModal: React.FC<EditRoleModalProps> = ({
   open,
   role,
   onClose,
   onSave,
 }) => {
-  const [name, setName] = useState<string>('');
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<{ name: string }>({
+    resolver: yupResolver(roleSchema),
+    defaultValues: { name: '' },
+  });
 
   useEffect(() => {
-    if (role) setName(role.name);
-  }, [role]);
+    if (role) {
+      reset({ name: role.name });
+    } else {
+      reset({ name: '' });
+    }
+  }, [role, reset]);
 
-  const handleSave = () => {
-    onSave(role?.id || null, name);
+  const onSubmit = (data: { name: string }) => {
+    onSave(role ? role.id : null, data.name);
   };
 
   return (
-    <Modal open={open} onClose={onClose}>
-      <Box
-        sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: 400,
-          bgcolor: 'background.paper',
-          boxShadow: 24,
-          p: 4,
-          borderRadius: 2,
-        }}
-      >
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+      <DialogTitle>{role ? 'Edit Role' : 'Create Role'}</DialogTitle>
+      <DialogContent>
         <TextField
           fullWidth
-          label='Role Name'
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          sx={{ mb: 2 }}
+          label="Role Name"
+          margin="normal"
+          {...register('name')}
+          error={!!errors.name}
+          helperText={errors.name?.message}
         />
-        <Box display='flex' justifyContent='flex-end'>
-          <Button onClick={onClose} sx={{ mr: 1 }}>
-            Cancel
-          </Button>
-          <Button variant='contained' onClick={handleSave}>
-            Save
-          </Button>
-        </Box>
-      </Box>
-    </Modal>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button variant="contained" onClick={handleSubmit(onSubmit)}>
+          Save
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 

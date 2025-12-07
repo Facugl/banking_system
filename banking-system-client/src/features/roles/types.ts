@@ -13,3 +13,5 @@ export interface RolesState {
   isLoading: boolean;
   error: string | null;
 }
+
+export type Role = RoleResponse;

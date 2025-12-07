@@ -6,7 +6,7 @@ import {
   updateRole,
   deleteRole,
 } from './thunks';
-import { RolesState, Role } from './types';
+import { RoleResponse, RolesState } from './types';
 
 const initialState: RolesState = {
   roles: [],
@@ -20,10 +20,10 @@ const rolesSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(createRole.fulfilled, (state, action: PayloadAction<Role>) => {
+      .addCase(createRole.fulfilled, (state, action: PayloadAction<RoleResponse>) => {
         state.roles.push(action.payload);
       })
-      .addCase(getRole.fulfilled, (state, action) => {
+      .addCase(getRole.fulfilled, (state, action: PayloadAction<RoleResponse>) => {
         const index = state.roles.findIndex(
           (role) => role.id === action.payload.id,
         );
@@ -37,7 +37,7 @@ const rolesSlice = createSlice({
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(getRoles.fulfilled, (state, { payload }) => {
+      .addCase(getRoles.fulfilled, (state, { payload }: PayloadAction<RoleResponse[]>) => {
         state.isLoading = false;
         state.roles = payload;
       })
@@ -45,16 +45,15 @@ const rolesSlice = createSlice({
         state.isLoading = false;
         state.error = payload as string;
       })
-      .addCase(updateRole.fulfilled, (state, { payload }) => {
+      .addCase(updateRole.fulfilled, (state, { payload }: PayloadAction<RoleResponse>) => {
         state.roles = state.roles.map((role) =>
           role.id === payload.id ? payload : role,
         );
       })
-      .addCase(deleteRole.fulfilled, (state, { payload }) => {
+      .addCase(deleteRole.fulfilled, (state, { payload }: PayloadAction<number>) => {
         state.roles = state.roles.filter((role) => role.id !== payload);
       });
   },
 });
 
-// export const { resetError } = rolesSlice.actions;
 export default rolesSlice.reducer;

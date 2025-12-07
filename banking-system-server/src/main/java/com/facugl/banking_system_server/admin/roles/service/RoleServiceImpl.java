@@ -74,7 +74,7 @@ public class RoleServiceImpl implements RoleService {
                 .orElseThrow(() -> new RoleNotFoundException(roleId));
 
         if (request.getName() != null) {
-            role.setName(request.getName());
+            role.setName(request.getName().toUpperCase());
         }
 
         Role updatedRole = roleRepository.save(role);
