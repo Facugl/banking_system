@@ -13,39 +13,50 @@ interface ConfirmDeleteModalProps {
   open: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  roleName: string;
+  itemName: string;
   isLoading: boolean;
+  title?: string;
+  message?: string;
 }
+
 const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
   open,
   onClose,
   onConfirm,
-  roleName,
+  itemName,
   isLoading,
-}: ConfirmDeleteModalProps) => {
+  title = "Confirm Delete",
+  message,
+}) => {
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth='xs'>
-      <DialogTitle>Confirm Delete</DialogTitle>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
+      <DialogTitle>{title}</DialogTitle>
 
       <DialogContent>
         <Typography>
-          Are you sure you want to delete the role <strong>{roleName}</strong>?
-          This action cannot be undone.
+          {message ? (
+            message
+          ) : (
+            <>
+              Are you sure you want to delete <strong>{itemName}</strong>? This
+              action cannot be undone.
+            </>
+          )}
         </Typography>
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={onClose} disabled={isLoading} variant='outlined'>
+        <Button onClick={onClose} disabled={isLoading} variant="outlined">
           Cancel
         </Button>
 
         <Button
           onClick={onConfirm}
           disabled={isLoading}
-          color='error'
-          variant='contained'
+          color="error"
+          variant="contained"
         >
-          {isLoading ? <CircularProgress size={20} /> : 'Delete'}
+          {isLoading ? <CircularProgress size={20} /> : "Delete"}
         </Button>
       </DialogActions>
     </Dialog>

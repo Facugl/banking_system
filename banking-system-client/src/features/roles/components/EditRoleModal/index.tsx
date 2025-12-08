@@ -9,8 +9,8 @@ import {
 } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { RoleResponse } from '../types';
-import { roleSchema } from '../validation/roleSchema';
+import { RoleResponse } from '../../types';
+import { roleSchema } from '../../validation/roleSchema';
 
 interface EditRoleModalProps {
   open: boolean;

@@ -11,3 +11,4 @@ export { default as RouterLink } from './RouterLink';
 export { default as Sidebar } from './Sidebar';
 export { default as StatsBox } from './StatsBox';
 export { default as StyledAvatar } from './StyledAvatar';
+export { default as ConfirmDeleteModal } from './ConfirmDeleteModal';

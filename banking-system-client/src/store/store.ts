@@ -7,6 +7,7 @@ import customerReducer from '../features/customer/customerSlice';
 import statisticsReducer from '../features/statistics/statisticsSlice';
 import transactionReducer from '../features/transactions/transactionSlice';
 import { configureResponseInterceptor } from '../services/axiosInstance';
+import operationsReducer from '../features/operations/operationsSlice';
 
 export const store = configureStore({
   reducer: {
@@ -17,6 +18,7 @@ export const store = configureStore({
     roles: rolesSlice,
     customer: customerReducer,
     transactions: transactionReducer,
+    operations: operationsReducer,
   },
 });
 

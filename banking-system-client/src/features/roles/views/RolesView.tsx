@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Box, Button } from '@mui/material';
 import { createRole, getRoles, updateRole, deleteRole } from '../thunks';
-import { EditRoleModal, ConfirmDeleteModal, RolesTable } from '../components';
 import { useAppSelector, useAppDispatch } from '../../../store/hooks';
 import { RoleResponse } from '../types';
 import { showSuccess, showError } from '../../../utils/toast';
 import { Messages } from '../../../utils/constants';
+import { RolesTable,EditRoleModal } from '../components';
+import { ConfirmDeleteModal } from '../../../components';
 
 const RolesView: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -103,7 +104,7 @@ const RolesView: React.FC = () => {
 
       <ConfirmDeleteModal
         open={deleteModalOpen}
-        roleName={roleToDelete?.name || ''}
+        itemName={roleToDelete?.name || ''}
         onClose={() => setDeleteModalOpen(false)}
         onConfirm={handleDeleteConfirm}
         isLoading={false}

@@ -1,9 +1,9 @@
 import React from 'react';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { Box, IconButton } from '@mui/material';
-import { RoleResponse } from '../types';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { RoleResponse } from '../../types';
 
 interface Props {
   roles: RoleResponse[];
