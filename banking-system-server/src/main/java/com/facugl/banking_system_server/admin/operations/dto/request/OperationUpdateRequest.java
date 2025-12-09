@@ -19,7 +19,10 @@ public class OperationUpdateRequest {
     @Size(min = 3, max = 100, message = "The name must be between 3 and 100 characters.")
     private String name;
 
-    @Pattern(regexp = "(^$|/[0-9]*)", message = "The path field must be either an empty string or match the pattern '/[0-9]*' if provided.")
+    @Pattern(
+            regexp = "^/.*$",
+            message = "The path must start with '/'."
+    )
     private String path;
 
     @Pattern(regexp = "^(GET|POST|PUT|DELETE|PATCH)$", message = "The HTTP method must be one of GET, POST, PUT, DELETE, PATCH.")

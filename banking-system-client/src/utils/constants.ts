@@ -74,6 +74,14 @@ export const RoleMessages = {
   ERROR: 'An error occurred while managing roles.',
 } as const;
 
+export const OperationMessages = {
+  FETCH_SUCCESS: 'Operations loaded successfully.',
+  CREATE_SUCCESS: 'Operation created successfully.',
+  UPDATE_SUCCESS: 'Operation updated successfully.',
+  DELETE_SUCCESS: 'Operation deleted successfully.',
+  ERROR: 'An error occurred while managing operations.',
+} as const;
+
 export const ApiEndpoints = {
   PROFILE: '/auth/profile',
   AUTHENTICATE: '/auth/authenticate',
@@ -120,6 +128,7 @@ export const Routes = {
   DASHBOARD: '/dashboard',
   DASHBOARD_MODULES: '/dashboard/modules',
   DASHBOARD_ROLES: '/dashboard/roles',
+  DASHBOARD_OPERATIONS: '/dashboard/operations',
   DASHBOARD_ACCOUNTS: '/dashboard/accounts',
   CUSTOMER_PANEL: '/customer-panel',
   CUSTOMER_TRANSACTIONS: '/customer-panel/transactions',

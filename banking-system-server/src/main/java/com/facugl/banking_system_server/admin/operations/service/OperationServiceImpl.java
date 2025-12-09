@@ -3,6 +3,7 @@ package com.facugl.banking_system_server.admin.operations.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.facugl.banking_system_server.common.utils.NameNormalizer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +36,7 @@ public class OperationServiceImpl implements OperationService {
     @Transactional
     public OperationResponse createOperation(OperationCreateRequest request) {
         Operation operation = operationMapper.toEntity(request, operationMapperHelper);
-        operation.setName(operation.getName().toUpperCase());
+        operation.setName(NameNormalizer.normalize(operation.getName()));
         operation.setHttpMethod(operation.getHttpMethod().toUpperCase());
 
         Operation savedOperation = operationRepository.save(operation);
@@ -68,7 +69,7 @@ public class OperationServiceImpl implements OperationService {
                 .orElseThrow(() -> new OperationNotFoundException(operationId));
 
         if (request.getName() != null) {
-            operation.setName(request.getName().toUpperCase());
+            operation.setName(NameNormalizer.normalize(request.getName()));
         }
 
         if (request.getPath() != null) {

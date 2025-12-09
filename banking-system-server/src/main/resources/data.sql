@@ -89,8 +89,8 @@ SELECT 'AUTHENTICATE', '/authenticate', 'POST', true, 4
 WHERE NOT EXISTS (SELECT 1 FROM operations WHERE name = 'AUTHENTICATE' AND modules_id = 4);
 
 INSERT INTO operations (name, path, http_method, permit_all, modules_id) 
-SELECT 'VALIDATE-TOKEN', '/validate-token', 'GET', true, 4
-WHERE NOT EXISTS (SELECT 1 FROM operations WHERE name = 'VALIDATE-TOKEN' AND modules_id = 4);
+SELECT 'VALIDATE_TOKEN', '/validate-token', 'GET', true, 4
+WHERE NOT EXISTS (SELECT 1 FROM operations WHERE name = 'VALIDATE_TOKEN' AND modules_id = 4);
 
 INSERT INTO operations (name, path, http_method, permit_all, modules_id) 
 SELECT 'READ_MY_PROFILE', '/profile', 'GET', false, 4

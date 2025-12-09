@@ -23,7 +23,10 @@ public class OperationCreateRequest {
     private String name;
 
     @NotNull(message = "The path cannot be null.")
-    @Pattern(regexp = "(^$|/[0-9]*)", message = "The path field must be either an empty string or match the pattern '/[0-9]*'.")
+    @Pattern(
+            regexp = "(^$|/\\[0-9]\\*)",
+            message = "The path must be '/[0-9]*' or empty."
+    )
     private String path;
 
     @NotBlank(message = "The HTTP method cannot be blank.")

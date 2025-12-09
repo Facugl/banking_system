@@ -16,6 +16,7 @@ import CustomerAccountsView from '../features/accounts/views/CustomerAccountsVie
 import ProfileView from '../features/customer/views/ProfileView';
 import LandingPage from '../pages/LandingPage';
 import { PrivateRoute } from '../components';
+import OperationsView from '../features/operations/views/OperationsView';
 
 const AppRoutes = () => (
   <Routes>
@@ -46,6 +47,7 @@ const AppRoutes = () => (
     >
       <Route index element={<StatisticsView />} />
       <Route path='modules' element={<ModulesView />} />
+      <Route path='operations' element={<OperationsView />} />
       <Route path='roles' element={<RolesView />} />
       <Route path='accounts' element={<AccountsView />} />
     </Route>
