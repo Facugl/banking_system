@@ -82,6 +82,14 @@ export const OperationMessages = {
   ERROR: 'An error occurred while managing operations.',
 } as const;
 
+export const ModuleMessages = {
+  FETCH_SUCCESS: 'Modules loaded successfully.',
+  CREATE_SUCCESS: 'Module created successfully.',
+  UPDATE_SUCCESS: 'Module updated successfully.',
+  DELETE_SUCCESS: 'Module deleted successfully.',
+  ERROR: 'An error occurred while managing modules.',
+} as const;
+
 export const ApiEndpoints = {
   PROFILE: '/auth/profile',
   AUTHENTICATE: '/auth/authenticate',

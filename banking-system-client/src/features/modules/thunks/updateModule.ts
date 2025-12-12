@@ -1,16 +1,16 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { updateModuleApi } from '../services/modulesApi';
-import { ModuleRequest, ModuleResponse } from '../types';
+import { ModuleResponse } from '../types';
 import { AxiosError } from 'axios';
 
 export const updateModule = createAsyncThunk<
   ModuleResponse,
-  { id: number; module: ModuleRequest }
+  { id: number; name: string; basePath: string }
 >(
   'modules/updateModule',
-  async ({ id, module: moduleData }, { rejectWithValue }) => {
+  async ({ id, name, basePath }, { rejectWithValue }) => {
     try {
-      const { data } = await updateModuleApi(id, moduleData);
+      const { data } = await updateModuleApi(id, { name, basePath });
       return data;
     } catch (error: unknown) {
       const axiosError = error as AxiosError;

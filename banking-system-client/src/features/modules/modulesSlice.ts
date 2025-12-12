@@ -20,34 +20,6 @@ const modulesSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(getModules.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(
-        getModules.fulfilled,
-        (state, action: PayloadAction<ModuleResponse[]>) => {
-          state.loading = false;
-          state.modules = action.payload;
-        },
-      )
-      .addCase(getModules.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      })
-      .addCase(
-        getModule.fulfilled,
-        (state, action: PayloadAction<ModuleResponse>) => {
-          const existingModule = state.modules.find(
-            (module) => module.id === action.payload.id,
-          );
-          if (existingModule) {
-            Object.assign(existingModule, action.payload);
-          } else {
-            state.modules.push(action.payload);
-          }
-        },
-      )
       .addCase(
         createModule.fulfilled,
         (state, action: PayloadAction<ModuleResponse>) => {
@@ -55,14 +27,39 @@ const modulesSlice = createSlice({
         },
       )
       .addCase(
-        updateModule.fulfilled,
+        getModule.fulfilled,
         (state, action: PayloadAction<ModuleResponse>) => {
           const index = state.modules.findIndex(
             (module) => module.id === action.payload.id,
           );
-          if (index >= 0) {
+          if (index) {
             state.modules[index] = action.payload;
+          } else {
+            state.modules.push(action.payload);
           }
+        },
+      )
+      .addCase(getModules.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(
+        getModules.fulfilled,
+        (state, { payload }: PayloadAction<ModuleResponse[]>) => {
+          state.loading = false;
+          state.modules = payload;
+        },
+      )
+      .addCase(getModules.rejected, (state, { payload }) => {
+        state.loading = false;
+        state.error = payload as string;
+      })
+      .addCase(
+        updateModule.fulfilled,
+        (state, { payload }: PayloadAction<ModuleResponse>) => {
+          state.modules = state.modules.map((module) =>
+            module.id === payload.id ? payload : module,
+          );
         },
       )
       .addCase(

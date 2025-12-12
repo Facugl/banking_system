@@ -3,6 +3,7 @@ package com.facugl.banking_system_server.admin.modules.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.facugl.banking_system_server.common.utils.PathNormalizer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,8 +33,9 @@ public class ModuleServiceImpl implements ModuleService {
         }
 
         Module module = moduleMapper.toEntity(request);
+
         module.setName(module.getName().toUpperCase());
-        module.setBasePath("/".concat(module.getBasePath()));
+        module.setBasePath(PathNormalizer.normalizeBasePath(module.getBasePath()));
 
         Module savedModule = moduleRepository.save(module);
 
@@ -69,7 +71,7 @@ public class ModuleServiceImpl implements ModuleService {
         }
 
         if (request.getBasePath() != null) {
-            module.setBasePath("/".concat(request.getBasePath()));
+            module.setBasePath(PathNormalizer.normalizeBasePath(request.getBasePath()));
         }
 
         Module updatedModule = moduleRepository.save(module);
