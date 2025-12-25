@@ -82,6 +82,14 @@ export const OperationMessages = {
   ERROR: 'An error occurred while managing operations.',
 } as const;
 
+export const PermissionMessages = {
+  FETCH_SUCCESS: 'Permissions loaded successfully.',
+  CREATE_SUCCESS: 'Permission created successfully.',
+  UPDATE_SUCCESS: 'Permission updated successfully.',
+  DELETE_SUCCESS: 'Permission deleted successfully.',
+  ERROR: 'An error occurred while managing permissions.',
+} as const;
+
 export const ModuleMessages = {
   FETCH_SUCCESS: 'Modules loaded successfully.',
   CREATE_SUCCESS: 'Module created successfully.',
@@ -96,6 +104,8 @@ export const ApiEndpoints = {
   REGISTER: '/users',
   LOGOUT: '/auth/logout',
   ACCOUNTS: '/accounts',
+  PERMISSIONS: '/permissions',
+  PERMISSIONS_BY_ID: '/permissions/:id',
   ACCOUNT_BY_NUMBER: '/accounts/:accountNumber',
   ACCOUNT_BALANCE: '/accounts/:accountNumber/balance',
   ACCOUNT_DEPOSIT: '/accounts/:accountNumber/deposit',
@@ -137,6 +147,7 @@ export const Routes = {
   DASHBOARD_MODULES: '/dashboard/modules',
   DASHBOARD_ROLES: '/dashboard/roles',
   DASHBOARD_OPERATIONS: '/dashboard/operations',
+  DASHBOARD_PERMISSIONS: '/dashboard/permissions',
   DASHBOARD_ACCOUNTS: '/dashboard/accounts',
   CUSTOMER_PANEL: '/customer-panel',
   CUSTOMER_TRANSACTIONS: '/customer-panel/transactions',

@@ -361,3 +361,31 @@ WHERE NOT EXISTS (SELECT 1 FROM transactions WHERE transaction_number = '5050505
 INSERT INTO transactions (transaction_number, type, amount, source_account_id, target_account_id, transaction_date, comment)
 SELECT '606060606043', 'WITHDRAW', 2500.00, 8, NULL, '2024-03-20 14:45:00.369442', 'Kakashi withdrawal'
 WHERE NOT EXISTS (SELECT 1 FROM transactions WHERE transaction_number = '606060606043');
+
+INSERT INTO permissions (roles_id, operations_id)
+SELECT r.id, o.id
+FROM roles r
+JOIN operations o ON o.name IN (
+
+  'CREATE_ONE_PERMISSION',
+  'READ_ONE_PERMISSION',
+  'READ_ALL_PERMISSIONS',
+  'DELETE_ONE_PERMISSION',
+
+  'READ_ONE_OPERATION',
+  'READ_ALL_OPERATIONS',
+
+  'READ_ONE_ROLE',
+  'READ_ALL_ROLES',
+
+  'READ_ONE_MODULE',
+  'READ_ALL_MODULES'
+
+)
+WHERE r.name = 'ADMINISTRATOR'
+AND NOT EXISTS (
+  SELECT 1
+  FROM permissions p
+  WHERE p.roles_id = r.id
+  AND p.operations_id = o.id
+);

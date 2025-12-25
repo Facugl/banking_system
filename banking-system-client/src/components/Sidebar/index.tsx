@@ -46,15 +46,21 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onDrawerToggle }) => {
       roles: [ROLES.ADMINISTRATOR, ROLES.EMPLOYEE],
     },
     {
+      text: 'Operations',
+      icon: <GroupIcon />,
+      path: Routes.DASHBOARD_OPERATIONS,
+      roles: [ROLES.ADMINISTRATOR, ROLES.EMPLOYEE],
+    },
+    {
       text: 'Roles',
       icon: <GroupIcon />,
       path: Routes.DASHBOARD_ROLES,
       roles: [ROLES.ADMINISTRATOR, ROLES.EMPLOYEE],
     },
     {
-      text: 'Operations',
+      text: 'Permissions',
       icon: <GroupIcon />,
-      path: Routes.DASHBOARD_OPERATIONS,
+      path: Routes.DASHBOARD_PERMISSIONS,
       roles: [ROLES.ADMINISTRATOR, ROLES.EMPLOYEE],
     },
     {

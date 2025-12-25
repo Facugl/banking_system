@@ -13,7 +13,7 @@ interface ConfirmDeleteModalProps {
   open: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  itemName: string;
+  itemName: string | number;
   isLoading: boolean;
   title?: string;
   message?: string;
@@ -25,11 +25,11 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
   onConfirm,
   itemName,
   isLoading,
-  title = "Confirm Delete",
+  title = 'Confirm Delete',
   message,
 }) => {
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth='xs'>
       <DialogTitle>{title}</DialogTitle>
 
       <DialogContent>
@@ -46,17 +46,17 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={onClose} disabled={isLoading} variant="outlined">
+        <Button onClick={onClose} disabled={isLoading} variant='outlined'>
           Cancel
         </Button>
 
         <Button
           onClick={onConfirm}
           disabled={isLoading}
-          color="error"
-          variant="contained"
+          color='error'
+          variant='contained'
         >
-          {isLoading ? <CircularProgress size={20} /> : "Delete"}
+          {isLoading ? <CircularProgress size={20} /> : 'Delete'}
         </Button>
       </DialogActions>
     </Dialog>

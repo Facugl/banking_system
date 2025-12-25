@@ -17,6 +17,7 @@ import ProfileView from '../features/customer/views/ProfileView';
 import LandingPage from '../pages/LandingPage';
 import { PrivateRoute } from '../components';
 import OperationsView from '../features/operations/views/OperationsView';
+import PermissionsView from '../features/permissions/Views/PermissionsView';
 
 const AppRoutes = () => (
   <Routes>
@@ -48,6 +49,7 @@ const AppRoutes = () => (
       <Route index element={<StatisticsView />} />
       <Route path='modules' element={<ModulesView />} />
       <Route path='operations' element={<OperationsView />} />
+      <Route path='permissions' element={<PermissionsView />} />
       <Route path='roles' element={<RolesView />} />
       <Route path='accounts' element={<AccountsView />} />
     </Route>
