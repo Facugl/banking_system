@@ -1,5 +1,4 @@
 import { AppError } from '../../types';
-import { Role } from '../../utils/constants';
 
 export interface AuthenticateRequest {
   username: string;
@@ -19,6 +18,7 @@ export interface AuthState {
   token: string;
   isLoading: boolean;
   sessionLoading: boolean;
+  sessionReady: boolean,
   loginSuccess: boolean;
   registerSuccess: boolean;
   logoutSuccess: boolean;
@@ -33,7 +33,6 @@ export interface UseAuthOptions {
 export interface UseAuthReturn {
   isLoading: boolean;
   error: AppError | null;
-  role: Role | undefined;
   loginSuccess: boolean;
   registerSuccess: boolean;
   handleLogin: (credentials: AuthenticateRequest) => void;

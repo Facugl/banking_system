@@ -287,6 +287,24 @@ INSERT INTO permissions (roles_id, operations_id)
 SELECT 2, 12 WHERE NOT EXISTS (SELECT 1 FROM permissions WHERE roles_id = 2 AND operations_id = 12);
 INSERT INTO permissions (roles_id, operations_id)
 SELECT 2, 17 WHERE NOT EXISTS (SELECT 1 FROM permissions WHERE roles_id = 2 AND operations_id = 17);
+INSERT INTO permissions (roles_id, operations_id)
+SELECT 2, 20 WHERE NOT EXISTS (SELECT 1 FROM permissions WHERE roles_id = 2 AND operations_id = 20);
+INSERT INTO permissions (roles_id, operations_id)
+SELECT 2, 21 WHERE NOT EXISTS (SELECT 1 FROM permissions WHERE roles_id = 2 AND operations_id = 21);
+INSERT INTO permissions (roles_id, operations_id)
+SELECT 2, 25 WHERE NOT EXISTS (SELECT 1 FROM permissions WHERE roles_id = 2 AND operations_id = 25);
+INSERT INTO permissions (roles_id, operations_id)
+SELECT 2, 26 WHERE NOT EXISTS (SELECT 1 FROM permissions WHERE roles_id = 2 AND operations_id = 26);
+INSERT INTO permissions (roles_id, operations_id)
+SELECT 2, 30 WHERE NOT EXISTS (SELECT 1 FROM permissions WHERE roles_id = 2 AND operations_id = 30);
+INSERT INTO permissions (roles_id, operations_id)
+SELECT 2, 31 WHERE NOT EXISTS (SELECT 1 FROM permissions WHERE roles_id = 2 AND operations_id = 31);
+INSERT INTO permissions (roles_id, operations_id)
+SELECT 2, 34 WHERE NOT EXISTS (SELECT 1 FROM permissions WHERE roles_id = 2 AND operations_id = 34);
+INSERT INTO permissions (roles_id, operations_id)
+SELECT 2, 35 WHERE NOT EXISTS (SELECT 1 FROM permissions WHERE roles_id = 2 AND operations_id = 35);
+INSERT INTO permissions (roles_id, operations_id)
+SELECT 2, 38 WHERE NOT EXISTS (SELECT 1 FROM permissions WHERE roles_id = 2 AND operations_id = 38);
 
 INSERT INTO permissions (roles_id, operations_id)
 SELECT 3, 1 WHERE NOT EXISTS (SELECT 1 FROM permissions WHERE roles_id = 3 AND operations_id = 1);

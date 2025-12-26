@@ -18,13 +18,17 @@ import { useAppDispatch } from '../../../../store/hooks';
 import { Messages, ROLES, Routes, ToastIds } from '../../../../utils/constants';
 import { showSuccess } from '../../../../utils/toast';
 import { AuthenticateRequest } from '../../types';
+import { useAuthSession } from '../../../../hooks/useAuthSession';
 
 const LoginForm: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { isLoading, error, loginSuccess, handleLogin, role } = useAuth({
+
+  const { isLoading, error, loginSuccess, handleLogin } = useAuth({
     showSuccessToast: false,
   });
+
+  const { role } = useAuthSession();
 
   const {
     register,

@@ -28,7 +28,7 @@ import {
 } from './styles';
 
 const CustomerAccountsView: React.FC = () => {
-  const { profile, isSessionLoading: profileLoading } = useAuthSession();
+  const { profile, sessionLoading: profileLoading } = useAuthSession();
 
   const { accounts, error: accountsError } = useAppSelector(
     (state) => state.accounts,

@@ -74,6 +74,11 @@ export const RoleMessages = {
   ERROR: 'An error occurred while managing roles.',
 } as const;
 
+export const AuthMessages = {
+  SESSION_BOOTSTRAP_FAILED: 'Session bootstrap failed.',
+  ERROR: 'An error occurred.',
+} as const;
+
 export const OperationMessages = {
   FETCH_SUCCESS: 'Operations loaded successfully.',
   CREATE_SUCCESS: 'Operation created successfully.',
@@ -123,6 +128,7 @@ export const ToastIds = {
   REGISTER_SUCCESS: 'register-success',
   PROFILE_ERROR: 'profile-error',
   AUTH_ERROR: 'auth-error',
+  SESSION_ERROR: 'session-error',
   ACCOUNT_CREATE_SUCCESS: 'account-create-success',
   ACCOUNT_FETCH_SUCCESS: 'account-fetch-success',
   ACCOUNTS_FETCH_SUCCESS: 'accounts-fetch-success',

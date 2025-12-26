@@ -1,11 +1,13 @@
 import { Navigate } from 'react-router-dom';
 import { ROLES, Routes } from '../../utils/constants';
 import { useAuthSession } from '../../hooks/useAuthSession';
+import { ReactNode } from 'react';
+import LoadingSpinner from '../LoadingSpinner';
 
 interface PrivateRouteProps {
   allowedRoles?: string[];
   publicRoute?: boolean;
-  children?: React.ReactNode;
+  children: ReactNode;
 }
 
 const PrivateRoute = ({
@@ -13,17 +15,23 @@ const PrivateRoute = ({
   publicRoute = false,
   children,
 }: PrivateRouteProps) => {
-  const { token, profile } = useAuthSession();
-  const isAuthenticated = !!token;
+  const { token, profile, sessionLoading } = useAuthSession();
+  const isAuthenticated = Boolean(token);
   const userRole = profile?.role;
 
   if (publicRoute) {
     if (isAuthenticated && userRole) {
       const redirectTo =
         userRole === ROLES.CUSTOMER ? Routes.CUSTOMER_PANEL : Routes.DASHBOARD;
+
       return <Navigate to={redirectTo} replace />;
     }
+
     return <>{children}</>;
+  }
+
+  if (sessionLoading) {
+    return <LoadingSpinner />;
   }
 
   if (!isAuthenticated || !userRole) {

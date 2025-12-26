@@ -3,7 +3,6 @@ import { AuthenticateRequest, AuthResponse } from '../types';
 import { authenticateApi } from '../authApi';
 import { AppError } from '../../../types';
 import { Messages, HttpStatus } from '../../../utils/constants';
-import getProfile from '../../customer/thunks/getProfile';
 
 const authenticate = createAsyncThunk<
   AuthResponse,
@@ -11,15 +10,14 @@ const authenticate = createAsyncThunk<
   { rejectValue: AppError }
 >(
   'auth/authenticate',
-  async (credentials: AuthenticateRequest, { rejectWithValue, dispatch }) => {
+  async (credentials: AuthenticateRequest, { rejectWithValue }) => {
     try {
       const { jwt } = await authenticateApi(credentials);
       sessionStorage.setItem('authToken', jwt);
 
-      await dispatch(getProfile());
-
       return { jwt };
     } catch (error: any) {
+      sessionStorage.removeItem('authToken');
       return rejectWithValue({
         frontendMessage: Messages.AUTHENTICATION_FAILED,
         backendMessage: error.message || Messages.UNKNOWN,

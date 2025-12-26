@@ -2,24 +2,24 @@ import React, { useEffect, useRef } from 'react';
 import { Modal, Typography, Button, TextField, MenuItem } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { createSelector } from 'reselect';
+import { createSelector } from '@reduxjs/toolkit';
 import { useAppSelector } from '../../../../store/hooks';
 import { useAccountActions } from '../../hooks/useAccountActions';
 import { StyledModalBox, StyledForm, ButtonContainer } from '../styled';
-import { TransferFormValues, TransferModalProps, Account } from '../../types';
+import { TransferFormValues, TransferModalProps } from '../../types';
 import { transferValidationSchema } from '../../validation/transferValidationSchema';
 import { Messages } from '../../../../utils/constants';
 import { ErrorMessage, LoadingSpinner } from '../../../../components';
 import { showError } from '../../../../utils/toast';
 import { RootState } from '../../../../store/store';
 
-const selectAccounts = createSelector(
-  (state: RootState) => state.accounts.accounts,
-  (accounts: Account[]) =>
-    accounts.map((acc) => ({
-      accountNumber: acc.accountNumber,
-      type: acc.type,
-    })),
+const selectAccountsRaw = (state: RootState) => state.accounts.accounts;
+
+const selectTransferAccounts = createSelector([selectAccountsRaw], (accounts) =>
+  accounts.map((acc) => ({
+    accountNumber: acc.accountNumber,
+    type: acc.type,
+  })),
 );
 
 const TransferModal: React.FC<TransferModalProps> = ({
@@ -34,7 +34,8 @@ const TransferModal: React.FC<TransferModalProps> = ({
       showErrorToast: false,
     });
 
-  const accounts = useAppSelector(selectAccounts);
+  const accounts = useAppSelector(selectTransferAccounts);
+
   const hasFetched = useRef(false);
 
   const {
@@ -179,20 +180,10 @@ const TransferModal: React.FC<TransferModalProps> = ({
               )}
             />
             <ButtonContainer>
-              <Button
-                variant='contained'
-                type='submit'
-                disabled={isLoading}
-                aria-label='Confirm transfer'
-              >
+              <Button variant='contained' type='submit' disabled={isLoading}>
                 Transfer
               </Button>
-              <Button
-                variant='outlined'
-                onClick={onClose}
-                disabled={isLoading}
-                aria-label='Cancel transfer'
-              >
+              <Button variant='outlined' onClick={onClose} disabled={isLoading}>
                 Cancel
               </Button>
             </ButtonContainer>

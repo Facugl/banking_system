@@ -9,7 +9,7 @@ const registerCustomer = createAsyncThunk<
   AuthResponse,
   RegisterRequest,
   { rejectValue: AppError }
->('users', async (customer: RegisterRequest, { rejectWithValue, dispatch }) => {
+>('auth/register', async (customer: RegisterRequest, { rejectWithValue, dispatch }) => {
   try {
     const { jwt } = await registerApi(customer);
     sessionStorage.setItem('authToken', jwt);
