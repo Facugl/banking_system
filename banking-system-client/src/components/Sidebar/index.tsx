@@ -1,14 +1,15 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAppSelector } from '../../store/hooks';
 import { List, ListItemIcon, ListItemText, Divider } from '@mui/material';
-import {
-  Home as HomeIcon,
-  Group as GroupIcon,
-  Settings as SettingsIcon,
-  AccountCircle as AccountCircleIcon,
-  History as HistoryIcon,
-  Person as ProfileIcon,
-} from '@mui/icons-material';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import ViewModuleIcon from '@mui/icons-material/ViewModule';
+import BuildIcon from '@mui/icons-material/Build';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import SecurityIcon from '@mui/icons-material/Security';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import PersonIcon from '@mui/icons-material/Person';
+import HomeIcon from '@mui/icons-material/Home';
 import {
   StyledDrawer,
   LogoContainer,
@@ -35,55 +36,55 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onDrawerToggle }) => {
   }> = [
     {
       text: 'Home',
-      icon: <HomeIcon />,
+      icon: <DashboardIcon />,
       path: Routes.DASHBOARD,
       roles: [ROLES.ADMINISTRATOR, ROLES.EMPLOYEE],
     },
     {
       text: 'Modules',
-      icon: <SettingsIcon />,
+      icon: <ViewModuleIcon />,
       path: Routes.DASHBOARD_MODULES,
       roles: [ROLES.ADMINISTRATOR, ROLES.EMPLOYEE],
     },
     {
       text: 'Operations',
-      icon: <GroupIcon />,
+      icon: <BuildIcon />,
       path: Routes.DASHBOARD_OPERATIONS,
       roles: [ROLES.ADMINISTRATOR, ROLES.EMPLOYEE],
     },
     {
       text: 'Roles',
-      icon: <GroupIcon />,
+      icon: <AdminPanelSettingsIcon />,
       path: Routes.DASHBOARD_ROLES,
       roles: [ROLES.ADMINISTRATOR, ROLES.EMPLOYEE],
     },
     {
       text: 'Permissions',
-      icon: <GroupIcon />,
+      icon: <SecurityIcon />,
       path: Routes.DASHBOARD_PERMISSIONS,
       roles: [ROLES.ADMINISTRATOR, ROLES.EMPLOYEE],
     },
     {
       text: 'Accounts',
-      icon: <AccountCircleIcon />,
+      icon: <AccountBalanceIcon />,
       path: Routes.DASHBOARD_ACCOUNTS,
       roles: [ROLES.ADMINISTRATOR, ROLES.EMPLOYEE],
     },
     {
-      text: 'Home',
+      text: 'Overview',
       icon: <HomeIcon />,
       path: Routes.CUSTOMER_PANEL,
       roles: [ROLES.CUSTOMER],
     },
     {
       text: 'Transactions',
-      icon: <HistoryIcon />,
+      icon: <ReceiptLongIcon />,
       path: Routes.CUSTOMER_TRANSACTIONS,
       roles: [ROLES.CUSTOMER],
     },
     {
       text: 'Profile',
-      icon: <ProfileIcon />,
+      icon: <PersonIcon />,
       path: Routes.CUSTOMER_PROFILE,
       roles: [ROLES.CUSTOMER],
     },
