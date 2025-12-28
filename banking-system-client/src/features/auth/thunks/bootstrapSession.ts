@@ -1,11 +1,17 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { AppError } from '../../../types';
-import { AuthMessages, HttpStatus, Messages, ROLES } from '../../../utils/constants';
+import {
+  AuthMessages,
+  HttpStatus,
+  Messages,
+  ROLES,
+} from '../../../utils/constants';
 import getProfile from '../../customer/thunks/getProfile';
 import { getModules } from '../../modules/thunks';
 import { getPermissions } from '../../permissions/thunks';
 import { getRoles } from '../../roles/thunks';
 import { getOperations } from '../../operations/thunks';
+import { setSessionLoading, setSessionReady } from '../authSlice';
 
 const bootstrapSession = createAsyncThunk<
   void,
@@ -13,6 +19,7 @@ const bootstrapSession = createAsyncThunk<
   { rejectValue: AppError }
 >('auth/bootstrapSession', async (_, { dispatch, rejectWithValue }) => {
   try {
+    dispatch(setSessionLoading(true));
     const profile = await dispatch(getProfile()).unwrap();
 
     switch (profile.role) {
@@ -44,6 +51,9 @@ const bootstrapSession = createAsyncThunk<
       backendMessage: error.message || Messages.UNKNOWN,
       status: HttpStatus.INTERNAL_SERVER_ERROR,
     });
+  } finally {
+    dispatch(setSessionLoading(false));
+    dispatch(setSessionReady(true));
   }
 });
 

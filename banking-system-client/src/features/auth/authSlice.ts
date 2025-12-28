@@ -23,10 +23,13 @@ const authSlice = createSlice({
   reducers: {
     clearSuccess: (state) => {
       state.loginSuccess = false;
-      state.sessionReady= false;
+      state.sessionReady = false;
       state.logoutSuccess = false;
       state.justLoggedIn = false;
       state.registerSuccess = false;
+    },
+    setSessionReady: (state, action: PayloadAction<boolean>) => {
+      state.sessionReady = action.payload;
     },
     setSessionLoading: (state, action: PayloadAction<boolean>) => {
       state.sessionLoading = action.payload;
@@ -128,5 +131,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearSuccess, setSessionLoading } = authSlice.actions;
+export const { clearSuccess, setSessionReady, setSessionLoading } = authSlice.actions;
 export default authSlice.reducer;

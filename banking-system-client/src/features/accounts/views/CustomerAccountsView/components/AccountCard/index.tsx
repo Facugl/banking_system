@@ -19,7 +19,7 @@ import {
   WithdrawModal,
 } from '../../../../components';
 import { showError, showSuccess } from '../../../../../../utils/toast';
-import { ToastIds } from '../../../../../../utils/constants';
+import { PERMISSIONS, ToastIds } from '../../../../../../utils/constants';
 import {
   StyledCard,
   StyledAccountType,
@@ -31,6 +31,7 @@ import {
   StyledInactiveMessage,
 } from './styles';
 import { LoadingSpinner } from '../../../../../../components';
+import { usePermissions } from '../../../../../permissions/hooks/usePermissions';
 
 interface AccountCardProps {
   account: Account;
@@ -48,6 +49,7 @@ const AccountCard: React.FC<AccountCardProps> = ({ account }) => {
       showErrorToast: false,
     });
   const isActive = account.status === AccountStatus.ACTIVE;
+  const { has, isCustomer } = usePermissions();
 
   const toggleVisibility = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -239,16 +241,18 @@ const AccountCard: React.FC<AccountCardProps> = ({ account }) => {
                   Transfer
                 </Button>
               </Tooltip>
-              <Tooltip title='Deactivate Account'>
-                <Button
-                  variant='outlined'
-                  color='error'
-                  onClick={handleDeactivate}
-                  disabled={isOperating}
-                >
-                  Deactivate
-                </Button>
-              </Tooltip>
+              {!isCustomer && has(PERMISSIONS.UPDATE_ACCOUNT_STATUS) && (
+                <Tooltip title='Deactivate Account'>
+                  <Button
+                    variant='outlined'
+                    color='error'
+                    onClick={handleDeactivate}
+                    disabled={isOperating}
+                  >
+                    Deactivate
+                  </Button>
+                </Tooltip>
+              )}
             </>
           ) : (
             <StyledInactiveMessage variant='body2' component='p'>
@@ -305,14 +309,17 @@ const AccountCard: React.FC<AccountCardProps> = ({ account }) => {
           >
             Cancel
           </Button>
-          <Button
-            onClick={confirmDeactivate}
-            color='error'
-            variant='contained'
-            disabled={isOperating}
-          >
-            Deactivate
-          </Button>
+          {isActive &&
+            !isCustomer &&
+            has(PERMISSIONS.UPDATE_ACCOUNT_STATUS) && (
+              <Button
+                onClick={confirmDeactivate}
+                color='error'
+                variant='outlined'
+              >
+                Deactivate
+              </Button>
+            )}
         </DialogActions>
       </Dialog>
     </>

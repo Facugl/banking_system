@@ -15,7 +15,8 @@ const PrivateRoute = ({
   publicRoute = false,
   children,
 }: PrivateRouteProps) => {
-  const { token, profile, sessionLoading } = useAuthSession();
+  const { token, profile, sessionLoading, sessionReady } = useAuthSession();
+
   const isAuthenticated = Boolean(token);
   const userRole = profile?.role;
 
@@ -30,11 +31,15 @@ const PrivateRoute = ({
     return <>{children}</>;
   }
 
-  if (sessionLoading) {
+  if (!isAuthenticated) {
+    return <Navigate to={Routes.LOGIN} replace />;
+  }
+
+  if (sessionLoading || !sessionReady) {
     return <LoadingSpinner />;
   }
 
-  if (!isAuthenticated || !userRole) {
+  if (!userRole) {
     return <Navigate to={Routes.LOGIN} replace />;
   }
 

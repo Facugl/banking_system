@@ -9,10 +9,9 @@ import {
   AccountCreateRequest,
 } from '../../types';
 import { useAccountActions } from '../../hooks/useAccountActions';
-import {
-  ErrorMessage,
-} from '../../../../components';
-import { Messages } from '../../../../utils/constants';
+import { ErrorMessage } from '../../../../components';
+import { Messages, PERMISSIONS } from '../../../../utils/constants';
+import { usePermissions } from '../../../permissions/hooks/usePermissions';
 
 const AccountsView: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -28,6 +27,7 @@ const AccountsView: React.FC = () => {
     handleDeleteAccount,
     handleChangeAccountStatus,
   } = useAccountActions();
+  const { has, isAdmin } = usePermissions();
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
   const [operationLoading, setOperationLoading] = useState(false);
@@ -108,18 +108,6 @@ const AccountsView: React.FC = () => {
     );
   }
 
-  // if (accountsLoading) {
-  //   return (
-  //     <LoadingSpinner />
-  //   );
-  // }
-
-  // if (!accounts.length) {
-  //   return (
-  //     <EmptyState message='No accounts available. Create one to get started!' />
-  //   );
-  // }
-
   return (
     <Box p={2}>
       <Box display='flex' justifyContent='space-between' mb={2}>
@@ -129,7 +117,11 @@ const AccountsView: React.FC = () => {
             setSelectedAccount(null);
             setModalOpen(true);
           }}
-          disabled={accountsLoading || operationLoading}
+          disabled={
+            accountsLoading ||
+            operationLoading ||
+            (!isAdmin && !has(PERMISSIONS.CREATE_ONE_ACCOUNT))
+          }
         >
           Add Account
         </Button>

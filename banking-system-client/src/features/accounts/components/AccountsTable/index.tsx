@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
-import { Box, Button, IconButton } from '@mui/material';
+import { Box, IconButton, Tooltip } from '@mui/material';
 import { Refresh, AttachMoney, MoneyOff, Send } from '@mui/icons-material';
 import { DepositModal, WithdrawModal, TransferModal } from '../index';
 import { AccountsTableProps, AccountStatus } from '../../types';
 import { useAccountActions } from '../../hooks/useAccountActions';
 import { showError } from '../../../../utils/toast';
 import { EmptyState, LoadingSpinner } from '../../../../components';
+import { usePermissions } from '../../../permissions/hooks/usePermissions';
+import { PERMISSIONS } from '../../../../utils/constants';
+import { Edit, Delete, ToggleOff, ToggleOn } from '@mui/icons-material';
 
 const AccountsTable: React.FC<AccountsTableProps> = ({
   accounts,
@@ -17,6 +20,7 @@ const AccountsTable: React.FC<AccountsTableProps> = ({
   const { handleGetAccountBalance, isLoading } = useAccountActions({
     showErrorToast: false,
   });
+  const { has } = usePermissions();
   const [depositModalOpen, setDepositModalOpen] = useState(false);
   const [withdrawModalOpen, setWithdrawModalOpen] = useState(false);
   const [transferModalOpen, setTransferModalOpen] = useState(false);
@@ -58,71 +62,109 @@ const AccountsTable: React.FC<AccountsTableProps> = ({
     {
       field: 'actions',
       headerName: 'Actions',
-      width: 500,
+      width: 320,
+      sortable: false,
       renderCell: ({ row }) => (
         <Box display='flex' gap={1}>
-          <Button variant='outlined' size='small' onClick={() => onEdit(row)}>
-            Edit
-          </Button>
-          <Button
-            variant='outlined'
-            size='small'
-            color='error'
-            onClick={() => onDelete(row)}
-          >
-            Delete
-          </Button>
-          <Button
-            variant='outlined'
-            size='small'
-            color='primary'
-            onClick={() =>
-              onChangeStatus(
-                row,
+          {has(PERMISSIONS.UPDATE_ONE_ACCOUNT) && (
+            <Tooltip title='Edit account'>
+              <IconButton size='small' onClick={() => onEdit(row)}>
+                <Edit />
+              </IconButton>
+            </Tooltip>
+          )}
+
+          {has(PERMISSIONS.DELETE_ONE_ACCOUNT) && (
+            <Tooltip title='Delete account'>
+              <IconButton
+                size='small'
+                color='error'
+                onClick={() => onDelete(row)}
+              >
+                <Delete />
+              </IconButton>
+            </Tooltip>
+          )}
+
+          {has(PERMISSIONS.UPDATE_ACCOUNT_STATUS) && (
+            <Tooltip
+              title={
                 row.status === AccountStatus.ACTIVE
-                  ? AccountStatus.INACTIVE
-                  : AccountStatus.ACTIVE,
-              )
-            }
-          >
-            {row.status === AccountStatus.ACTIVE ? 'Deactivate' : 'Activate'}
-          </Button>
-          <IconButton
-            size='small'
-            color='primary'
-            onClick={() => handleGetAccountBalance(row.accountNumber)}
-            title='Refresh Balance'
-            disabled={row.status !== AccountStatus.ACTIVE || isLoading}
-          >
-            <Refresh />
-          </IconButton>
-          <IconButton
-            size='small'
-            color='success'
-            onClick={() => handleOpenDepositModal(row.accountNumber)}
-            title='Deposit'
-            disabled={row.status !== AccountStatus.ACTIVE}
-          >
-            <AttachMoney />
-          </IconButton>
-          <IconButton
-            size='small'
-            color='warning'
-            onClick={() => handleOpenWithdrawModal(row.accountNumber)}
-            title='Withdraw'
-            disabled={row.status !== AccountStatus.ACTIVE}
-          >
-            <MoneyOff />
-          </IconButton>
-          <IconButton
-            size='small'
-            color='info'
-            onClick={() => handleOpenTransferModal(row.accountNumber)}
-            title='Transfer'
-            disabled={row.status !== AccountStatus.ACTIVE}
-          >
-            <Send />
-          </IconButton>
+                  ? 'Deactivate account'
+                  : 'Activate account'
+              }
+            >
+              <IconButton
+                size='small'
+                color='primary'
+                onClick={() =>
+                  onChangeStatus(
+                    row,
+                    row.status === AccountStatus.ACTIVE
+                      ? AccountStatus.INACTIVE
+                      : AccountStatus.ACTIVE,
+                  )
+                }
+              >
+                {row.status === AccountStatus.ACTIVE ? (
+                  <ToggleOff />
+                ) : (
+                  <ToggleOn />
+                )}
+              </IconButton>
+            </Tooltip>
+          )}
+
+          {has(PERMISSIONS.CHECK_ACCOUNT_BALANCE) && (
+            <Tooltip title='Refresh balance'>
+              <IconButton
+                size='small'
+                onClick={() => handleGetAccountBalance(row.accountNumber)}
+                disabled={row.status !== AccountStatus.ACTIVE || isLoading}
+              >
+                <Refresh />
+              </IconButton>
+            </Tooltip>
+          )}
+
+          {has(PERMISSIONS.DEPOSIT_INTO_ACCOUNT) && (
+            <Tooltip title='Deposit'>
+              <IconButton
+                size='small'
+                color='success'
+                onClick={() => handleOpenDepositModal(row.accountNumber)}
+                disabled={row.status !== AccountStatus.ACTIVE}
+              >
+                <AttachMoney />
+              </IconButton>
+            </Tooltip>
+          )}
+
+          {has(PERMISSIONS.WITHDRAW_FROM_ACCOUNT) && (
+            <Tooltip title='Withdraw'>
+              <IconButton
+                size='small'
+                color='warning'
+                onClick={() => handleOpenWithdrawModal(row.accountNumber)}
+                disabled={row.status !== AccountStatus.ACTIVE}
+              >
+                <MoneyOff />
+              </IconButton>
+            </Tooltip>
+          )}
+
+          {has(PERMISSIONS.TRANSFER_BETWEEN_ACCOUNTS) && (
+            <Tooltip title='Transfer'>
+              <IconButton
+                size='small'
+                color='info'
+                onClick={() => handleOpenTransferModal(row.accountNumber)}
+                disabled={row.status !== AccountStatus.ACTIVE}
+              >
+                <Send />
+              </IconButton>
+            </Tooltip>
+          )}
         </Box>
       ),
     },
