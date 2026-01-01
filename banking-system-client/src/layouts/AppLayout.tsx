@@ -4,8 +4,6 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
-
-import { Sidebar, LogoutButton } from '../../components';
 import {
   DashboardRoot,
   StyledAppBar,
@@ -13,37 +11,37 @@ import {
   MainContent,
   ContentContainer,
 } from './styles';
+import { useAppSelector } from '../store/hooks';
+import { ROLES } from '../utils/constants';
+import { LogoutButton, Sidebar } from '../components';
 
-const DashboardPage: React.FC = () => {
+const AppLayout = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
+  const role = useAppSelector((state) => state.customer.profile?.role);
+
+  const title = role === ROLES.CUSTOMER ? 'Customer Panel' : 'Dashboard';
 
   return (
     <DashboardRoot>
       <StyledAppBar position='fixed'>
         <StyledToolbar>
           {isMobile && (
-            <IconButton
-              onClick={handleDrawerToggle}
-              edge='start'
-              sx={{ mr: 2 }}
-            >
+            <IconButton onClick={() => setMobileOpen(!mobileOpen)}>
               <MenuIcon />
             </IconButton>
           )}
-          <Typography variant='h6' noWrap component='div'>
-            Dashboard
-          </Typography>
+          <Typography variant='h6'>{title}</Typography>
           <LogoutButton />
         </StyledToolbar>
       </StyledAppBar>
 
-      <Sidebar mobileOpen={mobileOpen} onDrawerToggle={handleDrawerToggle} />
+      <Sidebar
+        mobileOpen={mobileOpen}
+        onDrawerToggle={() => setMobileOpen(!mobileOpen)}
+      />
 
       <MainContent component='main'>
         <StyledToolbar />
@@ -55,4 +53,4 @@ const DashboardPage: React.FC = () => {
   );
 };
 
-export default DashboardPage;
+export default AppLayout;

@@ -1,6 +1,8 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAppSelector } from '../../store/hooks';
 import { List, ListItemIcon, ListItemText, Divider } from '@mui/material';
+import { useMemo } from 'react';
+
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
 import BuildIcon from '@mui/icons-material/Build';
@@ -10,12 +12,14 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import PersonIcon from '@mui/icons-material/Person';
 import HomeIcon from '@mui/icons-material/Home';
+
 import {
   StyledDrawer,
   LogoContainer,
   BrandName,
   StyledListItem,
 } from './styles';
+
 import { ROLES, Role, Routes } from '../../utils/constants';
 
 interface SidebarProps {
@@ -28,6 +32,10 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onDrawerToggle }) => {
   const profile = useAppSelector((state) => state.customer.profile);
   const role = profile?.role as Role | undefined;
 
+  if (!role) {
+    return null;
+  }
+
   const menuItems: Array<{
     text: string;
     icon: JSX.Element;
@@ -38,31 +46,31 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onDrawerToggle }) => {
       text: 'Home',
       icon: <DashboardIcon />,
       path: Routes.DASHBOARD,
-      roles: [ROLES.ADMINISTRATOR, ROLES.EMPLOYEE],
+      roles: [ROLES.ADMINISTRATOR],
     },
     {
       text: 'Modules',
       icon: <ViewModuleIcon />,
       path: Routes.DASHBOARD_MODULES,
-      roles: [ROLES.ADMINISTRATOR, ROLES.EMPLOYEE],
+      roles: [ROLES.ADMINISTRATOR],
     },
     {
       text: 'Operations',
       icon: <BuildIcon />,
       path: Routes.DASHBOARD_OPERATIONS,
-      roles: [ROLES.ADMINISTRATOR, ROLES.EMPLOYEE],
+      roles: [ROLES.ADMINISTRATOR],
     },
     {
       text: 'Roles',
       icon: <AdminPanelSettingsIcon />,
       path: Routes.DASHBOARD_ROLES,
-      roles: [ROLES.ADMINISTRATOR, ROLES.EMPLOYEE],
+      roles: [ROLES.ADMINISTRATOR],
     },
     {
       text: 'Permissions',
       icon: <SecurityIcon />,
       path: Routes.DASHBOARD_PERMISSIONS,
-      roles: [ROLES.ADMINISTRATOR, ROLES.EMPLOYEE],
+      roles: [ROLES.ADMINISTRATOR],
     },
     {
       text: 'Accounts',
@@ -79,16 +87,28 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onDrawerToggle }) => {
     {
       text: 'Transactions',
       icon: <ReceiptLongIcon />,
-      path: Routes.CUSTOMER_TRANSACTIONS,
-      roles: [ROLES.CUSTOMER],
+      path: Routes.TRANSACTIONS,
+      roles: [ROLES.ADMINISTRATOR, ROLES.EMPLOYEE, ROLES.CUSTOMER],
     },
     {
-      text: 'Profile',
+      text: 'My Profile',
       icon: <PersonIcon />,
-      path: Routes.CUSTOMER_PROFILE,
-      roles: [ROLES.CUSTOMER],
+      path: Routes.PROFILE,
+      roles: [ROLES.ADMINISTRATOR, ROLES.EMPLOYEE, ROLES.CUSTOMER],
     },
   ];
+
+  const filteredMenuItems = useMemo(
+    () => menuItems.filter((item) => item.roles.includes(role)),
+    [role],
+  );
+
+  const isActive = (path: string) => {
+    if (path === Routes.DASHBOARD || path === Routes.CUSTOMER_PANEL) {
+      return location.pathname === path;
+    }
+    return location.pathname.startsWith(path);
+  };
 
   const drawerContent = (
     <>
@@ -97,26 +117,21 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onDrawerToggle }) => {
           Banking System
         </BrandName>
       </LogoContainer>
+
       <Divider />
+
       <List>
-        {menuItems
-          .filter((item) => role && item.roles.includes(role))
-          .map((item) => (
-            <StyledListItem
-              key={item.text}
-              component={Link}
-              to={item.path}
-              isActive={
-                item.path === Routes.CUSTOMER_PANEL ||
-                item.path === Routes.DASHBOARD
-                  ? location.pathname === item.path
-                  : location.pathname.startsWith(item.path)
-              }
-            >
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
-            </StyledListItem>
-          ))}
+        {filteredMenuItems.map((item) => (
+          <StyledListItem
+            key={item.text}
+            component={Link}
+            to={item.path}
+            isActive={isActive(item.path)}
+          >
+            <ListItemIcon>{item.icon}</ListItemIcon>
+            <ListItemText primary={item.text} />
+          </StyledListItem>
+        ))}
       </List>
     </>
   );

@@ -11,12 +11,6 @@ export const useTransactions = () => {
   );
 
   useEffect(() => {
-    if (transactions.length === 0 && !isLoading) {
-      dispatch(getTransactions());
-    }
-  }, [dispatch, transactions.length, isLoading]);
-
-  useEffect(() => {
     if (error) {
       showError(error.frontendMessage, { toastId: ToastIds.ACCOUNT_ERROR });
     }

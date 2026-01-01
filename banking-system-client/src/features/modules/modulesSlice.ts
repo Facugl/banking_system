@@ -32,7 +32,8 @@ const modulesSlice = createSlice({
           const index = state.modules.findIndex(
             (module) => module.id === action.payload.id,
           );
-          if (index) {
+
+          if (index !== -1) {
             state.modules[index] = action.payload;
           } else {
             state.modules.push(action.payload);

@@ -12,6 +12,7 @@ import { getPermissions } from '../../permissions/thunks';
 import { getRoles } from '../../roles/thunks';
 import { getOperations } from '../../operations/thunks';
 import { setSessionLoading, setSessionReady } from '../authSlice';
+import { getTransactions } from '../../transactions/thunks';
 
 const bootstrapSession = createAsyncThunk<
   void,
@@ -20,30 +21,25 @@ const bootstrapSession = createAsyncThunk<
 >('auth/bootstrapSession', async (_, { dispatch, rejectWithValue }) => {
   try {
     dispatch(setSessionLoading(true));
+
     const profile = await dispatch(getProfile()).unwrap();
 
-    switch (profile.role) {
-      case ROLES.ADMINISTRATOR:
-        await Promise.all([
-          dispatch(getRoles()).unwrap(),
-          dispatch(getModules()).unwrap(),
-          dispatch(getOperations()).unwrap(),
-          dispatch(getPermissions()).unwrap(),
-        ]);
-        break;
+    if (profile.role === ROLES.ADMINISTRATOR) {
+      await Promise.all([
+        dispatch(getModules()).unwrap(),
+        dispatch(getOperations()).unwrap(),
+        dispatch(getRoles()).unwrap(),
+        dispatch(getPermissions()).unwrap(),
+        dispatch(getTransactions()).unwrap(),
+      ]);
+    }
 
-      case ROLES.EMPLOYEE:
-        await Promise.all([
-          dispatch(getModules()).unwrap(),
-          dispatch(getOperations()).unwrap(),
-        ]);
-        break;
+    if (profile.role === ROLES.EMPLOYEE) {
+      await dispatch(getTransactions()).unwrap();
+    }
 
-      case ROLES.CUSTOMER:
-        break;
-
-      default:
-        break;
+    if (profile.role === ROLES.CUSTOMER) {
+      await dispatch(getTransactions()).unwrap();
     }
   } catch (error: any) {
     return rejectWithValue({

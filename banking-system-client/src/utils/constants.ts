@@ -151,13 +151,14 @@ export const Routes = {
   UNAUTHORIZED: '/unauthorized',
   DASHBOARD: '/dashboard',
   DASHBOARD_MODULES: '/dashboard/modules',
-  DASHBOARD_ROLES: '/dashboard/roles',
   DASHBOARD_OPERATIONS: '/dashboard/operations',
+  DASHBOARD_ROLES: '/dashboard/roles',
   DASHBOARD_PERMISSIONS: '/dashboard/permissions',
+  DASHBOARD_STATISTICS: '/dashboard/statistics',
   DASHBOARD_ACCOUNTS: '/dashboard/accounts',
   CUSTOMER_PANEL: '/customer-panel',
-  CUSTOMER_TRANSACTIONS: '/customer-panel/transactions',
-  CUSTOMER_PROFILE: '/customer-panel/profile',
+  TRANSACTIONS: '/transactions',
+  PROFILE: '/profile',
 } as const;
 
 export const PERMISSIONS = {

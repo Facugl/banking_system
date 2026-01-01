@@ -9,13 +9,15 @@ import {
 import { useAppSelector, useAppDispatch } from '../../../store/hooks';
 import { ModuleResponse } from '../types';
 import { showSuccess, showError } from '../../../utils/toast';
-import { ModuleMessages } from '../../../utils/constants';
+import { ModuleMessages, ROLES } from '../../../utils/constants';
 import { EditModuleModal, ModulesTable } from '../components';
 import { ConfirmDeleteModal } from '../../../components';
+import { useAuthSession } from '../../../hooks/useAuthSession';
 
 const ModulesView: React.FC = () => {
   const dispatch = useAppDispatch();
   const { modules } = useAppSelector((state) => state.modules);
+  const { profile } = useAuthSession();
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedModule, setSelectedModule] = useState<ModuleResponse | null>(
@@ -27,6 +29,8 @@ const ModulesView: React.FC = () => {
   );
 
   useEffect(() => {
+    if (profile?.role !== ROLES.ADMINISTRATOR) return;
+
     const fetchModules = async () => {
       try {
         await dispatch(getModules()).unwrap();

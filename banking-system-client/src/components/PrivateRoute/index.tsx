@@ -21,6 +21,10 @@ const PrivateRoute = ({
   const userRole = profile?.role;
 
   if (publicRoute) {
+    if (sessionLoading && isAuthenticated) {
+      return <LoadingSpinner />;
+    }
+
     if (isAuthenticated && userRole) {
       const redirectTo =
         userRole === ROLES.CUSTOMER ? Routes.CUSTOMER_PANEL : Routes.DASHBOARD;
@@ -31,12 +35,12 @@ const PrivateRoute = ({
     return <>{children}</>;
   }
 
-  if (!isAuthenticated) {
-    return <Navigate to={Routes.LOGIN} replace />;
-  }
-
   if (sessionLoading || !sessionReady) {
     return <LoadingSpinner />;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to={Routes.LOGIN} replace />;
   }
 
   if (!userRole) {
