@@ -1,5 +1,5 @@
-import axiosInstance from '../../../services/axiosInstance';
-import { RoleRequest, RoleResponse } from '../types';
+import axiosInstance from '../../services/axiosInstance';
+import { RoleRequest, RoleResponse } from './types';
 
 export const createRoleApi = async (role: RoleRequest) => {
   return await axiosInstance.post<RoleResponse>('/roles', role);

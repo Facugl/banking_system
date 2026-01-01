@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { createModuleApi } from '../services/modulesApi';
+import { createModuleApi } from '../modulesApi';
 import { ModuleRequest, ModuleResponse } from '../types';
 import { AxiosError } from 'axios';
 

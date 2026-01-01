@@ -1,9 +1,9 @@
-import axiosInstance from '../../../services/axiosInstance';
+import axiosInstance from '../../services/axiosInstance';
 import {
   OperationCreateRequest,
-  OperationUpdateRequest,
   OperationResponse,
-} from '../types';
+  OperationUpdateRequest,
+} from './types';
 
 export const createOperationApi = async (operation: OperationCreateRequest) => {
   return await axiosInstance.post<OperationResponse>('/operations', operation);

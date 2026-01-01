@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { deleteRoleApi } from '../services/rolesApi';
+import { deleteRoleApi } from '../rolesApi';
 import { AxiosError } from 'axios';
 
 export const deleteRole = createAsyncThunk<number, number>(

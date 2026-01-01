@@ -1,9 +1,9 @@
 import { Typography, Chip, CardContent } from '@mui/material';
-import { useProfile } from '../../hooks/useProfile';
-import ErrorMessage from '../../../../components/ErrorMessage';
-import LoadingSpinner from '../../../../components/LoadingSpinner';
-import EmptyState from '../../../../components/EmptyState';
-import { getInitials } from '../../../../utils/getInitialsUtils';
+import { useProfile } from '../hooks/useProfile';
+import ErrorMessage from '../../../components/ErrorMessage';
+import LoadingSpinner from '../../../components/LoadingSpinner';
+import EmptyState from '../../../components/EmptyState';
+import { getInitials } from '../../../utils/getInitialsUtils';
 import {
   ProfileCard,
   AvatarContainer,
@@ -13,7 +13,7 @@ import {
   SectionTitle,
   PermissionsWrapper,
 } from './styles';
-import { Messages, permissionLabels } from '../../../../utils/constants';
+import { Messages, permissionLabels } from '../../../utils/constants';
 
 const ProfileView: React.FC = () => {
   const { profile, isLoading, error } = useProfile();

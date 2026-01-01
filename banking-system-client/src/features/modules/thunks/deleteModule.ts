@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { deleteModuleApi } from '../services/modulesApi';
+import { deleteModuleApi } from '../modulesApi';
 import { AxiosError } from 'axios';
 
 export const deleteModule = createAsyncThunk<number, number>(

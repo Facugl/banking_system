@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { getModuleApi } from '../services/modulesApi';
 import { ModuleResponse } from '../types';
 import { AxiosError } from 'axios';
+import { getModuleApi } from '../modulesApi';
 
 export const getModule = createAsyncThunk<ModuleResponse, number>(
   'modules/getModule',

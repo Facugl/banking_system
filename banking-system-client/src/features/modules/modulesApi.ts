@@ -1,5 +1,5 @@
-import axiosInstance from '../../../services/axiosInstance';
-import { ModuleRequest, ModuleResponse } from '../types';
+import axiosInstance from '../../services/axiosInstance';
+import { ModuleRequest, ModuleResponse } from './types';
 
 export const createModuleApi = async (module: ModuleRequest) => {
   return await axiosInstance.post<ModuleResponse>('/modules', module);

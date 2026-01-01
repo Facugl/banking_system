@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { updateRoleApi } from '../services/rolesApi';
+import { updateRoleApi } from '../rolesApi';
 import { RoleResponse } from '../types';
 import { AxiosError } from 'axios';
 

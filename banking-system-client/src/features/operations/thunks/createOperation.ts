@@ -1,4 +1,4 @@
-import { createOperationApi } from './../services/operationsApi';
+import { createOperationApi } from './../operationsApi';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { OperationCreateRequest, OperationResponse } from '../types';
 import { AxiosError } from 'axios';
