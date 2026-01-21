@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: ${SPRING_PROFILES_ACTIVE:dev}
   application:
     name: banking-system-server
   datasource:
@@ -16,4 +16,4 @@ security:
     role: "CUSTOMER"
   jwt:
     expiration-in-minutes: ${JWT_EXPIRATION_MINUTES:30}
-    secret: ${JWT_SECRET:default-secret-key-32-chars-or-more}
+    secret: ${JWT_SECRET}

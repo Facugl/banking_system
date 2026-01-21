@@ -22,6 +22,4 @@ spring:
     level:
       org.hibernate.SQL: INFO
       org.hibernate.jdbc.datasource.init.ScriptUtils: INFO
-# security:
-#   jwt:
-#     secret: ${JWT_SECRET:default-secret-key-32-chars-or-more}
+

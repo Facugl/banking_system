@@ -1,0 +1,17 @@
+# Etapa 1: build
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY package.json pnpm-lock.yaml* ./
+RUN npm install -g pnpm \
+ && pnpm config set fetch-timeout 600000 \
+ && pnpm config set fetch-retries 5 \
+ && pnpm install
+COPY . .
+RUN pnpm build
+
+# Etapa 2: nginx
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80

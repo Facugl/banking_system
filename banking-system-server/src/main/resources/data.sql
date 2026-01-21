@@ -570,7 +570,7 @@ SELECT
     'DEPOSIT',
     'Admin bonus'
 FROM accounts a
-WHERE a.account_number = '483920174563'
+WHERE a.account_number = ' 112233445501'
 AND NOT EXISTS (SELECT 1 FROM transactions WHERE transaction_number = '200000000001');
 
 INSERT INTO transactions (
@@ -591,7 +591,7 @@ SELECT
     'WITHDRAW',
     'System maintenance expense'
 FROM accounts a
-WHERE a.account_number = '483920174563'
+WHERE a.account_number = ' 112233445501'
 AND NOT EXISTS (SELECT 1 FROM transactions WHERE transaction_number = '200000000002');
 
 INSERT INTO transactions (
@@ -612,7 +612,7 @@ SELECT
     'DEPOSIT',
     'Quarterly funding'
 FROM accounts a
-WHERE a.account_number = '483920174563'
+WHERE a.account_number = '112233445501'
 AND NOT EXISTS (SELECT 1 FROM transactions WHERE transaction_number = '200000000003');
 
 -- Sasuke (EMPLOYEE) - Salary deposits and personal expenses
@@ -634,7 +634,7 @@ SELECT
     'DEPOSIT',
     'Monthly salary'
 FROM accounts a
-WHERE a.account_number = '739104826501'
+WHERE a.account_number = '223344556612'
 AND NOT EXISTS (SELECT 1 FROM transactions WHERE transaction_number = '200000000004');
 
 INSERT INTO transactions (
@@ -655,7 +655,7 @@ SELECT
     'WITHDRAW',
     'Personal expenses'
 FROM accounts a
-WHERE a.account_number = '739104826501'
+WHERE a.account_number = '223344556612'
 AND NOT EXISTS (SELECT 1 FROM transactions WHERE transaction_number = '200000000005');
 
 INSERT INTO transactions (
@@ -676,7 +676,7 @@ SELECT
     'DEPOSIT',
     'Monthly salary'
 FROM accounts a
-WHERE a.account_number = '739104826501'
+WHERE a.account_number = '223344556612'
 AND NOT EXISTS (SELECT 1 FROM transactions WHERE transaction_number = '200000000006');
 
 INSERT INTO transactions (
@@ -697,7 +697,7 @@ SELECT
     'DEPOSIT',
     'Monthly salary'
 FROM accounts a
-WHERE a.account_number = '739104826501'
+WHERE a.account_number = '223344556612'
 AND NOT EXISTS (SELECT 1 FROM transactions WHERE transaction_number = '200000000007');
 
 -- Sakura (CUSTOMER) - Regular customer activity
@@ -719,7 +719,7 @@ SELECT
     'DEPOSIT',
     'Salary deposit'
 FROM accounts a
-WHERE a.account_number = '920174638501'
+WHERE a.account_number = '334455667723'
 AND NOT EXISTS (SELECT 1 FROM transactions WHERE transaction_number = '200000000008');
 
 INSERT INTO transactions (
@@ -740,7 +740,7 @@ SELECT
     'WITHDRAW',
     'Shopping'
 FROM accounts a
-WHERE a.account_number = '920174638501'
+WHERE a.account_number = '334455667723'
 AND NOT EXISTS (SELECT 1 FROM transactions WHERE transaction_number = '200000000009');
 
 -- Transfers between the three users
@@ -762,8 +762,8 @@ SELECT
     'TRANSFER',
     'Naruto → Sakura (gift)'
 FROM accounts src
-JOIN accounts tgt ON tgt.account_number = '920174638501'
-WHERE src.account_number = '483920174563'
+JOIN accounts tgt ON tgt.account_number = '334455667723'
+WHERE src.account_number = '112233445501'
 AND NOT EXISTS (SELECT 1 FROM transactions WHERE transaction_number = '200000000010');
 
 INSERT INTO transactions (
@@ -784,8 +784,8 @@ SELECT
     'TRANSFER',
     'Sakura → Sasuke (payment)'
 FROM accounts src
-JOIN accounts tgt ON tgt.account_number = '739104826501'
-WHERE src.account_number = '920174638501'
+JOIN accounts tgt ON tgt.account_number = '223344556612'
+WHERE src.account_number = '334455667723'
 AND NOT EXISTS (SELECT 1 FROM transactions WHERE transaction_number = '200000000011');
 
 INSERT INTO transactions (
@@ -806,8 +806,8 @@ SELECT
     'TRANSFER',
     'Sasuke → Naruto (reimbursement)'
 FROM accounts src
-JOIN accounts tgt ON tgt.account_number = '483920174563'
-WHERE src.account_number = '739104826501'
+JOIN accounts tgt ON tgt.account_number = '112233445501'
+WHERE src.account_number = '223344556612'
 AND NOT EXISTS (SELECT 1 FROM transactions WHERE transaction_number = '200000000012');
 
 -- More activity throughout the year
@@ -829,7 +829,7 @@ SELECT
     'DEPOSIT',
     'Tax refund (Naruto)'
 FROM accounts a
-WHERE a.account_number = '483920174563'
+WHERE a.account_number = '112233445501'
 AND NOT EXISTS (SELECT 1 FROM transactions WHERE transaction_number = '200000000013');
 
 INSERT INTO transactions (
@@ -850,7 +850,7 @@ SELECT
     'WITHDRAW',
     'Groceries (Sakura)'
 FROM accounts a
-WHERE a.account_number = '920174638501'
+WHERE a.account_number = '334455667723'
 AND NOT EXISTS (SELECT 1 FROM transactions WHERE transaction_number = '200000000014');
 
 INSERT INTO transactions (
@@ -871,7 +871,7 @@ SELECT
     'DEPOSIT',
     'Monthly salary (Sasuke)'
 FROM accounts a
-WHERE a.account_number = '739104826501'
+WHERE a.account_number = '223344556612'
 AND NOT EXISTS (SELECT 1 FROM transactions WHERE transaction_number = '200000000015');
 
 INSERT INTO transactions (
@@ -892,8 +892,8 @@ SELECT
     'TRANSFER',
     'Naruto → Sasuke (team bonus)'
 FROM accounts src
-JOIN accounts tgt ON tgt.account_number = '739104826501'
-WHERE src.account_number = '483920174563'
+JOIN accounts tgt ON tgt.account_number = '223344556612'
+WHERE src.account_number = '112233445501'
 AND NOT EXISTS (SELECT 1 FROM transactions WHERE transaction_number = '200000000016');
 
 INSERT INTO transactions (
@@ -914,7 +914,7 @@ SELECT
     'WITHDRAW',
     'Medical expense (Sakura)'
 FROM accounts a
-WHERE a.account_number = '920174638501'
+WHERE a.account_number = '334455667723'
 AND NOT EXISTS (SELECT 1 FROM transactions WHERE transaction_number = '200000000017');
 
 INSERT INTO transactions (
@@ -935,7 +935,7 @@ SELECT
     'DEPOSIT',
     'Freelance payment (Sakura)'
 FROM accounts a
-WHERE a.account_number = '920174638501'
+WHERE a.account_number = '334455667723'
 AND NOT EXISTS (SELECT 1 FROM transactions WHERE transaction_number = '200000000018');
 
 INSERT INTO transactions (
@@ -956,8 +956,8 @@ SELECT
     'TRANSFER',
     'Sakura → Naruto (thank you)'
 FROM accounts src
-JOIN accounts tgt ON tgt.account_number = '483920174563'
-WHERE src.account_number = '920174638501'
+JOIN accounts tgt ON tgt.account_number = '112233445501'
+WHERE src.account_number = '334455667723'
 AND NOT EXISTS (SELECT 1 FROM transactions WHERE transaction_number = '200000000019');
 
 INSERT INTO transactions (
@@ -978,7 +978,7 @@ SELECT
     'WITHDRAW',
     'Training equipment (Sasuke)'
 FROM accounts a
-WHERE a.account_number = '739104826501'
+WHERE a.account_number = '223344556612'
 AND NOT EXISTS (SELECT 1 FROM transactions WHERE transaction_number = '200000000020');
 
 -- Final batch for 2025
@@ -1000,7 +1000,7 @@ SELECT
     'DEPOSIT',
     'Annual bonus (Naruto)'
 FROM accounts a
-WHERE a.account_number = '483920174563'
+WHERE a.account_number = '112233445501'
 AND NOT EXISTS (SELECT 1 FROM transactions WHERE transaction_number = '200000000021');
 
 INSERT INTO transactions (
@@ -1021,7 +1021,7 @@ SELECT
     'DEPOSIT',
     'Project payment (Sakura)'
 FROM accounts a
-WHERE a.account_number = '920174638501'
+WHERE a.account_number = '334455667723'
 AND NOT EXISTS (SELECT 1 FROM transactions WHERE transaction_number = '200000000022');
 
 INSERT INTO transactions (
@@ -1042,7 +1042,7 @@ SELECT
     'DEPOSIT',
     'Year-end bonus (Sasuke)'
 FROM accounts a
-WHERE a.account_number = '739104826501'
+WHERE a.account_number = '223344556612'
 AND NOT EXISTS (SELECT 1 FROM transactions WHERE transaction_number = '200000000023');
 
 INSERT INTO transactions (
@@ -1063,6 +1063,6 @@ SELECT
     'TRANSFER',
     'Naruto → Sakura (holiday gift)'
 FROM accounts src
-JOIN accounts tgt ON tgt.account_number = '920174638501'
-WHERE src.account_number = '483920174563'
+JOIN accounts tgt ON tgt.account_number = '334455667723'
+WHERE src.account_number = '112233445501'
 AND NOT EXISTS (SELECT 1 FROM transactions WHERE transaction_number = '200000000024');

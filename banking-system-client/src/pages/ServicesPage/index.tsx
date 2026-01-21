@@ -73,7 +73,7 @@ const ServicesPage = () => {
               ),
               title: permissionLabels.TRANSFER_BETWEEN_ACCOUNTS,
               description: 'Transfer funds between accounts instantly.',
-              link: Routes.CUSTOMER_TRANSACTIONS,
+              link: Routes.TRANSACTIONS,
             },
             {
               icon: <SecurityIcon color='primary' sx={{ fontSize: 40 }} />,
@@ -85,7 +85,7 @@ const ServicesPage = () => {
               icon: <PersonIcon color='primary' sx={{ fontSize: 40 }} />,
               title: 'Profile Management',
               description: 'Update your personal information securely.',
-              link: Routes.CUSTOMER_PROFILE,
+              link: Routes.PROFILE,
             },
           ].map((service) => (
             <Grid item xs={12} sm={6} md={3} key={service.title}>

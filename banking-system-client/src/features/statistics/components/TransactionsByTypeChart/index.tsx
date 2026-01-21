@@ -28,7 +28,7 @@ const TransactionsByTypeChart: React.FC<TransactionsByTypeChartProps> = ({
             fill='#8884d8'
             label
           >
-            {transactionsByType.map((entry, index) => (
+            {transactionsByType.map((_, index) => (
               <Cell
                 key={`cell-${index}`}
                 fill={COLORS[index % COLORS.length]}
