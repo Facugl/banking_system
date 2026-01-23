@@ -4,6 +4,7 @@ import { TransferRequest } from '../types';
 import { transferApi } from '../accountsApi';
 import { AppError } from '../../../types';
 import { Messages, HttpStatus } from '../../../utils/constants';
+import { getTransactions } from '../../transactions/thunks';
 
 export const transfer = createAsyncThunk<
   TransactionResponse,
@@ -11,9 +12,16 @@ export const transfer = createAsyncThunk<
   { rejectValue: AppError }
 >(
   'accounts/transfer',
-  async ({ sourceAccountNumber, transferData }, { rejectWithValue }) => {
+  async (
+    { sourceAccountNumber, transferData },
+    { dispatch, rejectWithValue },
+  ) => {
     try {
-      return await transferApi(sourceAccountNumber, transferData);
+      const response = await transferApi(sourceAccountNumber, transferData);
+
+      dispatch(getTransactions());
+
+      return response;
     } catch (error: any) {
       return rejectWithValue({
         frontendMessage: Messages.TRANSFER_FAILED,

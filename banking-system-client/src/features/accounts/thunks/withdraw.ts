@@ -4,6 +4,7 @@ import { AccountOperationRequest } from '../types';
 import { withdrawApi } from '../accountsApi';
 import { AppError } from '../../../types';
 import { Messages, HttpStatus } from '../../../utils/constants';
+import { getTransactions } from '../../transactions/thunks';
 
 export const withdraw = createAsyncThunk<
   TransactionResponse,
@@ -11,9 +12,13 @@ export const withdraw = createAsyncThunk<
   { rejectValue: AppError }
 >(
   'accounts/withdraw',
-  async ({ accountNumber, operationData }, { rejectWithValue }) => {
+  async ({ accountNumber, operationData }, { dispatch, rejectWithValue }) => {
     try {
-      return await withdrawApi(accountNumber, operationData);
+      const response = await withdrawApi(accountNumber, operationData);
+
+      dispatch(getTransactions());
+
+      return response;
     } catch (error: any) {
       return rejectWithValue({
         frontendMessage: Messages.WITHDRAW_FAILED,
