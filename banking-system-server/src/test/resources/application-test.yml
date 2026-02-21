@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:data-test.sql
+
+  h2:
+    console:
+      enabled: false
+security:
+  default:
+    role: "CUSTOMER"
+  jwt:
+    expiration-in-minutes: ${JWT_EXPIRATION_MINUTES:30}
+    secret: test-user

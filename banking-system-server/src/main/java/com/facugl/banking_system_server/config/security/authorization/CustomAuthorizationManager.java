@@ -1,12 +1,12 @@
 package com.facugl.banking_system_server.config.security.authorization;
 
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
+import com.facugl.banking_system_server.admin.operations.persistence.entity.Operation;
+import com.facugl.banking_system_server.admin.operations.persistence.repository.OperationRepository;
+import com.facugl.banking_system_server.users.exception.UserNotFoundException;
+import com.facugl.banking_system_server.users.persistence.entity.User;
+import com.facugl.banking_system_server.users.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authorization.AuthorizationDecision;
@@ -15,93 +15,99 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.stereotype.Component;
 
-import com.facugl.banking_system_server.admin.operations.persistence.entity.Operation;
-import com.facugl.banking_system_server.admin.operations.persistence.repository.OperationRepository;
-import com.facugl.banking_system_server.users.exception.UserNotFoundException;
-import com.facugl.banking_system_server.users.persistence.entity.User;
-import com.facugl.banking_system_server.users.service.UserService;
-
-import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Component
 public class CustomAuthorizationManager implements AuthorizationManager<RequestAuthorizationContext> {
 
-    private final OperationRepository operationRepository;
-    private final UserService userService;
+  private final OperationRepository operationRepository;
+  private final UserService userService;
 
-    @Override
-    public AuthorizationDecision check(Supplier<Authentication> authentication,
-            RequestAuthorizationContext requestContext) {
+  @Override
+  public AuthorizationDecision check(Supplier<Authentication> authentication,
+                                     RequestAuthorizationContext requestContext) {
 
-        HttpServletRequest request = requestContext.getRequest();
+    HttpServletRequest request = requestContext.getRequest();
 
-        String url = extractUrl(request);
-        String httpMethod = request.getMethod();
+    String url = extractUrl(request);
+    String httpMethod = request.getMethod();
 
-        boolean isPublic = isPublic(url, httpMethod);
+    boolean isPublic = isPublic(url, httpMethod);
 
-        if (isPublic) {
-            return new AuthorizationDecision(true);
-        }
-
-        boolean isGranted = isGranted(url, httpMethod, authentication.get());
-
-        return new AuthorizationDecision(isGranted);
-
+    if (isPublic) {
+      return new AuthorizationDecision(true);
     }
 
-    private boolean isGranted(String url, String httpMethod, Authentication authentication) {
-        if (authentication == null || !(authentication instanceof UsernamePasswordAuthenticationToken)) {
-            throw new AuthenticationCredentialsNotFoundException("User not logged in");
-        }
+    boolean isGranted = isGranted(url, httpMethod, authentication.get());
 
-        List<Operation> operations = obtainedOperations(authentication);
+    return new AuthorizationDecision(isGranted);
 
-        boolean isGranted = operations.stream().anyMatch(getOperationPredicate(url, httpMethod));
+  }
 
-        return isGranted;
+  private boolean isGranted(String url, String httpMethod, Authentication authentication) {
+    if (authentication == null || !(authentication instanceof UsernamePasswordAuthenticationToken)) {
+      throw new AuthenticationCredentialsNotFoundException("User not logged in");
     }
 
-    private Predicate<? super Operation> getOperationPredicate(String url, String httpMethod) {
-        return operation -> {
-            String basePath = operation.getModule().getBasePath();
+    List<Operation> operations = obtainedOperations(authentication);
 
-            Pattern pattern = Pattern.compile(basePath.concat(operation.getPath()));
-            Matcher matcher = pattern.matcher(url);
+    boolean isGranted = operations.stream().anyMatch(getOperationPredicate(url, httpMethod));
 
-            return matcher.matches() && operation.getHttpMethod().equals(httpMethod);
-        };
+    return isGranted;
+  }
+
+  private Predicate<? super Operation> getOperationPredicate(String url, String httpMethod) {
+    return operation -> {
+      String basePath = operation.getModule().getBasePath();
+
+      Pattern pattern = Pattern.compile(basePath.concat(operation.getPath()));
+      Matcher matcher = pattern.matcher(url);
+
+      return matcher.matches() && operation.getHttpMethod().equals(httpMethod);
+    };
+  }
+
+  private List<Operation> obtainedOperations(Authentication authentication) {
+    UsernamePasswordAuthenticationToken authToken = (UsernamePasswordAuthenticationToken) authentication;
+
+    Object principal = authToken.getPrincipal();
+
+    String username;
+
+    if (principal instanceof org.springframework.security.core.userdetails.UserDetails userDetails) {
+      username = userDetails.getUsername();
+    } else {
+      username = principal.toString();
     }
 
-    private List<Operation> obtainedOperations(Authentication authentication) {
-        UsernamePasswordAuthenticationToken authToken = (UsernamePasswordAuthenticationToken) authentication;
+    User user = userService.findByUsername(username)
+        .orElseThrow(() -> new UserNotFoundException(username));
 
-        String username = (String) authToken.getPrincipal();
+    return user.getRole().getPermissions().stream()
+        .map(grantedPermission -> grantedPermission.getOperation())
+        .collect(Collectors.toList());
+  }
 
-        User user = userService.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException(username));
+  private boolean isPublic(String url, String httpMethod) {
+    List<Operation> publicAccessEndpoints = operationRepository.findByPublicAccess();
 
-        return user.getRole().getPermissions().stream()
-                .map(grantedPermission -> grantedPermission.getOperation())
-                .collect(Collectors.toList());
-    }
+    boolean isPublic = publicAccessEndpoints.stream().anyMatch(getOperationPredicate(url, httpMethod));
 
-    private boolean isPublic(String url, String httpMethod) {
-        List<Operation> publicAccessEndpoints = operationRepository.findByPublicAccess();
+    return isPublic;
+  }
 
-        boolean isPublic = publicAccessEndpoints.stream().anyMatch(getOperationPredicate(url, httpMethod));
+  private String extractUrl(HttpServletRequest request) {
+    String contextPath = request.getContextPath();
+    String url = request.getRequestURI();
+    url = url.replace(contextPath, "");
 
-        return isPublic;
-    }
-
-    private String extractUrl(HttpServletRequest request) {
-        String contextPath = request.getContextPath();
-        String url = request.getRequestURI();
-        url = url.replace(contextPath, "");
-
-        return url;
-    }
+    return url;
+  }
 
 }
