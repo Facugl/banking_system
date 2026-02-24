@@ -1,0 +1,27 @@
+services:
+  mysql:
+    image: mysql:8.4
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    image: faculuna27/banking-backend:latest
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+    ports:
+      - "8080:8080"
+
+  frontend:
+    image: faculuna27/banking-frontend:latest
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:

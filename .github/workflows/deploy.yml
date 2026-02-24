@@ -1,0 +1,46 @@
+name: Deploy Banking System
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build backend
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/banking-backend:latest ./banking-system-server
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/banking-backend:latest
+
+      - name: Build frontend
+        run: |
+          docker build \
+            --build-arg VITE_API_BASE_URL=http://${{ secrets.EC2_HOST }}/api/v1 \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/banking-frontend:latest \
+            ./banking-system-client
+
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/banking-frontend:latest
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            mkdir -p app
+            cd app
+            docker compose pull
+            docker compose up -d --remove-orphans
