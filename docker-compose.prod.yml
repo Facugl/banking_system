@@ -6,13 +6,21 @@ services:
       - .env
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
     image: faculuna27/banking-backend:latest
     env_file:
       - .env
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     ports:
       - "8080:8080"
 
