@@ -1,7 +1,6 @@
 /* =========================================================
    MODULES
    ========================================================= */
-
 INSERT INTO modules (name, base_path) VALUES
 ('ACCOUNT','/accounts'),
 ('TRANSACTION','/transactions'),
@@ -17,7 +16,6 @@ INSERT INTO modules (name, base_path) VALUES
 /* =========================================================
    ROLES
    ========================================================= */
-
 INSERT INTO roles (name) VALUES
 ('ADMINISTRATOR'),
 ('EMPLOYEE'),
@@ -27,6 +25,70 @@ INSERT INTO roles (name) VALUES
 /* =========================================================
    OPERATIONS
    ========================================================= */
+/* MODULE */
+INSERT INTO operations (name, path, http_method, permit_all, modules_id)
+SELECT 'CREATE_ONE_MODULE', '', 'POST', false, id FROM modules WHERE name='MODULE';
+
+INSERT INTO operations (name, path, http_method, permit_all, modules_id)
+SELECT 'READ_ONE_MODULE', '/[0-9]*', 'GET', false, id FROM modules WHERE name='MODULE';
+
+INSERT INTO operations (name, path, http_method, permit_all, modules_id)
+SELECT 'READ_ALL_MODULES', '', 'GET', false, id FROM modules WHERE name='MODULE';
+
+INSERT INTO operations (name, path, http_method, permit_all, modules_id)
+SELECT 'UPDATE_ONE_MODULE', '/[0-9]*', 'PUT', false, id FROM modules WHERE name='MODULE';
+
+INSERT INTO operations (name, path, http_method, permit_all, modules_id)
+SELECT 'DELETE_ONE_MODULE', '/[0-9]*', 'DELETE', false, id FROM modules WHERE name='MODULE';
+
+
+/* OPERATION */
+INSERT INTO operations (name, path, http_method, permit_all, modules_id)
+SELECT 'CREATE_ONE_OPERATION', '', 'POST', false, id FROM modules WHERE name='OPERATION';
+
+INSERT INTO operations (name, path, http_method, permit_all, modules_id)
+SELECT 'READ_ONE_OPERATION', '/[0-9]*', 'GET', false, id FROM modules WHERE name='OPERATION';
+
+INSERT INTO operations (name, path, http_method, permit_all, modules_id)
+SELECT 'READ_ALL_OPERATIONS', '', 'GET', false, id FROM modules WHERE name='OPERATION';
+
+INSERT INTO operations (name, path, http_method, permit_all, modules_id)
+SELECT 'UPDATE_ONE_OPERATION', '/[0-9]*', 'PUT', false, id FROM modules WHERE name='OPERATION';
+
+INSERT INTO operations (name, path, http_method, permit_all, modules_id)
+SELECT 'DELETE_ONE_OPERATION', '/[0-9]*', 'DELETE', false, id FROM modules WHERE name='OPERATION';
+
+
+/* ROLE */
+INSERT INTO operations (name, path, http_method, permit_all, modules_id)
+SELECT 'CREATE_ONE_ROLE', '', 'POST', false, id FROM modules WHERE name='ROLE';
+
+INSERT INTO operations (name, path, http_method, permit_all, modules_id)
+SELECT 'READ_ONE_ROLE', '/[0-9]*', 'GET', false, id FROM modules WHERE name='ROLE';
+
+INSERT INTO operations (name, path, http_method, permit_all, modules_id)
+SELECT 'READ_ALL_ROLES', '', 'GET', false, id FROM modules WHERE name='ROLE';
+
+INSERT INTO operations (name, path, http_method, permit_all, modules_id)
+SELECT 'UPDATE_ONE_ROLE', '/[0-9]*', 'PUT', false, id FROM modules WHERE name='ROLE';
+
+INSERT INTO operations (name, path, http_method, permit_all, modules_id)
+SELECT 'DELETE_ONE_ROLE', '/[0-9]*', 'DELETE', false, id FROM modules WHERE name='ROLE';
+
+
+/* PERMISSION */
+INSERT INTO operations (name, path, http_method, permit_all, modules_id)
+SELECT 'CREATE_ONE_PERMISSION', '', 'POST', false, id FROM modules WHERE name='PERMISSION';
+
+INSERT INTO operations (name, path, http_method, permit_all, modules_id)
+SELECT 'READ_ONE_PERMISSION', '/[0-9]*', 'GET', false, id FROM modules WHERE name='PERMISSION';
+
+INSERT INTO operations (name, path, http_method, permit_all, modules_id)
+SELECT 'READ_ALL_PERMISSIONS', '', 'GET', false, id FROM modules WHERE name='PERMISSION';
+
+INSERT INTO operations (name, path, http_method, permit_all, modules_id)
+SELECT 'DELETE_ONE_PERMISSION', '/[0-9]*', 'DELETE', false, id FROM modules WHERE name='PERMISSION';
+
 
 /* ACCOUNT */
 INSERT INTO operations (name, path, http_method, permit_all, modules_id)
@@ -88,6 +150,11 @@ SELECT 'READ_ALL_USERS','','GET',false,id FROM modules WHERE name='USER';
 
 INSERT INTO operations (name, path, http_method, permit_all, modules_id)
 SELECT 'REGISTER_ONE','','POST',true,id FROM modules WHERE name='USER';
+
+
+/* STATISTICS */
+INSERT INTO operations (name, path, http_method, permit_all, modules_id)
+SELECT 'READ_STATISTICS','','GET',false,id FROM modules WHERE name='STATISTICS';
 
 
 /* ADMINISTRATOR gets ALL operations */
