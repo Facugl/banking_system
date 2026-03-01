@@ -1,35 +1,21 @@
 services:
-  mysql:
-    image: mysql:8.0
-    restart: always
-    env_file:
-      - .env
-    volumes:
-      - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   backend:
     image: faculuna27/banking-backend:latest
-    env_file:
-      - .env
+    container_name: banking-backend
     environment:
-      - SPRING_PROFILES_ACTIVE=prod
-    depends_on:
-      mysql:
-        condition: service_healthy
+      DB_HOST: ${DB_HOST}
+      DB_PORT: 3306
+      DB_NAME: banking_system_db
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+    restart: always
     ports:
       - "8080:8080"
 
   frontend:
     image: faculuna27/banking-frontend:latest
+    container_name: banking-frontend
     ports:
       - "80:80"
     depends_on:
       - backend
-
-volumes:
-  mysql_data:
