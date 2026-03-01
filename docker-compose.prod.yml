@@ -13,7 +13,7 @@ services:
       JWT_EXPIRATION_MINUTES: 60
     restart: always
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
 
   frontend:
     image: faculuna27/banking-frontend:latest
