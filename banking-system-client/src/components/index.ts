@@ -1,4 +1,6 @@
+export { default as BrandLink } from './BrandLink';
 export { default as EmptyState } from './EmptyState';
+export { default as EntityActionsCell } from './EntityActionsCell';
 export { default as ErrorMessage } from './ErrorMessage';
 export { default as FooterSection } from './FooterSection';
 export { default as GradientButton } from './GradientButton';

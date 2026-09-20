@@ -1,6 +1,6 @@
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
-import { Box, IconButton } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { Box } from '@mui/material';
+import { EntityActionsCell } from '../../../../components';
 import { PermissionResponse } from '../../types';
 
 interface Props {
@@ -20,14 +20,10 @@ const PermissionsTable: React.FC<Props> = ({ permissions, onDelete }) => {
       width: 120,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => (
-        <Box display='flex' gap={1}>
-          <IconButton
-            color='error'
-            onClick={() => onDelete(params.row as PermissionResponse)}
-          >
-            <DeleteIcon />
-          </IconButton>
-        </Box>
+        <EntityActionsCell
+          entityLabel='permission'
+          onDelete={() => onDelete(params.row as PermissionResponse)}
+        />
       ),
     },
   ];

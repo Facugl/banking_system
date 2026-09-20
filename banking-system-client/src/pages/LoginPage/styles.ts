@@ -12,10 +12,22 @@ export const LoginPageContainer = styled(Box)(({ theme }) => ({
     ' 0%, ' +
     theme.palette.background.default +
     ' 100%)',
+}));
+
+export const LoginContent = styled(Box)(({ theme }) => ({
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
   padding: '2rem',
   [theme.breakpoints.down('sm')]: {
     padding: '1rem',
   },
+}));
+
+export const BrandLinkContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  marginBottom: theme.spacing(3),
 }));
 
 export const LoginBackground = styled(Box)({

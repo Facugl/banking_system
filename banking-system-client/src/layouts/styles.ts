@@ -1,52 +1,52 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material/styles';
 import { AppBar, Box, Container, Toolbar, BoxProps } from '@mui/material';
 
 interface MainContentProps extends BoxProps {
   component?: React.ElementType;
 }
 
-export const DashboardRoot = styled(Box)`
-  display: flex;
-  height: 100vh;
-  background-color: #f7fafc;
-`;
+export const DashboardRoot = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  height: '100vh',
+  backgroundColor: theme.palette.background.default,
+}));
 
-export const StyledAppBar = styled(AppBar)`
-  z-index: 1201;
-  background-color: white;
-  color: #1a365d;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-`;
+export const StyledAppBar = styled(AppBar)(({ theme }) => ({
+  zIndex: 1201,
+  backgroundColor: theme.palette.background.paper,
+  color: theme.palette.primary.main,
+  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)',
+}));
 
-export const StyledToolbar = styled(Toolbar)`
-  display: flex;
-  justify-content: space-between;
-  padding: 0 1rem;
+export const StyledToolbar = styled(Toolbar)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  padding: '0 1rem',
 
-  @media (min-width: 600px) {
-    padding: 0 1.5rem;
-  }
-`;
+  [theme.breakpoints.up('sm')]: {
+    padding: '0 1.5rem',
+  },
+}));
 
-export const MainContent = styled(Box)<MainContentProps>`
-  flex-grow: 1;
-  padding: 2rem;
-  overflow-y: auto;
+export const MainContent = styled(Box)<MainContentProps>(({ theme }) => ({
+  flexGrow: 1,
+  padding: '2rem',
+  overflowY: 'auto',
 
-  @media (max-width: 960px) {
-    padding: 1.5rem;
-  }
+  [theme.breakpoints.down('md')]: {
+    padding: '1.5rem',
+  },
 
-  @media (max-width: 600px) {
-    padding: 1rem;
-  }
-`;
+  [theme.breakpoints.down('sm')]: {
+    padding: '1rem',
+  },
+}));
 
-export const ContentContainer = styled(Container)`
-  padding-top: 1.5rem;
+export const ContentContainer = styled(Container)(({ theme }) => ({
+  paddingTop: '1.5rem',
 
-  @media (max-width: 600px) {
-    padding-left: 0;
-    padding-right: 0;
-  }
-`;
+  [theme.breakpoints.down('sm')]: {
+    paddingLeft: 0,
+    paddingRight: 0,
+  },
+}));

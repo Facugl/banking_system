@@ -1,12 +1,26 @@
+import { BrandLink, FooterSection } from '../../components';
 import { RegisterForm } from '../../features/auth/components';
-import { RegisterPageContainer, RegisterBackground } from './styles';
+import {
+  RegisterPageContainer,
+  RegisterContent,
+  BrandLinkContainer,
+  RegisterBackground,
+} from './styles';
 
 const RegisterPage: React.FC = () => {
   return (
     <RegisterPageContainer>
-      <RegisterBackground>
-        <RegisterForm />
-      </RegisterBackground>
+      <RegisterContent>
+        <BrandLinkContainer>
+          <BrandLink />
+        </BrandLinkContainer>
+
+        <RegisterBackground>
+          <RegisterForm />
+        </RegisterBackground>
+      </RegisterContent>
+
+      <FooterSection />
     </RegisterPageContainer>
   );
 };

@@ -10,13 +10,14 @@ import {
   AccountBalance as AccountBalanceIcon,
   Star as StarIcon,
 } from '@mui/icons-material';
+import { Routes } from '../../utils/constants';
 import { FooterSectionStyled } from './styles';
 
 const navItems = [
-  { label: 'Home', path: '#home' },
-  { label: 'About', path: '#about' },
-  { label: 'Services', path: '#services' },
-  { label: 'Contact', path: '#contact' },
+  { label: 'Home', path: `${Routes.HOME}#home` },
+  { label: 'About', path: `${Routes.HOME}#about` },
+  { label: 'Services', path: `${Routes.HOME}#services` },
+  { label: 'Contact', path: `${Routes.HOME}#contact` },
 ];
 
 const FooterSection = () => {
@@ -25,12 +26,24 @@ const FooterSection = () => {
       <Container maxWidth='lg'>
         <Grid container spacing={4}>
           <Grid item xs={12} sm={6} md={3}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <Box
+              component='a'
+              href={Routes.HOME}
+              aria-label='Go to home page'
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                mb: 2,
+                color: 'inherit',
+                textDecoration: 'none',
+                width: 'fit-content',
+              }}
+            >
               <AccountBalanceIcon
                 sx={{ fontSize: 32, color: 'primary.light', mr: 1 }}
               />
               <Typography variant='h5' sx={{ fontWeight: 'bold' }}>
-                Horizon Bank
+                Banking System
               </Typography>
             </Box>
             <Typography variant='body2' sx={{ mb: 3, opacity: 0.8 }}>
@@ -39,7 +52,10 @@ const FooterSection = () => {
             </Typography>
             <Box sx={{ display: 'flex', gap: 0.5 }}>
               {[1, 2, 3, 4, 5].map((star) => (
-                <StarIcon key={star} sx={{ fontSize: 20, color: '#FFD700' }} />
+                <StarIcon
+                  key={star}
+                  sx={{ fontSize: 20, color: 'primary.main' }}
+                />
               ))}
             </Box>
           </Grid>
@@ -99,7 +115,7 @@ const FooterSection = () => {
             </Typography>
             <Stack spacing={1}>
               <Typography variant='body2' sx={{ opacity: 0.8 }}>
-                support@horizonbank.com
+                support@bankingsystem.com
               </Typography>
               <Typography variant='body2' sx={{ opacity: 0.8 }}>
                 (800) 123-4567
@@ -115,7 +131,7 @@ const FooterSection = () => {
 
         <Divider sx={{ my: 4, borderColor: 'rgba(255, 255, 255, 0.2)' }} />
         <Typography variant='body2' align='center' sx={{ opacity: 0.8 }}>
-          © {new Date().getFullYear()} Horizon Bank. All rights reserved.
+          © {new Date().getFullYear()} Banking System. All rights reserved.
         </Typography>
       </Container>
     </FooterSectionStyled>

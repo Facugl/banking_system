@@ -2,5 +2,5 @@ import styled from '@emotion/styled';
 
 export const ChartContainer = styled('div')({
   width: '100%',
-  height: 300,
+  height: 360,
 });

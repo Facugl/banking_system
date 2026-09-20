@@ -5,7 +5,7 @@ export const StyledCard = styled(Card)(({ theme }) => ({
   width: '100%',
   backgroundColor: theme.palette.background.paper,
   borderRadius: theme.shape.borderRadius,
-  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+  boxShadow: theme.customShadows.card,
   transition: 'transform 0.2s ease-in-out',
   '&:hover': {
     transform: 'translateY(-4px)',

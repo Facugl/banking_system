@@ -1,59 +1,54 @@
 import { createTheme } from '@mui/material/styles';
 import { palette } from './palette';
+import { typography } from './typography';
 
 const theme = createTheme({
-  palette: palette,
-  typography: {
-    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
-    h1: {
-      fontWeight: 700,
-    },
-    h2: {
-      fontWeight: 700,
-    },
-    h3: {
-      fontWeight: 600,
-    },
-    h4: {
-      fontWeight: 600,
-    },
-    h5: {
-      fontWeight: 600,
-    },
-    h6: {
-      fontWeight: 600,
-    },
-    button: {
-      fontWeight: 600,
-      textTransform: 'none',
-    },
-  },
+  palette,
+  typography,
   shape: {
-    borderRadius: 8,
+    borderRadius: 16,
+  },
+  customShadows: {
+    card: '0 20px 60px rgba(108, 142, 232, 0.15)',
+    buttonHover: '0 10px 30px rgba(108, 142, 232, 0.35)',
+    modal: '0 0 0 3px rgba(108, 142, 232, 0.45)',
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
+          borderRadius: 999,
           boxShadow: 'none',
-          '&:hover': {
-            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
-          },
         },
       },
     },
     MuiCard: {
       styleOverrides: {
+        root: ({ theme }) => ({
+          border: `1px solid ${theme.palette.divider}`,
+          borderRadius: theme.shape.borderRadius,
+          backgroundImage: 'none',
+          boxShadow: theme.customShadows.card,
+        }),
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
         root: {
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-          borderRadius: 10,
+          borderRadius: 999,
         },
       },
     },
-  },
-  customShadows: {
-    card: '0 4px 8px rgba(0,0,0,0.1)',
-    buttonHover: '0 4px 8px rgba(0,0,0,0.2)',
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          '&.Mui-focusVisible': {
+            outline: '2px solid currentColor',
+            outlineOffset: 2,
+          },
+        },
+      },
+    },
   },
 });
 

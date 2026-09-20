@@ -6,6 +6,6 @@ export const ChartContainer = styled(Box)(({ theme }) => ({
   height: '400px',
   backgroundColor: theme.palette.background.paper,
   borderRadius: theme.shape.borderRadius,
-  boxShadow: '0 4px 10px rgba(0, 0, 0, 0.05)',
+  boxShadow: theme.customShadows.card,
   padding: theme.spacing(2),
 }));

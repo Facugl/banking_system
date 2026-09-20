@@ -9,7 +9,7 @@ const SecuritySection = () => {
         <ShieldIcon
           sx={{
             fontSize: { xs: 50, sm: 60, md: 80 },
-            color: 'primary.light',
+            color: 'primary.main',
             mb: { xs: 2, md: 3 },
           }}
         />
@@ -35,7 +35,7 @@ const SecuritySection = () => {
             mx: 'auto',
           }}
         >
-          Horizon Bank employs state-of-the-art encryption and multi-factor
+          Banking System employs state-of-the-art encryption and multi-factor
           authentication to protect your financial information.
         </Typography>
         <ChipStyled label='FDIC Insured' />

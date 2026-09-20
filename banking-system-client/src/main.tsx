@@ -4,6 +4,10 @@ import { Provider } from 'react-redux';
 import { store } from './store/store';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
+import '@fontsource/inter/700.css';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import theme from './theme/index.ts';
 

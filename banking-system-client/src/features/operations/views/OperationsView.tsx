@@ -17,6 +17,7 @@ import { Messages, OperationMessages } from '../../../utils/constants';
 import OperationsTable from '../components/OperationsTable';
 import EditOperationModal from '../components/EditOperationModal';
 import { ConfirmDeleteModal } from '../../../components';
+import { useDeleteConfirmation } from '../../../hooks/useDeleteConfirmation';
 
 const OperationsView: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -26,9 +27,12 @@ const OperationsView: React.FC = () => {
   const [selectedOperation, setSelectedOperation] =
     useState<OperationResponse | null>(null);
 
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [operationToDelete, setOperationToDelete] =
-    useState<OperationResponse | null>(null);
+  const deleteConfirmation = useDeleteConfirmation<OperationResponse>({
+    deleteAction: (operation) =>
+      dispatch(deleteOperation(operation.id)).unwrap(),
+    successMessage: OperationMessages.DELETE_SUCCESS,
+    errorMessage: OperationMessages.ERROR,
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -70,25 +74,6 @@ const OperationsView: React.FC = () => {
     setModalOpen(false);
   };
 
-  const handleDeleteRequest = (operation: OperationResponse) => {
-    setOperationToDelete(operation);
-    setDeleteModalOpen(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!operationToDelete) return;
-
-    try {
-      await dispatch(deleteOperation(operationToDelete.id)).unwrap();
-      showSuccess(OperationMessages.DELETE_SUCCESS);
-    } catch (error) {
-      showError(OperationMessages.ERROR);
-    }
-
-    setDeleteModalOpen(false);
-    setOperationToDelete(null);
-  };
-
   return (
     <Box p={2}>
       <Box display='flex' justifyContent='space-between' mb={2}>
@@ -111,7 +96,7 @@ const OperationsView: React.FC = () => {
         <OperationsTable
           operations={operations}
           onEdit={handleEdit}
-          onDelete={handleDeleteRequest}
+          onDelete={deleteConfirmation.requestDelete}
         />
       </Box>
 
@@ -123,11 +108,11 @@ const OperationsView: React.FC = () => {
       />
 
       <ConfirmDeleteModal
-        open={deleteModalOpen}
-        itemName={operationToDelete?.name || ''}
-        onClose={() => setDeleteModalOpen(false)}
-        onConfirm={handleDeleteConfirm}
-        isLoading={false}
+        open={deleteConfirmation.isOpen}
+        itemName={deleteConfirmation.itemToDelete?.name || ''}
+        onClose={deleteConfirmation.cancelDelete}
+        onConfirm={deleteConfirmation.confirmDelete}
+        isLoading={deleteConfirmation.isLoading}
       />
     </Box>
   );

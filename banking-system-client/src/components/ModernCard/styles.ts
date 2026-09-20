@@ -6,11 +6,13 @@ export const ModernCardStyled = styled(Card)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-  border: 'none',
-  borderRadius: theme.spacing(2),
-  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+  border: `1px solid ${theme.palette.divider}`,
+  borderRadius: theme.shape.borderRadius,
+  backgroundImage: 'none',
+  boxShadow: theme.customShadows.card,
   '&:hover': {
     transform: 'translateY(-8px)',
-    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
+    borderColor: theme.palette.primary.main,
+    boxShadow: theme.customShadows.buttonHover,
   },
 }));

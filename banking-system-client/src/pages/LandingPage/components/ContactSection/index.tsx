@@ -40,7 +40,7 @@ const ContactSection = () => {
                   {
                     icon: EmailIcon,
                     title: 'Email',
-                    info: 'support@horizonbank.com',
+                    info: 'support@bankingsystem.com',
                   },
                   {
                     icon: PhoneIcon,

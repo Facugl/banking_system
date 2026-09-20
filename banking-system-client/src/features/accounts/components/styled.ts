@@ -12,6 +12,9 @@ export const StyledModalBox = styled(Box)(({ theme }) => ({
   width: '100%',
   boxShadow: theme.customShadows.card,
   outline: 'none',
+  '&:focus-visible, &:focus': {
+    boxShadow: theme.customShadows.modal,
+  },
   display: 'flex',
   flexDirection: 'column',
   [theme.breakpoints.up('sm')]: {

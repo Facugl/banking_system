@@ -126,7 +126,6 @@ const CtaSection = () => {
                   fullWidth
                   size='large'
                   sx={{
-                    borderRadius: 2,
                     py: { xs: 1, md: 1.5 },
                     fontSize: { xs: '0.9rem', md: '1rem' },
                   }}

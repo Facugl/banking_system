@@ -181,11 +181,26 @@ const AccountCard: React.FC<AccountCardProps> = ({ account }) => {
               variant='body2'
               component='p'
               onClick={handleCopyToClipboard}
+              role='button'
+              tabIndex={0}
+              aria-label='Copy account number to clipboard'
+              onKeyDown={(e: React.KeyboardEvent) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleCopyToClipboard();
+                }
+              }}
             >
               Account Number: {displayedNumber}
             </StyledAccountNumber>
           </Tooltip>
-          <IconButton onClick={toggleVisibility} size='small'>
+          <IconButton
+            onClick={toggleVisibility}
+            size='small'
+            aria-label={
+              showFullNumber ? 'Hide account number' : 'Show account number'
+            }
+          >
             {showFullNumber ? <VisibilityOff /> : <Visibility />}
           </IconButton>
         </StyledAccountInfo>
@@ -203,6 +218,7 @@ const AccountCard: React.FC<AccountCardProps> = ({ account }) => {
             <span>
               <IconButton
                 size='small'
+                aria-label='Refresh balance'
                 onClick={handleRefreshBalance}
                 disabled={!isActive || isOperating}
               >

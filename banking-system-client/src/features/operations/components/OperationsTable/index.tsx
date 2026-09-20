@@ -1,8 +1,7 @@
 import React from 'react';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
-import { Box, IconButton, Chip } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { Box, Chip } from '@mui/material';
+import { EntityActionsCell } from '../../../../components';
 import { OperationResponse } from '../../types';
 
 interface Props {
@@ -11,11 +10,7 @@ interface Props {
   onDelete: (operation: OperationResponse) => void;
 }
 
-const OperationsTable: React.FC<Props> = ({
-  operations,
-  onEdit,
-  onDelete,
-}) => {
+const OperationsTable: React.FC<Props> = ({ operations, onEdit, onDelete }) => {
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 90 },
     { field: 'name', headerName: 'Name', flex: 1 },
@@ -28,7 +23,7 @@ const OperationsTable: React.FC<Props> = ({
       renderCell: (params: GridRenderCellParams) => (
         <Chip
           label={params.value}
-          size="small"
+          size='small'
           sx={{ textTransform: 'uppercase' }}
         />
       ),
@@ -42,7 +37,7 @@ const OperationsTable: React.FC<Props> = ({
         <Chip
           label={params.value ? 'Yes' : 'No'}
           color={params.value ? 'success' : 'default'}
-          size="small"
+          size='small'
         />
       ),
     },
@@ -55,21 +50,11 @@ const OperationsTable: React.FC<Props> = ({
       width: 120,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => (
-        <Box display="flex" gap={1}>
-          <IconButton
-            color="primary"
-            onClick={() => onEdit(params.row as OperationResponse)}
-          >
-            <EditIcon />
-          </IconButton>
-
-          <IconButton
-            color="error"
-            onClick={() => onDelete(params.row as OperationResponse)}
-          >
-            <DeleteIcon />
-          </IconButton>
-        </Box>
+        <EntityActionsCell
+          entityLabel='operation'
+          onEdit={() => onEdit(params.row as OperationResponse)}
+          onDelete={() => onDelete(params.row as OperationResponse)}
+        />
       ),
     },
   ];

@@ -5,8 +5,9 @@ import { useAppSelector, useAppDispatch } from '../../../store/hooks';
 import { RoleResponse } from '../types';
 import { showSuccess, showError } from '../../../utils/toast';
 import { Messages } from '../../../utils/constants';
-import { RolesTable,EditRoleModal } from '../components';
+import { RolesTable, EditRoleModal } from '../components';
 import { ConfirmDeleteModal } from '../../../components';
+import { useDeleteConfirmation } from '../../../hooks/useDeleteConfirmation';
 
 const RolesView: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -14,8 +15,12 @@ const RolesView: React.FC = () => {
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<RoleResponse | null>(null);
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [roleToDelete, setRoleToDelete] = useState<RoleResponse | null>(null);
+
+  const deleteConfirmation = useDeleteConfirmation<RoleResponse>({
+    deleteAction: (role) => dispatch(deleteRole(role.id)).unwrap(),
+    successMessage: 'Role deleted successfully.',
+    errorMessage: 'Failed to delete role.',
+  });
 
   useEffect(() => {
     const fetchRoles = async () => {
@@ -50,25 +55,6 @@ const RolesView: React.FC = () => {
     setModalOpen(false);
   };
 
-  const handleDeleteRequest = (role: RoleResponse) => {
-    setRoleToDelete(role);
-    setDeleteModalOpen(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!roleToDelete) return;
-
-    try {
-      await dispatch(deleteRole(roleToDelete.id)).unwrap();
-      showSuccess('Role deleted successfully.');
-    } catch (error) {
-      showError('Failed to delete role.');
-    }
-
-    setDeleteModalOpen(false);
-    setRoleToDelete(null);
-  };
-
   return (
     <Box p={2}>
       <Box display='flex' justifyContent='space-between' mb={2}>
@@ -91,7 +77,7 @@ const RolesView: React.FC = () => {
         <RolesTable
           roles={roles}
           onEdit={handleEdit}
-          onDelete={handleDeleteRequest}
+          onDelete={deleteConfirmation.requestDelete}
         />
       </Box>
 
@@ -103,11 +89,11 @@ const RolesView: React.FC = () => {
       />
 
       <ConfirmDeleteModal
-        open={deleteModalOpen}
-        itemName={roleToDelete?.name || ''}
-        onClose={() => setDeleteModalOpen(false)}
-        onConfirm={handleDeleteConfirm}
-        isLoading={false}
+        open={deleteConfirmation.isOpen}
+        itemName={deleteConfirmation.itemToDelete?.name || ''}
+        onClose={deleteConfirmation.cancelDelete}
+        onConfirm={deleteConfirmation.confirmDelete}
+        isLoading={deleteConfirmation.isLoading}
       />
     </Box>
   );

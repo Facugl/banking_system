@@ -16,7 +16,7 @@ const AboutSection = () => {
     <StyledContainer maxWidth='lg' id='about'>
       <SectionHeader>
         <Typography variant='h2' component='h2' gutterBottom>
-          About Horizon Bank
+          About Banking System
         </Typography>
         <SectionSubtitle variant='h6'>
           Founded in 1990, we've been dedicated to providing secure and

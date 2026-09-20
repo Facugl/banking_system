@@ -32,8 +32,9 @@ export const ContactItem = styled(Box)(({ theme }) => ({
   gap: theme.spacing(2),
 }));
 
-export const ContactAvatar = styled(Avatar)(({}) => ({
-  backgroundColor: '#f3f4f6',
+export const ContactAvatar = styled(Avatar)(({ theme }) => ({
+  backgroundColor: theme.palette.background.paper,
+  border: `1px solid ${theme.palette.divider}`,
 }));
 
 export const StyledForm = styled(Box)<BoxProps>(({ theme }) => ({

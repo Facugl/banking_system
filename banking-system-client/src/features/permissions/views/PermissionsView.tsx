@@ -7,6 +7,7 @@ import { showSuccess, showError } from '../../../utils/toast';
 import { PermissionMessages } from '../../../utils/constants';
 import { PermissionsTable, CreatePermissionModal } from '../components';
 import { ConfirmDeleteModal } from '../../../components';
+import { useDeleteConfirmation } from '../../../hooks/useDeleteConfirmation';
 
 const PermissionsView: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -15,9 +16,15 @@ const PermissionsView: React.FC = () => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedPermission, setSelectedPermission] =
     useState<PermissionResponse | null>(null);
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [permissionToDelete, setPermissionToDelete] =
-    useState<PermissionResponse | null>(null);
+
+  const deleteConfirmation = useDeleteConfirmation<PermissionResponse>({
+    deleteAction: (permission) =>
+      dispatch(deletePermission(permission.id)).unwrap(),
+    successMessage: PermissionMessages.DELETE_SUCCESS,
+    errorMessage: PermissionMessages.ERROR,
+    getMessage: (permission) =>
+      `Are you sure you want to remove the permission with ID: ${permission.id}? This action cannot be undone.`,
+  });
 
   useEffect(() => {
     const fetchPermissions = async () => {
@@ -42,25 +49,6 @@ const PermissionsView: React.FC = () => {
     setModalOpen(false);
   };
 
-  const handleDeleteRequest = (permission: PermissionResponse) => {
-    setPermissionToDelete(permission);
-    setDeleteModalOpen(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!permissionToDelete) return;
-
-    try {
-      await dispatch(deletePermission(permissionToDelete.id)).unwrap();
-      showSuccess(PermissionMessages.DELETE_SUCCESS);
-    } catch (error) {
-      showError(PermissionMessages.ERROR);
-    }
-
-    setDeleteModalOpen(false);
-    setPermissionToDelete(null);
-  };
-
   return (
     <Box p={2}>
       <Box display='flex' justifyContent='space-between' mb={2}>
@@ -82,7 +70,7 @@ const PermissionsView: React.FC = () => {
       <Box sx={{ width: '100%', overflowX: 'auto' }}>
         <PermissionsTable
           permissions={permissions}
-          onDelete={handleDeleteRequest}
+          onDelete={deleteConfirmation.requestDelete}
         />
       </Box>
 
@@ -94,12 +82,12 @@ const PermissionsView: React.FC = () => {
       />
 
       <ConfirmDeleteModal
-        message={`Are you sure you want to remove the permission with ID: ${permissionToDelete?.id}? This action cannot be undone.`}
-        open={deleteModalOpen}
-        itemName={permissionToDelete?.id || ''}
-        onClose={() => setDeleteModalOpen(false)}
-        onConfirm={handleDeleteConfirm}
-        isLoading={false}
+        message={deleteConfirmation.message}
+        open={deleteConfirmation.isOpen}
+        itemName={deleteConfirmation.itemToDelete?.id || ''}
+        onClose={deleteConfirmation.cancelDelete}
+        onConfirm={deleteConfirmation.confirmDelete}
+        isLoading={deleteConfirmation.isLoading}
       />
     </Box>
   );

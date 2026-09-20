@@ -18,10 +18,27 @@ const AccountGrowthChart: React.FC<AccountGrowthChartProps> = ({ data }) => {
     <ChartContainer>
       <ResponsiveContainer width='100%' height='100%'>
         <LineChart data={data}>
-          <CartesianGrid strokeDasharray='3 3' />
-          <XAxis dataKey='date' angle={-45} textAnchor='end' />
-          <YAxis />
-          <Tooltip />
+          <CartesianGrid strokeDasharray='3 3' stroke={theme.palette.divider} />
+          <XAxis
+            dataKey='date'
+            angle={-45}
+            textAnchor='end'
+            tick={{ fill: theme.palette.text.secondary }}
+            stroke={theme.palette.divider}
+          />
+          <YAxis
+            tick={{ fill: theme.palette.text.secondary }}
+            stroke={theme.palette.divider}
+          />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: theme.palette.background.paper,
+              border: `1px solid ${theme.palette.divider}`,
+              borderRadius: theme.shape.borderRadius,
+              color: theme.palette.text.primary,
+            }}
+            labelStyle={{ color: theme.palette.text.primary }}
+          />
           <Line
             type='monotone'
             dataKey='cumulativeTotal'

@@ -19,6 +19,7 @@ import {
 } from '@mui/icons-material';
 import { StyledAppBarStyled } from './styles';
 import GradientButton from '../GradientButton';
+import { Routes } from '../../utils/constants';
 
 interface NavItem {
   label: string;
@@ -43,8 +44,20 @@ const Navbar = ({ navItems }: NavBarProps) => {
       role='presentation'
       onClick={handleDrawerToggle}
     >
-      <Typography variant='h6' sx={{ mb: 2, fontWeight: 'bold' }}>
-        Horizon Bank
+      <Typography
+        variant='h6'
+        component='a'
+        href={Routes.HOME}
+        aria-label='Go to home page'
+        sx={{
+          mb: 2,
+          fontWeight: 'bold',
+          display: 'block',
+          color: 'inherit',
+          textDecoration: 'none',
+        }}
+      >
+        Banking System
       </Typography>
       <List>
         {navItems.map((item) => (
@@ -88,14 +101,25 @@ const Navbar = ({ navItems }: NavBarProps) => {
             <MenuIcon />
           </IconButton>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
+          <Box
+            component='a'
+            href={Routes.HOME}
+            aria-label='Go to home page'
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              flexGrow: 1,
+              color: 'inherit',
+              textDecoration: 'none',
+            }}
+          >
             <AccountBalanceIcon sx={{ mr: 1, color: 'primary.main' }} />
             <Typography
               variant='h6'
-              component='div'
+              component='span'
               sx={{ fontWeight: 'bold', color: 'text.primary' }}
             >
-              Horizon Bank
+              Banking System
             </Typography>
           </Box>
 
@@ -115,7 +139,7 @@ const Navbar = ({ navItems }: NavBarProps) => {
                 sx={{
                   color: 'text.primary',
                   fontWeight: 500,
-                  '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' },
+                  '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.06)' },
                 }}
               >
                 {item.label}

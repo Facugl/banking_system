@@ -77,12 +77,12 @@ const CreatePermissionModal: React.FC<CreatePermissionModalProps> = ({
 
       <DialogContent>
         <FormControl fullWidth margin='normal' error={!!errors.role}>
-          <InputLabel>Role</InputLabel>
+          <InputLabel id='permission-role-label'>Role</InputLabel>
           <Controller
             name='role'
             control={control}
             render={({ field }) => (
-              <Select {...field} label='Role'>
+              <Select {...field} labelId='permission-role-label' label='Role'>
                 <MenuItem value='' disabled>
                   Select a role
                 </MenuItem>
@@ -98,12 +98,16 @@ const CreatePermissionModal: React.FC<CreatePermissionModalProps> = ({
         </FormControl>
 
         <FormControl fullWidth margin='normal' error={!!errors.operation}>
-          <InputLabel>Operation</InputLabel>
+          <InputLabel id='permission-operation-label'>Operation</InputLabel>
           <Controller
             name='operation'
             control={control}
             render={({ field }) => (
-              <Select {...field} label='Operation'>
+              <Select
+                {...field}
+                labelId='permission-operation-label'
+                label='Operation'
+              >
                 <MenuItem value='' disabled>
                   Select an operation
                 </MenuItem>

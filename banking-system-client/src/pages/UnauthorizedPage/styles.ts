@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material/styles';
 import { Box, Typography, Button, ButtonProps } from '@mui/material';
 import { LinkProps } from 'react-router-dom';
 
@@ -10,72 +10,68 @@ interface LinkNavigationProps {
 
 interface BackButtonProps extends ButtonProps, LinkNavigationProps {}
 
-export const UnauthorizedContainer = styled(Box)`
-  max-width: 450px;
-  height: 400px;
-  margin: 2rem auto;
-  padding: 2.5rem;
-  border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  background-color: #ffffff; /* palette.background.paper */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  transition: transform 0.3s ease;
+export const UnauthorizedContainer = styled(Box)(({ theme }) => ({
+  maxWidth: 450,
+  height: 400,
+  margin: '2rem auto',
+  padding: '2.5rem',
+  borderRadius: 12,
+  boxShadow: theme.customShadows.card,
+  backgroundColor: theme.palette.background.paper,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  textAlign: 'center',
+  transition: 'transform 0.3s ease',
 
-  &:hover {
-    transform: translateY(-5px);
-  }
+  '&:hover': {
+    transform: 'translateY(-5px)',
+  },
 
-  @media (max-width: 600px) {
-    padding: 1.5rem;
-    margin: 1rem;
-    width: auto;
-  }
-`;
+  [theme.breakpoints.down('sm')]: {
+    padding: '1.5rem',
+    margin: '1rem',
+    width: 'auto',
+  },
+}));
 
-export const ErrorCode = styled(Typography)`
-  font-size: 6rem;
-  font-weight: 700;
-  color: #1a365d; /* palette.primary.main */
-  margin-bottom: 1rem;
-  position: relative;
+export const ErrorCode = styled(Typography)(({ theme }) => ({
+  fontSize: '6rem',
+  fontWeight: 700,
+  color: theme.palette.primary.main,
+  marginBottom: '1rem',
+  position: 'relative',
 
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 50px;
-    height: 3px;
-    background-color: #b8a369; /* palette.secondary.main */
-    border-radius: 2px;
-  }
-`;
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    bottom: -10,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: 50,
+    height: 3,
+    backgroundColor: theme.palette.secondary.main,
+    borderRadius: 2,
+  },
+}));
 
-export const ErrorMessage = styled(Typography)`
-  font-size: 1.5rem;
-  color: #4a5568; /* palette.text.secondary */
-  margin-bottom: 2rem;
-`;
+export const ErrorMessage = styled(Typography)(({ theme }) => ({
+  fontSize: '1.5rem',
+  color: theme.palette.text.secondary,
+  marginBottom: '2rem',
+}));
 
-export const BackButton = styled(Button)<BackButtonProps>`
-  padding: 0.8rem 2rem;
-  font-weight: 600;
-  border-radius: 8px;
-  background-color: #1a365d; /* palette.primary.main */
-  color: #ffffff; /* palette.primary.contrastText */
-  transition: all 0.3s ease;
+export const BackButton = styled(Button)<BackButtonProps>(({ theme }) => ({
+  padding: '0.8rem 2rem',
+  fontWeight: 600,
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: theme.palette.primary.main,
+  color: theme.palette.primary.contrastText,
+  transition: 'all 0.3s ease',
 
-  &:hover {
-    background-color: #2c5282; /* palette.primary.light */
-    box-shadow: 0 4px 12px rgba(26, 54, 93, 0.25);
-  }
-
-  &.Mui-disabled {
-    background-color: #a0aec0; /* palette.text.disabled */
-  }
-`;
+  '&:hover': {
+    backgroundColor: theme.palette.primary.light,
+    boxShadow: theme.customShadows.buttonHover,
+  },
+}));

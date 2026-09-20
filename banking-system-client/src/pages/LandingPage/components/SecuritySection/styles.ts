@@ -2,10 +2,15 @@ import { Box, Chip } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 export const SecuritySectionStyled = styled(Box)(({ theme }) => ({
-  background: 'linear-gradient(135deg, #1a237e 0%, #000051 100%)',
-  color: theme.palette.common.white,
+  background: `
+    radial-gradient(circle at 50% 0%, rgba(108, 142, 232, 0.18), transparent 60%),
+    ${theme.palette.background.paper}
+  `,
+  color: theme.palette.text.primary,
   padding: theme.spacing(6, 0),
   textAlign: 'center',
+  borderTop: `1px solid ${theme.palette.divider}`,
+  borderBottom: `1px solid ${theme.palette.divider}`,
   [theme.breakpoints.up('sm')]: {
     padding: theme.spacing(8, 0),
   },
@@ -16,7 +21,8 @@ export const SecuritySectionStyled = styled(Box)(({ theme }) => ({
 
 export const ChipStyled = styled(Chip)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
-  color: theme.palette.common.white,
+  color: theme.palette.primary.contrastText,
+  fontWeight: 600,
   fontSize: '1rem',
   padding: theme.spacing(1, 2),
   height: 'auto',

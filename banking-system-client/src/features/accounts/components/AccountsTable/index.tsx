@@ -68,7 +68,11 @@ const AccountsTable: React.FC<AccountsTableProps> = ({
         <Box display='flex' gap={1}>
           {has(PERMISSIONS.UPDATE_ONE_ACCOUNT) && (
             <Tooltip title='Edit account'>
-              <IconButton size='small' onClick={() => onEdit(row)}>
+              <IconButton
+                size='small'
+                aria-label='Edit account'
+                onClick={() => onEdit(row)}
+              >
                 <Edit />
               </IconButton>
             </Tooltip>
@@ -79,6 +83,7 @@ const AccountsTable: React.FC<AccountsTableProps> = ({
               <IconButton
                 size='small'
                 color='error'
+                aria-label='Delete account'
                 onClick={() => onDelete(row)}
               >
                 <Delete />
@@ -97,6 +102,11 @@ const AccountsTable: React.FC<AccountsTableProps> = ({
               <IconButton
                 size='small'
                 color='primary'
+                aria-label={
+                  row.status === AccountStatus.ACTIVE
+                    ? 'Deactivate account'
+                    : 'Activate account'
+                }
                 onClick={() =>
                   onChangeStatus(
                     row,
@@ -119,6 +129,7 @@ const AccountsTable: React.FC<AccountsTableProps> = ({
             <Tooltip title='Refresh balance'>
               <IconButton
                 size='small'
+                aria-label='Refresh balance'
                 onClick={() => handleGetAccountBalance(row.accountNumber)}
                 disabled={row.status !== AccountStatus.ACTIVE || isLoading}
               >
@@ -132,6 +143,7 @@ const AccountsTable: React.FC<AccountsTableProps> = ({
               <IconButton
                 size='small'
                 color='success'
+                aria-label='Deposit into account'
                 onClick={() => handleOpenDepositModal(row.accountNumber)}
                 disabled={row.status !== AccountStatus.ACTIVE}
               >
@@ -145,6 +157,7 @@ const AccountsTable: React.FC<AccountsTableProps> = ({
               <IconButton
                 size='small'
                 color='warning'
+                aria-label='Withdraw from account'
                 onClick={() => handleOpenWithdrawModal(row.accountNumber)}
                 disabled={row.status !== AccountStatus.ACTIVE}
               >
@@ -158,6 +171,7 @@ const AccountsTable: React.FC<AccountsTableProps> = ({
               <IconButton
                 size='small'
                 color='info'
+                aria-label='Transfer between accounts'
                 onClick={() => handleOpenTransferModal(row.accountNumber)}
                 disabled={row.status !== AccountStatus.ACTIVE}
               >

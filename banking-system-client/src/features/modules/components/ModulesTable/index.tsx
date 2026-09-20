@@ -1,8 +1,7 @@
 import React from 'react';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
-import { Box, IconButton } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { Box } from '@mui/material';
+import { EntityActionsCell } from '../../../../components';
 import { ModuleResponse } from '../../types';
 
 interface Props {
@@ -22,21 +21,11 @@ const ModulesTable: React.FC<Props> = ({ modules, onEdit, onDelete }) => {
       width: 120,
       sortable: false,
       renderCell: (params: GridRenderCellParams) => (
-        <Box display='flex' gap={1}>
-          <IconButton
-            color='primary'
-            onClick={() => onEdit(params.row as ModuleResponse)}
-          >
-            <EditIcon />
-          </IconButton>
-
-          <IconButton
-            color='error'
-            onClick={() => onDelete(params.row as ModuleResponse)}
-          >
-            <DeleteIcon />
-          </IconButton>
-        </Box>
+        <EntityActionsCell
+          entityLabel='module'
+          onEdit={() => onEdit(params.row as ModuleResponse)}
+          onDelete={() => onDelete(params.row as ModuleResponse)}
+        />
       ),
     },
   ];

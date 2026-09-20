@@ -26,21 +26,22 @@ const HeroSection = () => {
               <Box
                 component='span'
                 sx={{
-                  background: 'linear-gradient(45deg, #FFD700, #FFA500)',
+                  background: (theme) =>
+                    `linear-gradient(90deg, ${theme.palette.primary.light}, ${theme.palette.primary.main})`,
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
                 }}
               >
-                Horizon Bank
+                Banking System
               </Box>
             </Typography>
             <Typography
               variant='h5'
               paragraph
+              color='text.secondary'
               sx={{
                 mb: { xs: 3, md: 4 },
-                opacity: 0.9,
                 fontSize: { xs: '1rem', sm: '1.25rem', md: '1.5rem' },
                 maxWidth: { xs: '100%', md: '800px' },
                 mx: 'auto',
@@ -72,13 +73,13 @@ const HeroSection = () => {
                 size='large'
                 onClick={() => navigate('/login')}
                 sx={{
-                  borderColor: 'white',
-                  color: 'white',
+                  borderColor: 'rgba(255, 255, 255, 0.3)',
+                  color: 'text.primary',
                   fontSize: { xs: '0.9rem', md: '1rem' },
                   py: { xs: 1, md: 1.5 },
                   '&:hover': {
-                    borderColor: 'white',
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    borderColor: 'primary.main',
+                    backgroundColor: 'rgba(108, 142, 232, 0.1)',
                   },
                 }}
                 aria-label='Sign in'

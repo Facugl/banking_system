@@ -13,6 +13,7 @@ import { ModuleMessages, ROLES } from '../../../utils/constants';
 import { EditModuleModal, ModulesTable } from '../components';
 import { ConfirmDeleteModal } from '../../../components';
 import { useAuthSession } from '../../../hooks/useAuthSession';
+import { useDeleteConfirmation } from '../../../hooks/useDeleteConfirmation';
 
 const ModulesView: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -23,10 +24,12 @@ const ModulesView: React.FC = () => {
   const [selectedModule, setSelectedModule] = useState<ModuleResponse | null>(
     null,
   );
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [moduleToDelete, setModuleToDelete] = useState<ModuleResponse | null>(
-    null,
-  );
+
+  const deleteConfirmation = useDeleteConfirmation<ModuleResponse>({
+    deleteAction: (module) => dispatch(deleteModule(module.id)).unwrap(),
+    successMessage: ModuleMessages.DELETE_SUCCESS,
+    errorMessage: ModuleMessages.ERROR,
+  });
 
   useEffect(() => {
     if (profile?.role !== ROLES.ADMINISTRATOR) return;
@@ -67,25 +70,6 @@ const ModulesView: React.FC = () => {
     setModalOpen(false);
   };
 
-  const handleDeleteRequest = (module: ModuleResponse) => {
-    setModuleToDelete(module);
-    setDeleteModalOpen(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!moduleToDelete) return;
-
-    try {
-      await dispatch(deleteModule(moduleToDelete.id)).unwrap();
-      showSuccess(ModuleMessages.DELETE_SUCCESS);
-    } catch (error) {
-      showError(ModuleMessages.ERROR);
-    }
-
-    setDeleteModalOpen(false);
-    setModuleToDelete(null);
-  };
-
   return (
     <Box p={2}>
       <Box display='flex' justifyContent='space-between' mb={2}>
@@ -108,7 +92,7 @@ const ModulesView: React.FC = () => {
         <ModulesTable
           modules={modules}
           onEdit={handleEdit}
-          onDelete={handleDeleteRequest}
+          onDelete={deleteConfirmation.requestDelete}
         />
       </Box>
 
@@ -120,11 +104,11 @@ const ModulesView: React.FC = () => {
       />
 
       <ConfirmDeleteModal
-        open={deleteModalOpen}
-        itemName={moduleToDelete?.name || ''}
-        onClose={() => setDeleteModalOpen(false)}
-        onConfirm={handleDeleteConfirm}
-        isLoading={false}
+        open={deleteConfirmation.isOpen}
+        itemName={deleteConfirmation.itemToDelete?.name || ''}
+        onClose={deleteConfirmation.cancelDelete}
+        onConfirm={deleteConfirmation.confirmDelete}
+        isLoading={deleteConfirmation.isLoading}
       />
     </Box>
   );

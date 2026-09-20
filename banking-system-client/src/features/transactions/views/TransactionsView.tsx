@@ -63,7 +63,9 @@ const TransactionsView: React.FC = () => {
 
       <TransactionSearchBar onSearch={handleSearch} />
 
-      <Paper elevation={3}>
+      <Paper
+        sx={{ boxShadow: (theme) => theme.customShadows.card, borderRadius: 3 }}
+      >
         <Table>
           <TableHead>
             <TableRow>
@@ -93,6 +95,15 @@ const TransactionsView: React.FC = () => {
                   key={tx.transactionNumber}
                   hover
                   onClick={() => handleRowClick(tx.transactionNumber)}
+                  onKeyDown={(e: React.KeyboardEvent) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleRowClick(tx.transactionNumber);
+                    }
+                  }}
+                  role='button'
+                  tabIndex={0}
+                  aria-label={`View transaction details for ${tx.transactionNumber}`}
                   style={{ cursor: 'pointer' }}
                 >
                   <TableCell>{formatDate(tx.transactionDate)}</TableCell>

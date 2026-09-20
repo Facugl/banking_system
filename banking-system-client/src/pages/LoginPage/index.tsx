@@ -1,12 +1,26 @@
+import { BrandLink, FooterSection } from '../../components';
 import { LoginForm } from '../../features/auth/components';
-import { LoginPageContainer, LoginBackground } from './styles';
+import {
+  LoginPageContainer,
+  LoginContent,
+  BrandLinkContainer,
+  LoginBackground,
+} from './styles';
 
 const LoginPage: React.FC = () => {
   return (
     <LoginPageContainer>
-      <LoginBackground>
-        <LoginForm />
-      </LoginBackground>
+      <LoginContent>
+        <BrandLinkContainer>
+          <BrandLink />
+        </BrandLinkContainer>
+
+        <LoginBackground>
+          <LoginForm />
+        </LoginBackground>
+      </LoginContent>
+
+      <FooterSection />
     </LoginPageContainer>
   );
 };

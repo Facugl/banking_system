@@ -29,7 +29,10 @@ const AppLayout = () => {
       <StyledAppBar position='fixed'>
         <StyledToolbar>
           {isMobile && (
-            <IconButton onClick={() => setMobileOpen(!mobileOpen)}>
+            <IconButton
+              onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label='Open navigation menu'
+            >
               <MenuIcon />
             </IconButton>
           )}
