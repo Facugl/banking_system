@@ -5,11 +5,11 @@ WORKDIR /app
 ARG VITE_API_BASE_URL
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
-COPY package.json pnpm-lock.yaml* ./
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml* ./
 RUN npm install -g pnpm \
  && pnpm config set fetch-timeout 600000 \
  && pnpm config set fetch-retries 5 \
- && pnpm install
+ && pnpm install --ignore-scripts
 
 COPY . .
 RUN pnpm build
