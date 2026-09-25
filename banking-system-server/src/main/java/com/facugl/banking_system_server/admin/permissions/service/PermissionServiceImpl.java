@@ -1,4 +1,4 @@
-package com.facugl.banking_system_server.admin.permissions.services;
+package com.facugl.banking_system_server.admin.permissions.service;
 
 import java.util.List;
 import java.util.stream.Collectors;

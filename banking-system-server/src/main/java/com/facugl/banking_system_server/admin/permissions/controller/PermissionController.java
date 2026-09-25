@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.facugl.banking_system_server.admin.permissions.dto.request.PermissionRequest;
 import com.facugl.banking_system_server.admin.permissions.dto.response.PermissionResponse;
-import com.facugl.banking_system_server.admin.permissions.services.PermissionServiceImpl;
+import com.facugl.banking_system_server.admin.permissions.service.PermissionServiceImpl;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
