@@ -24,8 +24,8 @@ public class OperationCreateRequest {
 
     @NotNull(message = "The path cannot be null.")
     @Pattern(
-            regexp = "(^$|/\\[0-9]\\*)",
-            message = "The path must be '/[0-9]*' or empty."
+            regexp = "^$|^/\\[0-9]\\*(/[a-zA-Z0-9_-]+)*$",
+            message = "The path must be empty or start with '/[0-9]*', optionally followed by more segments (e.g. '/[0-9]*/deposit')."
     )
     private String path;
 
