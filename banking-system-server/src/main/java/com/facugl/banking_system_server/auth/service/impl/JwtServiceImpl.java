@@ -65,7 +65,9 @@ public class JwtServiceImpl implements JwtService {
             return null;
         }
 
-        return authorizationHeader.split(" ")[1];
+        String token = authorizationHeader.substring("Bearer ".length()).trim();
+
+        return StringUtils.hasText(token) ? token : null;
     }
 
     public Date extractExpiration(String jwt) {

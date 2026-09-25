@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -128,6 +129,25 @@ public class GlobalExceptionHandler {
 
 		return ResponseEntity
 				.status(HttpStatus.NOT_FOUND)
+				.body(errorResponse);
+	}
+
+	// Deliberately the same response for "unknown username" and "wrong password":
+	// DaoAuthenticationProvider already normalizes both into this exception during
+	// login, and this handler must not reintroduce a way to tell them apart.
+	@ExceptionHandler(BadCredentialsException.class)
+	public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex,
+			HttpServletRequest request) {
+		ErrorResponse errorResponse = ErrorResponse.builder()
+				.frontendMessage("Invalid username or password.")
+				.backendMessage(ex.getMessage())
+				.status(HttpStatus.UNAUTHORIZED.value())
+				.path(request.getRequestURI())
+				.timestamp(now())
+				.build();
+
+		return ResponseEntity
+				.status(HttpStatus.UNAUTHORIZED)
 				.body(errorResponse);
 	}
 
