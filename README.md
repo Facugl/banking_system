@@ -119,8 +119,8 @@ Flyway runs automatically when the backend starts, ensuring the database schema 
 - Docker
 - Docker Compose
 - GitHub Actions
-- EC2
-- RDS
+- Render
+- TiDB Cloud (Serverless, MySQL-compatible)
 
 ---
 

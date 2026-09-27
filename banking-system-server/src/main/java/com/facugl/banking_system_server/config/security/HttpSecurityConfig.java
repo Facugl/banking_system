@@ -2,6 +2,7 @@ package com.facugl.banking_system_server.config.security;
 
 import java.util.Arrays;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -33,6 +34,9 @@ public class HttpSecurityConfig {
 	private final AccessDeniedHandler accessDeniedHandler;
 	private final AuthorizationManager<RequestAuthorizationContext> authorizationManager;
 
+	@Value("${FRONTEND_ORIGIN:http://localhost:5173}")
+	private String frontendOrigin;
+
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
@@ -55,7 +59,7 @@ public class HttpSecurityConfig {
 	@Bean
 	UrlBasedCorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+		configuration.setAllowedOrigins(Arrays.asList(frontendOrigin));
 		configuration.setAllowedMethods(Arrays.asList("*"));
 		configuration.setAllowedHeaders(Arrays.asList("*"));
 		configuration.setAllowCredentials(true);
