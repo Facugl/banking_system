@@ -21,7 +21,14 @@ SELECT
     t.comment
 FROM (
     /* Naruto (ADMIN) - Account: 112233445501 */
-    SELECT '200000000001', NULL, '112233445501', 150000, '2025-01-15', 'DEPOSIT',  'Admin bonus'
+    SELECT
+        '200000000001' AS transaction_number,
+        NULL AS source_account_number,
+        '112233445501' AS target_account_number,
+        150000 AS amount,
+        '2025-01-15' AS transaction_date,
+        'DEPOSIT' AS type,
+        'Admin bonus' AS comment
     UNION ALL
     SELECT '200000000002', '112233445501', NULL, 80000,  '2025-02-10', 'WITHDRAW', 'System maintenance expense'
     UNION ALL
@@ -79,14 +86,6 @@ FROM (
     UNION ALL
     SELECT '200000000024', '112233445501', '778899001167', 20000, '2025-12-20', 'TRANSFER', 'Naruto → Sakura (holiday gift)'
 
-) AS t(
-    transaction_number,
-    source_account_number,
-    target_account_number,
-    amount,
-    transaction_date,
-    type,
-    comment
-)
+) AS t
 LEFT JOIN accounts src ON src.account_number = t.source_account_number
 LEFT JOIN accounts tgt ON tgt.account_number = t.target_account_number;
