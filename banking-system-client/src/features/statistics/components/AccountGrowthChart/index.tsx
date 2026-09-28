@@ -38,6 +38,7 @@ const AccountGrowthChart: React.FC<AccountGrowthChartProps> = ({ data }) => {
               color: theme.palette.text.primary,
             }}
             labelStyle={{ color: theme.palette.text.primary }}
+            itemStyle={{ color: theme.palette.text.primary }}
           />
           <Line
             type='monotone'

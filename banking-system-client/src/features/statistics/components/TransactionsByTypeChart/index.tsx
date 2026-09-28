@@ -103,6 +103,8 @@ const TransactionsByTypeChart: React.FC<TransactionsByTypeChartProps> = ({
               borderRadius: theme.shape.borderRadius,
               color: theme.palette.text.primary,
             }}
+            itemStyle={{ color: theme.palette.text.primary }}
+            labelStyle={{ color: theme.palette.text.primary }}
           />
           <Legend
             wrapperStyle={{
