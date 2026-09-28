@@ -9,6 +9,10 @@ The system supports account management, deposits, withdrawals, transfers, transa
 ![Docker](https://img.shields.io/badge/Docker-Containerized-blue)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
+**Live demo:** [banking-system-frontend-fny8.onrender.com](https://banking-system-frontend-fny8.onrender.com)
+
+> Hosted on Render's free tier, so the backend spins down after inactivity — the first request after a while can take up to a minute. Log in with any of the seed users (e.g. `naruto` / `Naruto_123456`, an ADMINISTRATOR) to explore.
+
 ## Table of Contents
 
 - [Project Highlights](#project-highlights)
@@ -145,8 +149,8 @@ Optional but recommended:
 The entire application stack (MySQL, backend API, and frontend) is containerized and can be started with Docker Compose.
 
 ### 1. Clone the repository
-`git clone https://github.com/your-username/banking-system.git
-cd banking-system`
+`git clone https://github.com/Facugl/banking_system.git
+cd banking_system`
 
 ### 2. Configure environment variables
 
@@ -336,14 +340,13 @@ curl -X POST \
         "jwt": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
       }
       ```
-  - **500 (Internal Server Error)**: If the the username or password is incorrect.
-
+  - **401 (Unauthorized)**: If the username does not exist or the password is incorrect. Both cases return the same generic message, to avoid leaking which usernames exist.
     - **Example**:
       ```json
       {
-        "frontendMessage": "An unexpected error occurred. Please try again.",
-        "backendMessage": "User with username 'narutor' was not found.",
-        "status": 500,
+        "frontendMessage": "Invalid username or password.",
+        "backendMessage": "Bad credentials",
+        "status": 401,
         "path": "/api/v1/auth/authenticate",
         "timestamp": "2025/03/25 13:24:12"
       }
