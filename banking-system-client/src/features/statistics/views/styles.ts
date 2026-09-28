@@ -5,7 +5,7 @@ export const CenteredBox = styled(Box)({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  height: '100%',
+  minHeight: '60vh',
 });
 
 export const ErrorBox = styled(Box)({
