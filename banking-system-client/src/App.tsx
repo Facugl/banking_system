@@ -7,7 +7,7 @@ const App = () => {
   const { sessionReady, token } = useAuthSession();
 
   if (token && !sessionReady) {
-    return <LoadingSpinner />;
+    return <LoadingSpinner fullScreen />;
   }
 
   return (

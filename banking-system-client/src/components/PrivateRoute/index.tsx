@@ -22,7 +22,7 @@ const PrivateRoute = ({
 
   if (publicRoute) {
     if (sessionLoading && isAuthenticated) {
-      return <LoadingSpinner />;
+      return <LoadingSpinner fullScreen />;
     }
 
     if (isAuthenticated && userRole) {
@@ -36,7 +36,7 @@ const PrivateRoute = ({
   }
 
   if (sessionLoading || !sessionReady) {
-    return <LoadingSpinner />;
+    return <LoadingSpinner fullScreen />;
   }
 
   if (!isAuthenticated) {

@@ -7,7 +7,7 @@ const DashboardIndex = () => {
   const { profile, sessionLoading, sessionReady } = useAuthSession();
 
   if (sessionLoading || !sessionReady) {
-    return <LoadingSpinner />;
+    return <LoadingSpinner fullScreen />;
   }
 
   if (!profile?.role) {
